@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub 登录中...</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0b0f16, #1a1f2e);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+        }
+        .login-box {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 40px 30px;
+            width: 90%;
+            max-width: 380px;
+            text-align: center;
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255,255,255,0.1);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .message {
+            font-size: 14px;
+            color: rgba(255,255,255,0.6);
+            line-height: 1.6;
+        }
+        .error {
+            color: #ff6b6b;
+        }
+        .success {
+            color: #51cf66;
+        }
+        .back-btn {
+            margin-top: 20px;
+            padding: 10px 24px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .back-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <div class="spinner" id="spinner"></div>
+        <div class="title" id="title">GitHub 登录中</div>
+        <div class="message" id="message">正在验证授权信息，请稍候...</div>
+        <button class="back-btn" id="backBtn" style="display:none;" onclick="goBack()">返回</button>
+    </div>
+
+    <script>
+    (function() {
+        // 从 URL 获取参数
+        var urlParams = new URLSearchParams(window.location.search);
+        var code = urlParams.get('code');
+        var error = urlParams.get('error');
+        var errorDescription = urlParams.get('error_description');
+        var state = urlParams.get('state') || '';
+        // 从state参数中解析绑定模式（OAuth标准方式，避免回调地址带参数导致错误）
+        var bindMode = state.indexOf('bind_mode=1') !== -1;
+
+        var titleEl = document.getElementById('title');
+        var messageEl = document.getElementById('message');
+        var spinnerEl = document.getElementById('spinner');
+        var backBtn = document.getElementById('backBtn');
+
+        // 如果是绑定模式，修改标题
+        if (bindMode) {
+            titleEl.textContent = '正在绑定 GitHub 账号';
+            messageEl.textContent = '正在验证授权信息并绑定账号，请稍候...';
+        }
+
+        function goBack() {
+            if (bindMode) {
+                window.location.href = 'dashboard.html?open_bindings=1';
+            } else {
+                window.location.href = 'index.html';
+            }
+        }
+
+        function showError(msg) {
+            spinnerEl.style.display = 'none';
+            titleEl.textContent = bindMode ? '绑定失败' : '登录失败';
+            titleEl.classList.add('error');
+            messageEl.textContent = msg;
+            messageEl.classList.add('error');
+            backBtn.style.display = 'inline-block';
+        }
+
+        function showSuccess(msg) {
+            spinnerEl.style.display = 'none';
+            titleEl.textContent = bindMode ? '绑定成功' : '登录成功';
+            titleEl.classList.add('success');
+            messageEl.textContent = msg;
+            messageEl.classList.add('success');
+        }
+
+        // 如果用户拒绝授权
+        if (error) {
+            showError(errorDescription || '用户已取消授权');
+            return;
+        }
+
+        // 如果没有 code 参数
+        if (!code) {
+            showError('未获取到授权码，请重试');
+            return;
+        }
+
+        // 发送 code 到后端
+        var fd = new FormData();
+        fd.append('action', 'githubLogin');
+        fd.append('code', code);
+        if (bindMode) {
+            fd.append('bind_mode', '1');
+            var token = localStorage.getItem('token');
+            if (token) fd.append('token', token);
+        }
+
+        fetch('api.php', {
+            method: 'POST',
+            body: fd
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+            if (d.success) {
+                if (bindMode) {
+                    // 绑定成功
+                    showSuccess('GitHub 账号绑定成功，正在返回...');
+                    setTimeout(function() {
+                        window.location.href = 'dashboard.html?open_bindings=1';
+                    }, 1000);
+                } else if (d.token) {
+                    // 登录成功
+                    localStorage.setItem('token', d.token);
+                    localStorage.setItem('username', d.username || '');
+                    localStorage.setItem('user_id', d.user_id || '');
+                    showSuccess('正在跳转到主页...');
+                    setTimeout(function() {
+                        window.location.href = 'dashboard.html';
+                    }, 800);
+                } else {
+                    showError(d.message || '操作失败，请重试');
+                }
+            } else {
+                showError(d.message || '操作失败，请重试');
+            }
+        })
+        .catch(function(e) {
+            showError('网络错误: ' + e.message);
+        });
+    })();
+    </script>
+</body>
+</html>

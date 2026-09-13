@@ -17,6 +17,10 @@
         'zh-CN': {
             /* ===== 登录页 index.html ===== */
             login_title: '登录',
+            or_login_with: '或使用以下方式登录',
+            github_login: 'GitHub 登录',
+            discord_login: 'Discord 登录',
+            gitee_login: 'Gitee 登录',
             register_title: '注册',
             label_email: '📬 邮箱',
             label_password: '🔑 密码',
@@ -134,6 +138,12 @@
 
             /* 好友 */
             friend_title: '好友',
+            add_friend: '添加好友',
+            more_login_methods: '更多登录方式',
+            account_binding_title: '账号绑定管理',
+            binding_hint: '绑定第三方账号后，可以使用该账号快速登录。每个第三方账号只能绑定到一个本站账号。',
+            binding_footer_tip: '如果您的账号没有设置密码，取消唯一的登录方式绑定前请先设置密码',
+            search_type: '选择搜索方式',
             friend_request: '请求',
             no_friends: '还没有好友',
             chat_placeholder: '输入消息（最多500字）',
@@ -175,6 +185,15 @@
             btn_submit_report: '提交举报',
             play_title: '游戏',
             lang_hint: '选择后立即生效',
+
+            /* 修改密码 */
+            change_password_title: '🔑 修改密码',
+            change_password_email_hint: '验证码将发送到您的注册邮箱：',
+            change_password_code_ph: '请输入6位验证码',
+            send_code: '发送验证码',
+            new_password_ph: '请输入新密码（6-20位）',
+            confirm_password_ph: '请再次输入新密码',
+            confirm_change_password: '确认修改密码',
             editor_info_title: '2.0 可视化编辑器',
             editor_info_desc: '使用可视化编辑器创作游戏，支持文件管理、属性编辑',
             editor_info_tip: '需要先创建游戏仓库，再进入编辑器',
@@ -243,149 +262,16 @@
             pls_btn_close: '关闭并返回登录',
             pls_part1: '第一部分 用户服务条款',
             pls_part2: '第二部分 隐私政策',
-            pls_effective: '生效日期：2026年09月06日',
-            /* ===== 编辑器2.0 2htm.html ===== */
-            editor_page_title: '编辑器2.0 · 龙黑化',
-            editor_project_info: '编辑器 2.0 · ID: ',
-            editor_project_unnamed: '编辑器 2.0 · 未命名',
-            editor_btn_back: '← 返回',
-            editor_btn_preview: '👁️ 预览',
-            editor_btn_upload: '📤 更新',
-            editor_file_panel: '📂 文件',
-            editor_btn_new: '📄 新建',
-            editor_btn_import: '📥 导入',
-            editor_loading: '加载中...',
-            editor_no_files: '📭 暂无文件<br>点击"新建"创建',
-            editor_tab_preview: '👁️ 预览',
-            editor_tab_edit: '✏️ 编辑',
-            editor_btn_save: '💾 保存',
-            editor_btn_format: '🔧 格式化',
-            editor_btn_undo: '↩️ 撤销',
-            editor_prop_title: '🎨 属性编辑',
-            editor_prop_color: '颜色',
-            editor_prop_size: '大小',
-            editor_prop_content: '内容',
-            editor_btn_apply: '✅ 应用',
-            editor_upload_title: '📤 更新作品',
-            editor_upload_sub: '上传图标、名称、描述，更新后立即上线',
-            editor_upload_click_icon: '点击更换图标',
-            editor_upload_icon_hint: '支持 JPG/PNG/GIF，≤5MB',
-            editor_upload_title_ph: '作品名称（2-20字）',
-            editor_upload_desc_ph: '作品描述（可选）',
-            editor_btn_publish: '🚀 更新发布',
-            editor_btn_cancel: '取消',
-            editor_err_title_len: '❌ 作品名称必须为2-20个字符',
-            editor_err_no_icon: '❌ 请选择作品图标',
-            editor_uploading: '⏳ 更新中...',
-            editor_upload_success: '✅ 更新成功！已秒上线',
-            editor_upload_failed: '❌ 更新失败: ',
-            editor_network_error: '❌ 网络错误，请重试',
-            editor_toast_save_success: '✅ 保存成功',
-            editor_toast_save_failed: '❌ 保存失败: ',
-            editor_toast_save_net_err: '❌ 保存失败',
-            editor_toast_no_file: '❌ 没有选中的文件',
-            editor_toast_undo: '↩️ 已撤销',
-            editor_toast_no_undo: '📭 没有可撤销的操作',
-            editor_toast_format_ok: '✅ 格式化完成',
-            editor_toast_format_fail: '⚠️ 格式化失败',
-            editor_toast_file_exists: '❌ 文件已存在',
-            editor_toast_create_ok: '✅ 创建成功: ',
-            editor_toast_create_fail: '❌ 创建失败: ',
-            editor_toast_create_net_err: '❌ 创建失败',
-            editor_toast_delete_confirm: '确定要删除 ',
-            editor_toast_delete_confirm2: ' 吗？',
-            editor_toast_min_file: '❌ 至少保留一个文件',
-            editor_toast_cannot_delete_index: '❌ 不能删除主文件',
-            editor_toast_delete_ok: '✅ 已删除: ',
-            editor_toast_delete_fail: '❌ 删除失败: ',
-            editor_toast_delete_net_err: '❌ 删除失败',
-            editor_toast_import_ok: '✅ 导入成功: ',
-            editor_toast_import_fail: '❌ 导入失败: ',
-            editor_toast_import_net_err: '❌ 导入失败',
-            editor_toast_import_overwrite: '文件 ',
-            editor_toast_import_overwrite2: ' 已存在，是否覆盖？',
-            editor_toast_load_fail: '❌ 加载失败: ',
-            editor_toast_load_net_err: '❌ 加载失败',
-            editor_toast_local_save_ok: '⚠️ 本地保存成功，但服务器同步失败',
-            editor_toast_icon_too_large: '图标不能超过5MB',
-            editor_toast_no_elem: '❌ 请先选择元素',
-            editor_toast_prop_applied: '✅ 属性已应用',
-            editor_toast_prop_fail: '⚠️ 应用失败: ',
-            editor_toast_back_confirm: '确定返回？未保存的更改可能会丢失。',
-            editor_toast_missing_id: '❌ 缺少游戏ID',
-            editor_toast_upload_ok: '🎉 作品已更新，已秒上线',
-            editor_new_file_prompt: '请输入文件名（如 style.css）:',
-            editor_empty_file_title: '空文件',
-            editor_empty_file_h1: '文件为空',
-            editor_preview_error_title: '预览错误',
-            editor_preview_error_h1: '预览加载失败',
-            editor_new_page_title: '新页面',
-            editor_css_comment: '/* 样式文件 */',
-            editor_js_comment: '// JavaScript 文件',
-            editor_my_game_title: '我的游戏',
-            editor_2_0: '编辑器 2.0',
-            editor_icon_selected_prefix: '已选择图标<br><span style="font-size:12px;color:#6b7f94;">',
-
-            /* ===== 货币明细 w.html ===== */
-            w_page_title: '💰 R币明细',
-            w_btn_recharge: '💳 充值',
-            w_btn_redeem: '🎫 兑换码',
-            w_total_income: '💰 总收入',
-            w_total_expense: '💸 总支出',
-            w_total_count: '📊 总笔数',
-            w_loading: '加载中...',
-            w_no_records: '📭 暂无记录',
-            w_load_failed: '❌ 加载失败，请重试',
-            w_redeem_title: '🎫 兑换码',
-            w_redeem_sub: '输入兑换码领取R币奖励',
-            w_redeem_placeholder: '输入兑换码',
-            w_btn_do_redeem: '🎫 兑换',
-            w_btn_cancel: '取消',
-            w_err_enter_code: '❌ 请输入兑换码',
-            w_verifying: '⏳ 验证中...',
-            w_success_prefix: '✅ ',
-            w_error_prefix: '❌ ',
-            w_network_error: '❌ 网络错误，请重试',
-            w_recharge_title: '💰 充值中心',
-            w_recharge_sub: '购买完成后R币自动到账，请刷新余额查看',
-            w_rcoin_50: '50 R币',
-            w_price_50: '¥ 1.00｜入门套餐',
-            w_rcoin_1000: '1000 R币',
-            w_price_1000: '¥ 9.80｜超值套餐',
-            w_btn_buy: '去购买',
-            w_btn_close: '关闭',
-            w_rcoin_change: 'R币变动',
-            w_in_game: '在 ',
-            w_received_tip: ' 中收到打赏',
-            w_spent_tip: ' 中打赏支出',
-            w_income_desc: '充值、兑换码或系统奖励',
-            w_expense_desc: '消费或扣款',
-            w_recharge_success: '✅ 充值成功！',
-            w_rcoin_arrived: ' R币已到账',
-
-            /* ===== 首次进入引导 onboarding ===== */
-            onboarding_welcome: '欢迎来到龙黑化创作工坊',
-            onboarding_step1_title: '📁 存储权限',
-            onboarding_step1_desc: '存储权限用于游戏中上传文件（作品图标、封面、导入文件等）',
-            onboarding_step1_checking: '正在检测存储权限...',
-            onboarding_step1_granted: '✅ 存储权限已开启',
-            onboarding_step1_denied: '❌ 存储权限未开启',
-            onboarding_btn_grant: '开启存储权限',
-            onboarding_step2_title: '📍 设备位置',
-            onboarding_step2_desc: '获取设备位置用于适配时区时间，否则将自动使用美国地区时间',
-            onboarding_step2_checking: '正在获取设备位置...',
-            onboarding_step2_granted: '✅ 位置已获取，时区已适配',
-            onboarding_step2_denied: '⚠️ 未获取位置，将使用美国时区',
-            onboarding_btn_get_location: '获取设备位置',
-            onboarding_btn_skip: '跳过',
-            onboarding_btn_done: '✓ 已经设置，进入主界面',
-            onboarding_btn_next: '下一步',
-            onboarding_step_indicator: '第 {current} 步 / 共 {total} 步',
+            pls_effective: '生效日期：2026年09月06日'
         },
 
         'zh-TW': {
             /* ===== 登入頁 index.html ===== */
             login_title: '登入',
+            or_login_with: '或使用以下方式登入',
+            github_login: 'GitHub 登入',
+            discord_login: 'Discord 登入',
+            gitee_login: 'Gitee 登入',
             register_title: '註冊',
             label_email: '📬 電子郵件',
             label_password: '🔑 密碼',
@@ -503,6 +389,12 @@
 
             /* 好友 */
             friend_title: '好友',
+            add_friend: '添加好友',
+            more_login_methods: '更多登入方式',
+            account_binding_title: '帳號綁定管理',
+            binding_hint: '綁定第三方帳號後，可以使用該帳號快速登入。每個第三方帳號只能綁定到一個本站帳號。',
+            binding_footer_tip: '如果您的帳號沒有設置密碼，取消唯一的登入方式綁定前請先設置密碼',
+            search_type: '選擇搜索方式',
             friend_request: '請求',
             no_friends: '還沒有好友',
             chat_placeholder: '輸入訊息（最多500字）',
@@ -544,6 +436,15 @@
             btn_submit_report: '提交檢舉',
             play_title: '遊戲',
             lang_hint: '選擇後立即生效',
+
+            /* 修改密碼 */
+            change_password_title: '🔑 修改密碼',
+            change_password_email_hint: '驗證碼將發送到您的註冊郵箱：',
+            change_password_code_ph: '請輸入6位驗證碼',
+            send_code: '發送驗證碼',
+            new_password_ph: '請輸入新密碼（6-20位）',
+            confirm_password_ph: '請再次輸入新密碼',
+            confirm_change_password: '確認修改密碼',
             editor_info_title: '2.0 可視化編輯器',
             editor_info_desc: '使用可視化編輯器創作遊戲，支援檔案管理、屬性編輯',
             editor_info_tip: '需要先建立遊戲倉庫，再進入編輯器',
@@ -612,149 +513,16 @@
             pls_btn_close: '關閉並返回登入',
             pls_part1: '第一部分 用戶服務條款',
             pls_part2: '第二部分 隱私政策',
-            pls_effective: '生效日期：2026年09月06日',
-            /* ===== 编辑器2.0 2htm.html ===== */
-            editor_page_title: '编辑器2.0 · 龙黑化',
-            editor_project_info: '编辑器 2.0 · ID: ',
-            editor_project_unnamed: '编辑器 2.0 · 未命名',
-            editor_btn_back: '← 返回',
-            editor_btn_preview: '👁️ 预览',
-            editor_btn_upload: '📤 更新',
-            editor_file_panel: '📂 文件',
-            editor_btn_new: '📄 新建',
-            editor_btn_import: '📥 导入',
-            editor_loading: '加载中...',
-            editor_no_files: '📭 暂无文件<br>点击"新建"创建',
-            editor_tab_preview: '👁️ 预览',
-            editor_tab_edit: '✏️ 编辑',
-            editor_btn_save: '💾 保存',
-            editor_btn_format: '🔧 格式化',
-            editor_btn_undo: '↩️ 撤销',
-            editor_prop_title: '🎨 属性编辑',
-            editor_prop_color: '颜色',
-            editor_prop_size: '大小',
-            editor_prop_content: '内容',
-            editor_btn_apply: '✅ 应用',
-            editor_upload_title: '📤 更新作品',
-            editor_upload_sub: '上传图标、名称、描述，更新后立即上线',
-            editor_upload_click_icon: '点击更换图标',
-            editor_upload_icon_hint: '支持 JPG/PNG/GIF，≤5MB',
-            editor_upload_title_ph: '作品名称（2-20字）',
-            editor_upload_desc_ph: '作品描述（可选）',
-            editor_btn_publish: '🚀 更新发布',
-            editor_btn_cancel: '取消',
-            editor_err_title_len: '❌ 作品名称必须为2-20个字符',
-            editor_err_no_icon: '❌ 请选择作品图标',
-            editor_uploading: '⏳ 更新中...',
-            editor_upload_success: '✅ 更新成功！已秒上线',
-            editor_upload_failed: '❌ 更新失败: ',
-            editor_network_error: '❌ 网络错误，请重试',
-            editor_toast_save_success: '✅ 保存成功',
-            editor_toast_save_failed: '❌ 保存失败: ',
-            editor_toast_save_net_err: '❌ 保存失败',
-            editor_toast_no_file: '❌ 没有选中的文件',
-            editor_toast_undo: '↩️ 已撤销',
-            editor_toast_no_undo: '📭 没有可撤销的操作',
-            editor_toast_format_ok: '✅ 格式化完成',
-            editor_toast_format_fail: '⚠️ 格式化失败',
-            editor_toast_file_exists: '❌ 文件已存在',
-            editor_toast_create_ok: '✅ 创建成功: ',
-            editor_toast_create_fail: '❌ 创建失败: ',
-            editor_toast_create_net_err: '❌ 创建失败',
-            editor_toast_delete_confirm: '确定要删除 ',
-            editor_toast_delete_confirm2: ' 吗？',
-            editor_toast_min_file: '❌ 至少保留一个文件',
-            editor_toast_cannot_delete_index: '❌ 不能删除主文件',
-            editor_toast_delete_ok: '✅ 已删除: ',
-            editor_toast_delete_fail: '❌ 删除失败: ',
-            editor_toast_delete_net_err: '❌ 删除失败',
-            editor_toast_import_ok: '✅ 导入成功: ',
-            editor_toast_import_fail: '❌ 导入失败: ',
-            editor_toast_import_net_err: '❌ 导入失败',
-            editor_toast_import_overwrite: '文件 ',
-            editor_toast_import_overwrite2: ' 已存在，是否覆盖？',
-            editor_toast_load_fail: '❌ 加载失败: ',
-            editor_toast_load_net_err: '❌ 加载失败',
-            editor_toast_local_save_ok: '⚠️ 本地保存成功，但服务器同步失败',
-            editor_toast_icon_too_large: '图标不能超过5MB',
-            editor_toast_no_elem: '❌ 请先选择元素',
-            editor_toast_prop_applied: '✅ 属性已应用',
-            editor_toast_prop_fail: '⚠️ 应用失败: ',
-            editor_toast_back_confirm: '确定返回？未保存的更改可能会丢失。',
-            editor_toast_missing_id: '❌ 缺少游戏ID',
-            editor_toast_upload_ok: '🎉 作品已更新，已秒上线',
-            editor_new_file_prompt: '请输入文件名（如 style.css）:',
-            editor_empty_file_title: '空文件',
-            editor_empty_file_h1: '文件为空',
-            editor_preview_error_title: '预览错误',
-            editor_preview_error_h1: '预览加载失败',
-            editor_new_page_title: '新页面',
-            editor_css_comment: '/* 样式文件 */',
-            editor_js_comment: '// JavaScript 文件',
-            editor_my_game_title: '我的游戏',
-            editor_2_0: '编辑器 2.0',
-            editor_icon_selected_prefix: '已选择图标<br><span style="font-size:12px;color:#6b7f94;">',
-
-            /* ===== 货币明细 w.html ===== */
-            w_page_title: '💰 R币明细',
-            w_btn_recharge: '💳 充值',
-            w_btn_redeem: '🎫 兑换码',
-            w_total_income: '💰 总收入',
-            w_total_expense: '💸 总支出',
-            w_total_count: '📊 总笔数',
-            w_loading: '加载中...',
-            w_no_records: '📭 暂无记录',
-            w_load_failed: '❌ 加载失败，请重试',
-            w_redeem_title: '🎫 兑换码',
-            w_redeem_sub: '输入兑换码领取R币奖励',
-            w_redeem_placeholder: '输入兑换码',
-            w_btn_do_redeem: '🎫 兑换',
-            w_btn_cancel: '取消',
-            w_err_enter_code: '❌ 请输入兑换码',
-            w_verifying: '⏳ 验证中...',
-            w_success_prefix: '✅ ',
-            w_error_prefix: '❌ ',
-            w_network_error: '❌ 网络错误，请重试',
-            w_recharge_title: '💰 充值中心',
-            w_recharge_sub: '购买完成后R币自动到账，请刷新余额查看',
-            w_rcoin_50: '50 R币',
-            w_price_50: '¥ 1.00｜入门套餐',
-            w_rcoin_1000: '1000 R币',
-            w_price_1000: '¥ 9.80｜超值套餐',
-            w_btn_buy: '去购买',
-            w_btn_close: '关闭',
-            w_rcoin_change: 'R币变动',
-            w_in_game: '在 ',
-            w_received_tip: ' 中收到打赏',
-            w_spent_tip: ' 中打赏支出',
-            w_income_desc: '充值、兑换码或系统奖励',
-            w_expense_desc: '消费或扣款',
-            w_recharge_success: '✅ 充值成功！',
-            w_rcoin_arrived: ' R币已到账',
-
-            /* ===== 首次进入引导 onboarding ===== */
-            onboarding_welcome: '欢迎来到龙黑化创作工坊',
-            onboarding_step1_title: '📁 存储权限',
-            onboarding_step1_desc: '存储权限用于游戏中上传文件（作品图标、封面、导入文件等）',
-            onboarding_step1_checking: '正在检测存储权限...',
-            onboarding_step1_granted: '✅ 存储权限已开启',
-            onboarding_step1_denied: '❌ 存储权限未开启',
-            onboarding_btn_grant: '开启存储权限',
-            onboarding_step2_title: '📍 设备位置',
-            onboarding_step2_desc: '获取设备位置用于适配时区时间，否则将自动使用美国地区时间',
-            onboarding_step2_checking: '正在获取设备位置...',
-            onboarding_step2_granted: '✅ 位置已获取，时区已适配',
-            onboarding_step2_denied: '⚠️ 未获取位置，将使用美国时区',
-            onboarding_btn_get_location: '获取设备位置',
-            onboarding_btn_skip: '跳过',
-            onboarding_btn_done: '✓ 已经设置，进入主界面',
-            onboarding_btn_next: '下一步',
-            onboarding_step_indicator: '第 {current} 步 / 共 {total} 步',
+            pls_effective: '生效日期：2026年09月06日'
         },
 
         'en': {
             /* ===== Login index.html ===== */
             login_title: 'Login',
+            or_login_with: 'Or login with',
+            github_login: 'GitHub Login',
+            discord_login: 'Discord Login',
+            gitee_login: 'Gitee Login',
             register_title: 'Register',
             label_email: '📬 Email',
             label_password: '🔑 Password',
@@ -872,6 +640,12 @@
 
             /* Friends */
             friend_title: 'Friends',
+            add_friend: 'Add Friend',
+            more_login_methods: 'More Login Methods',
+            account_binding_title: 'Account Binding',
+            binding_hint: 'After binding a third-party account, you can use it to log in quickly. Each third-party account can only be bound to one account on this site.',
+            binding_footer_tip: 'If your account has no password set, please set a password before unbinding the only login method',
+            search_type: 'Search Type',
             friend_request: 'Requests',
             no_friends: 'No friends yet',
             chat_placeholder: 'Type a message (max 500 chars)',
@@ -913,6 +687,15 @@
             btn_submit_report: 'Submit Report',
             play_title: 'Game',
             lang_hint: 'Takes effect immediately',
+
+            /* Change Password */
+            change_password_title: '🔑 Change Password',
+            change_password_email_hint: 'Verification code will be sent to your registered email:',
+            change_password_code_ph: 'Enter 6-digit code',
+            send_code: 'Send Code',
+            new_password_ph: 'Enter new password (6-20 chars)',
+            confirm_password_ph: 'Confirm new password',
+            confirm_change_password: 'Confirm Change Password',
             editor_info_title: '2.0 Visual Editor',
             editor_info_desc: 'Create games with visual editor, file manager & property editing',
             editor_info_tip: 'Create game repo first, then enter editor',
@@ -981,144 +764,7 @@
             pls_btn_close: 'Close & Back to Login',
             pls_part1: 'Part 1: Terms of Service',
             pls_part2: 'Part 2: Privacy Policy',
-            pls_effective: 'Effective: September 6, 2026',
-            /* ===== Editor 2.0 2htm.html ===== */
-            editor_page_title: 'Editor 2.0 · DragonDark',
-            editor_project_info: 'Editor 2.0 · ID: ',
-            editor_project_unnamed: 'Editor 2.0 · Untitled',
-            editor_btn_back: '← Back',
-            editor_btn_preview: '👁️ Preview',
-            editor_btn_upload: '📤 Update',
-            editor_file_panel: '📂 Files',
-            editor_btn_new: '📄 New',
-            editor_btn_import: '📥 Import',
-            editor_loading: 'Loading...',
-            editor_no_files: '📭 No files<br>Click "New" to create',
-            editor_tab_preview: '👁️ Preview',
-            editor_tab_edit: '✏️ Edit',
-            editor_btn_save: '💾 Save',
-            editor_btn_format: '🔧 Format',
-            editor_btn_undo: '↩️ Undo',
-            editor_prop_title: '🎨 Properties',
-            editor_prop_color: 'Color',
-            editor_prop_size: 'Size',
-            editor_prop_content: 'Content',
-            editor_btn_apply: '✅ Apply',
-            editor_upload_title: '📤 Update Game',
-            editor_upload_sub: 'Upload icon, name, description, live after update',
-            editor_upload_click_icon: 'Click to change icon',
-            editor_upload_icon_hint: 'JPG/PNG/GIF, ≤5MB',
-            editor_upload_title_ph: 'Game name (2-20 chars)',
-            editor_upload_desc_ph: 'Description (optional)',
-            editor_btn_publish: '🚀 Publish Update',
-            editor_btn_cancel: 'Cancel',
-            editor_err_title_len: '❌ Name must be 2-20 characters',
-            editor_err_no_icon: '❌ Please select an icon',
-            editor_uploading: '⏳ Updating...',
-            editor_upload_success: '✅ Update successful! Live now',
-            editor_upload_failed: '❌ Update failed: ',
-            editor_network_error: '❌ Network error, please retry',
-            editor_toast_save_success: '✅ Saved',
-            editor_toast_save_failed: '❌ Save failed: ',
-            editor_toast_save_net_err: '❌ Save failed',
-            editor_toast_no_file: '❌ No file selected',
-            editor_toast_undo: '↩️ Undone',
-            editor_toast_no_undo: '📭 Nothing to undo',
-            editor_toast_format_ok: '✅ Formatted',
-            editor_toast_format_fail: '⚠️ Format failed',
-            editor_toast_file_exists: '❌ File already exists',
-            editor_toast_create_ok: '✅ Created: ',
-            editor_toast_create_fail: '❌ Create failed: ',
-            editor_toast_create_net_err: '❌ Create failed',
-            editor_toast_delete_confirm: 'Delete ',
-            editor_toast_delete_confirm2: '?',
-            editor_toast_min_file: '❌ Keep at least one file',
-            editor_toast_cannot_delete_index: '❌ Cannot delete main file',
-            editor_toast_delete_ok: '✅ Deleted: ',
-            editor_toast_delete_fail: '❌ Delete failed: ',
-            editor_toast_delete_net_err: '❌ Delete failed',
-            editor_toast_import_ok: '✅ Imported: ',
-            editor_toast_import_fail: '❌ Import failed: ',
-            editor_toast_import_net_err: '❌ Import failed',
-            editor_toast_import_overwrite: 'File ',
-            editor_toast_import_overwrite2: ' exists, overwrite?',
-            editor_toast_load_fail: '❌ Load failed: ',
-            editor_toast_load_net_err: '❌ Load failed',
-            editor_toast_local_save_ok: '⚠️ Saved locally, server sync failed',
-            editor_toast_icon_too_large: 'Icon must be ≤5MB',
-            editor_toast_no_elem: '❌ Select an element first',
-            editor_toast_prop_applied: '✅ Applied',
-            editor_toast_prop_fail: '⚠️ Apply failed: ',
-            editor_toast_back_confirm: 'Go back? Unsaved changes may be lost.',
-            editor_toast_missing_id: '❌ Missing game ID',
-            editor_toast_upload_ok: '🎉 Game updated, live now',
-            editor_new_file_prompt: 'Enter filename (e.g. style.css):',
-            editor_empty_file_title: 'Empty File',
-            editor_empty_file_h1: 'File is empty',
-            editor_preview_error_title: 'Preview Error',
-            editor_preview_error_h1: 'Preview failed to load',
-            editor_new_page_title: 'New Page',
-            editor_css_comment: '/* Styles */',
-            editor_js_comment: '// JavaScript',
-            editor_my_game_title: 'My Game',
-            editor_2_0: 'Editor 2.0',
-            editor_icon_selected_prefix: 'Icon selected<br><span style="font-size:12px;color:#6b7f94;">',
-
-            /* ===== R-Coin Details w.html ===== */
-            w_page_title: '💰 R-Coin Details',
-            w_btn_recharge: '💳 Recharge',
-            w_btn_redeem: '🎫 Redeem Code',
-            w_total_income: '💰 Total Income',
-            w_total_expense: '💸 Total Expense',
-            w_total_count: '📊 Total Count',
-            w_loading: 'Loading...',
-            w_no_records: '📭 No records',
-            w_load_failed: '❌ Load failed, please retry',
-            w_redeem_title: '🎫 Redeem Code',
-            w_redeem_sub: 'Enter code to claim R-Coin reward',
-            w_redeem_placeholder: 'Enter code',
-            w_btn_do_redeem: '🎫 Redeem',
-            w_btn_cancel: 'Cancel',
-            w_err_enter_code: '❌ Please enter code',
-            w_verifying: '⏳ Verifying...',
-            w_success_prefix: '✅ ',
-            w_error_prefix: '❌ ',
-            w_network_error: '❌ Network error, please retry',
-            w_recharge_title: '💰 Recharge Center',
-            w_recharge_sub: 'R-Coins auto-credit after purchase, refresh balance to view',
-            w_rcoin_50: '50 R-Coins',
-            w_price_50: '$0.99 | Starter Pack',
-            w_rcoin_1000: '1000 R-Coins',
-            w_price_1000: '$4.99 | Value Pack',
-            w_btn_buy: 'Buy',
-            w_btn_close: 'Close',
-            w_rcoin_change: 'R-Coin Change',
-            w_in_game: 'In ',
-            w_received_tip: ' received tip',
-            w_spent_tip: ' tipped',
-            w_income_desc: 'Recharge, redeem or system reward',
-            w_expense_desc: 'Purchase or deduction',
-            w_recharge_success: '✅ Recharge successful!',
-            w_rcoin_arrived: ' R-Coins credited',
-
-            /* ===== Onboarding ===== */
-            onboarding_welcome: 'Welcome to DragonDark Workshop',
-            onboarding_step1_title: '📁 Storage Permission',
-            onboarding_step1_desc: 'Storage permission is used for uploading files in games (game icons, covers, imported files, etc.)',
-            onboarding_step1_checking: 'Checking storage permission...',
-            onboarding_step1_granted: '✅ Storage permission granted',
-            onboarding_step1_denied: '❌ Storage permission denied',
-            onboarding_btn_grant: 'Grant Storage Permission',
-            onboarding_step2_title: '📍 Device Location',
-            onboarding_step2_desc: 'Device location is used to adapt timezone, otherwise US timezone will be used automatically',
-            onboarding_step2_checking: 'Getting device location...',
-            onboarding_step2_granted: '✅ Location obtained, timezone adapted',
-            onboarding_step2_denied: '⚠️ Location not obtained, US timezone will be used',
-            onboarding_btn_get_location: 'Get Device Location',
-            onboarding_btn_skip: 'Skip',
-            onboarding_btn_done: '✓ Done, Enter Home',
-            onboarding_btn_next: 'Next',
-            onboarding_step_indicator: 'Step {current} of {total}',
+            pls_effective: 'Effective: September 6, 2026'
         }
     };
 
@@ -1145,57 +791,27 @@
     }
 
     function applyLanguage() {
-        try {
-            /* 1) 处理 data-i18n 文本（安全模式：不删除子元素） */
-            var nodes = document.querySelectorAll('[data-i18n]');
-            for (var i = 0; i < nodes.length; i++) {
-                var key = nodes[i].getAttribute('data-i18n');
-                if (!key) continue;
-                var translated = t(key);
-                var el = nodes[i];
-                // 检查是否有子元素（除了文本节点）
-                var hasChildElements = false;
-                for (var c = 0; c < el.childNodes.length; c++) {
-                    if (el.childNodes[c].nodeType === 1) { hasChildElements = true; break; }
-                }
-                if (hasChildElements) {
-                    // 有子元素：只替换第一个文本节点，不删除子元素
-                    var replaced = false;
-                    for (var n = 0; n < el.childNodes.length; n++) {
-                        if (el.childNodes[n].nodeType === 3 && el.childNodes[n].textContent.trim()) {
-                            el.childNodes[n].textContent = translated + ' ';
-                            replaced = true;
-                            break;
-                        }
-                    }
-                    if (!replaced) {
-                        // 没有文本节点，在开头插入文本
-                        el.insertBefore(document.createTextNode(translated + ' '), el.firstChild);
-                    }
-                } else {
-                    // 没有子元素，直接替换
-                    el.textContent = translated;
-                }
-            }
-            /* 2) 处理 data-i18n-placeholder */
-            var phNodes = document.querySelectorAll('[data-i18n-placeholder]');
-            for (var j = 0; j < phNodes.length; j++) {
-                var pkey = phNodes[j].getAttribute('data-i18n-placeholder');
-                if (pkey) phNodes[j].placeholder = t(pkey);
-            }
-            /* 3) 处理 data-i18n-html（允许含标签） */
-            var htmlNodes = document.querySelectorAll('[data-i18n-html]');
-            for (var k = 0; k < htmlNodes.length; k++) {
-                var hkey = htmlNodes[k].getAttribute('data-i18n-html');
-                if (hkey) htmlNodes[k].innerHTML = t(hkey);
-            }
-            /* 4) 更新 <title> */
-            var titleKey = document.documentElement.getAttribute('data-i18n-title');
-            if (titleKey) document.title = t(titleKey);
-        } catch (e) {
-            // 出错不影响后续代码
-            console.warn('i18n applyLanguage error:', e);
+        /* 1) 处理 data-i18n 文本 */
+        var nodes = document.querySelectorAll('[data-i18n]');
+        for (var i = 0; i < nodes.length; i++) {
+            var key = nodes[i].getAttribute('data-i18n');
+            if (key) nodes[i].textContent = t(key);
         }
+        /* 2) 处理 data-i18n-placeholder */
+        var phNodes = document.querySelectorAll('[data-i18n-placeholder]');
+        for (var j = 0; j < phNodes.length; j++) {
+            var pkey = phNodes[j].getAttribute('data-i18n-placeholder');
+            if (pkey) phNodes[j].placeholder = t(pkey);
+        }
+        /* 3) 处理 data-i18n-html（允许含标签） */
+        var htmlNodes = document.querySelectorAll('[data-i18n-html]');
+        for (var k = 0; k < htmlNodes.length; k++) {
+            var hkey = htmlNodes[k].getAttribute('data-i18n-html');
+            if (hkey) htmlNodes[k].innerHTML = t(hkey);
+        }
+        /* 4) 更新 <title> */
+        var titleKey = document.documentElement.getAttribute('data-i18n-title');
+        if (titleKey) document.title = t(titleKey);
     }
 
     /* ---------- 语言选择器UI生成 ---------- */

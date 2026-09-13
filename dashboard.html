@@ -307,37 +307,6 @@ img{
     user-drag:none;
 }
 
-
-/* ===== 首次进入引导 Onboarding ===== */
-#onboardingOverlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.75);z-index:99999;display:none;justify-content:center;align-items:center;backdrop-filter:blur(4px)}
-#onboardingOverlay.show{display:flex}
-.onboarding-card{background:#fff;border-radius:20px;padding:32px 28px;max-width:420px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3);position:relative;animation:onboardingSlideIn 0.4s ease}
-@keyframes onboardingSlideIn{from{opacity:0;transform:translateY(30px) scale(0.95)}to{opacity:1;transform:translateY(0) scale(1)}}
-.onboarding-welcome{text-align:center;margin-bottom:24px}
-.onboarding-welcome h2{margin:0 0 8px;font-size:22px;color:#1a1a2e;background:linear-gradient(135deg,#667eea,#764ba2);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.onboarding-welcome p{margin:0;font-size:13px;color:#6b7f94}
-.onboarding-step{display:none}
-.onboarding-step.active{display:block;animation:stepFadeIn 0.3s ease}
-@keyframes stepFadeIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
-.onboarding-step-icon{font-size:48px;text-align:center;margin-bottom:16px}
-.onboarding-step-title{font-size:18px;font-weight:700;color:#1a1a2e;text-align:center;margin-bottom:12px}
-.onboarding-step-desc{font-size:14px;color:#4a5568;text-align:center;line-height:1.6;margin-bottom:20px;padding:0 8px}
-.onboarding-status{text-align:center;padding:12px 16px;background:#f7fafc;border-radius:12px;margin-bottom:20px;font-size:14px;font-weight:600;min-height:44px;display:flex;align-items:center;justify-content:center}
-.onboarding-status.checking{color:#667eea}
-.onboarding-status.granted{color:#38a169;background:#f0fff4}
-.onboarding-status.denied{color:#e53e3e;background:#fff5f5}
-.onboarding-btn{width:100%;padding:14px;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;transition:all 0.2s;margin-bottom:10px}
-.onboarding-btn-primary{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff}
-.onboarding-btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(102,126,234,0.4)}
-.onboarding-btn-primary:disabled{opacity:0.5;cursor:not-allowed;transform:none}
-.onboarding-btn-secondary{background:#edf2f7;color:#4a5568}
-.onboarding-btn-secondary:hover{background:#e2e8f0}
-.onboarding-btn-done{background:linear-gradient(135deg,#38a169,#2f855a);color:#fff}
-.onboarding-btn-done:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(56,161,105,0.4)}
-.onboarding-indicator{display:flex;justify-content:center;gap:8px;margin-top:20px}
-.onboarding-dot{width:8px;height:8px;border-radius:50%;background:#cbd5e0;transition:all 0.3s}
-.onboarding-dot.active{background:#667eea;width:24px;border-radius:4px}
-.onboarding-step-text{text-align:center;font-size:12px;color:#a0aec0;margin-top:8px}
 </style>
 <script src="i18n.js"></script>
 
@@ -366,41 +335,6 @@ img{
     </div>
 </div>
 
-<!-- 启动页强制隐藏（不依赖后续JS，确保即使后续代码出错也能隐藏） -->
-<script>
-(function(){
-    var splash = document.getElementById('splashScreen');
-    var progress = document.getElementById('splashProgress');
-    if(!splash) return;
-    // 进度条动画
-    var p = 0;
-    var iv = setInterval(function(){
-        p += Math.random() * 15;
-        if(p > 90) p = 90;
-        if(progress) progress.style.width = p + '%';
-    }, 200);
-    // 强制隐藏函数
-    function forceHideSplash(){
-        try { clearInterval(iv); } catch(e){}
-        if(progress) progress.style.width = '100%';
-        setTimeout(function(){
-            if(splash) {
-                splash.style.opacity = '0';
-                setTimeout(function(){ if(splash) splash.style.display = 'none'; }, 500);
-            }
-        }, 300);
-    }
-    // 页面加载完成后隐藏
-    if(document.readyState === 'complete'){
-        setTimeout(forceHideSplash, 800);
-    } else {
-        window.addEventListener('load', function(){ setTimeout(forceHideSplash, 800); });
-    }
-    // 最多2.5秒后强制隐藏（比之前的3秒更早，确保不卡住）
-    setTimeout(forceHideSplash, 2500);
-})();
-</script>
-
 
 <div class="card" id="app">
 
@@ -415,7 +349,6 @@ img{
 <a data-i18n="menu_edit_profile" onclick="openEditProfile()">编辑资料</a>
 <a onclick="openMails()"><span data-i18n="menu_mails">邮件</span> <span id="mailBadge" style="display:none;background:#2563eb;color:#fff;border-radius:50%;font-size:10px;padding:1px 7px;min-width:18px;text-align:center;font-weight:700;margin-left:6px;">0</span></a>
 <a data-i18n="menu_badge" onclick="openBadgeManager()">勋章设置</a>
-<a class="danger" data-i18n="menu_logout" onclick="logout()">退出登录</a>
 </div>
 </div>
 </div>
@@ -426,7 +359,7 @@ img{
 </div>
 
 <div class="search-bar" id="searchBar">
-<input type="text" id="searchInput" data-i18n-placeholder="search_placeholder" placeholder="搜索作品名称或作者..." onkeyup="if(event.key==='Enter') searchGames()">
+<input type="text" id="searchInput" data-i18n-placeholder="search_placeholder" placeholder="搜索作品名称..." onkeyup="if(event.key==='Enter') searchGames()">
 <button data-i18n="btn_search" onclick="searchGames()">搜索</button>
 </div>
 
@@ -479,10 +412,15 @@ img{
 <div id="friendsPage" style="display:none;">
     <div style="display:flex;justify-content:space-between;align-items:center;padding:0 0 12px 0;border-bottom:1px solid #e8edf4;">
         <span style="font-size:17px;font-weight:700;color:#1a2a3a;" data-i18n="friend_title">好友</span>
-        <button onclick="openFriendRequests()" style="background:transparent;border:none;font-size:16px;cursor:pointer;position:relative;color:#4a5a6a;" id="inviteBellBtn">
-            <span data-i18n="friend_request">请求</span>
-            <span id="inviteBadge" style="display:none;position:absolute;top:-4px;right:-6px;background:#e74c3c;color:#fff;border-radius:50%;font-size:9px;padding:1px 6px;min-width:16px;text-align:center;font-weight:700;">0</span>
-        </button>
+        <div style="display:flex;align-items:center;gap:10px;">
+            <button onclick="openAddFriendModal()" style="background:#2563eb;color:#fff;border:none;padding:6px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:4px;">
+                <span style="font-size:16px;">+</span><span data-i18n="add_friend">添加好友</span>
+            </button>
+            <button onclick="openFriendRequests()" style="background:transparent;border:none;font-size:16px;cursor:pointer;position:relative;color:#4a5a6a;" id="inviteBellBtn">
+                <span data-i18n="friend_request">请求</span>
+                <span id="inviteBadge" style="display:none;position:absolute;top:-4px;right:-6px;background:#e74c3c;color:#fff;border-radius:50%;font-size:9px;padding:1px 6px;min-width:16px;text-align:center;font-weight:700;">0</span>
+            </button>
+        </div>
     </div>
     <div id="friendList" style="margin-top:12px;">
         <div class="empty-state">加载中...</div>
@@ -528,10 +466,65 @@ img{
 <div class="lang-hint" data-i18n="lang_hint">选择后立即生效</div>
 </div>
 
+<!-- 修改密码 -->
+<div class="change-password-section" style="margin-top:20px;padding-top:16px;border-top:1px solid #e8edf4;">
+<button type="button" onclick="toggleChangePassword()" style="width:100%;background:#f8fafc;border:1px solid #dce3ec;color:#4a5a6a;padding:10px 16px;border-radius:8px;font-size:14px;cursor:pointer;text-align:left;" data-i18n="change_password_title">🔑 修改密码</button>
+<div id="changePasswordForm" style="display:none;margin-top:12px;">
+    <div style="background:#f0f7ff;border:1px solid #dbeafe;border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:13px;color:#2563eb;">
+        <span data-i18n="change_password_email_hint">验证码将发送到您的注册邮箱：</span>
+        <span id="changePasswordEmail" style="font-weight:600;">-</span>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:10px;">
+        <input type="text" id="changePasswordCode" placeholder="请输入6位验证码" data-i18n-placeholder="change_password_code_ph" style="flex:1;padding:10px 12px;border:1px solid #dce3ec;border-radius:8px;font-size:14px;" maxlength="6">
+        <button type="button" id="sendCodeBtn" onclick="sendChangePasswordCode()" style="background:#2563eb;color:#fff;border:none;padding:10px 16px;border-radius:8px;font-size:13px;cursor:pointer;white-space:nowrap;" data-i18n="send_code">发送验证码</button>
+    </div>
+    <input type="password" id="newPassword" placeholder="请输入新密码（6-20位）" data-i18n-placeholder="new_password_ph" style="width:100%;padding:10px 12px;border:1px solid #dce3ec;border-radius:8px;font-size:14px;margin-bottom:10px;">
+    <input type="password" id="confirmPassword" placeholder="请再次输入新密码" data-i18n-placeholder="confirm_password_ph" style="width:100%;padding:10px 12px;border:1px solid #dce3ec;border-radius:8px;font-size:14px;margin-bottom:10px;">
+    <div id="changePasswordStatus" class="status-msg"></div>
+    <button type="button" onclick="submitChangePassword()" style="width:100%;background:linear-gradient(135deg,#10b981,#059669);color:#fff;border:none;padding:12px;border-radius:8px;font-size:15px;cursor:pointer;font-weight:600;" data-i18n="confirm_change_password">确认修改密码</button>
+</div>
+</div>
+
+<!-- 更多登录方式 -->
+<div style="margin-top:16px;padding-top:16px;border-top:1px solid #e8edf4;">
+<button type="button" onclick="openBindingsModal()" style="width:100%;background:#f0f7ff;border:1px solid #dbeafe;color:#2563eb;padding:12px;border-radius:8px;font-size:15px;cursor:pointer;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px;" data-i18n="more_login_methods">🔗 更多登录方式</button>
+</div>
+
+<!-- 退出登录 -->
+<div style="margin-top:16px;padding-top:16px;border-top:1px solid #e8edf4;">
+<button type="button" onclick="logout()" style="width:100%;background:#fef2f2;border:1px solid #fecaca;color:#dc2626;padding:12px;border-radius:8px;font-size:15px;cursor:pointer;font-weight:600;" data-i18n="menu_logout">退出登录</button>
+</div>
+
 <div class="btn-group">
 <button class="btn-primary" data-i18n="btn_save" onclick="saveEditProfile()">保存</button>
 <button class="btn-secondary" data-i18n="btn_cancel" onclick="closeEditProfile()">取消</button>
 </div>
+</div>
+</div>
+
+<!-- 账号绑定管理（全屏界面） -->
+<div class="modal-overlay" id="bindingsModal" style="background:rgba(0,0,0,0.5);z-index:9999;">
+<div style="width:100%;max-width:500px;background:#fff;border-radius:16px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+    <!-- 顶部标题栏 -->
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:18px 20px;border-bottom:1px solid #e8edf4;position:sticky;top:0;background:#fff;z-index:10;border-radius:16px 16px 0 0;">
+        <div style="font-size:18px;font-weight:700;color:#1a2a3a;" data-i18n="account_binding_title">账号绑定管理</div>
+        <button onclick="closeBindingsModal()" style="background:transparent;border:none;font-size:24px;cursor:pointer;color:#8a9baa;line-height:1;padding:0 4px;">✕</button>
+    </div>
+    
+    <!-- 说明文字 -->
+    <div style="padding:14px 20px;background:#f8fafc;border-bottom:1px solid #e8edf4;">
+        <div style="font-size:13px;color:#64748b;line-height:1.6;" data-i18n="binding_hint">绑定第三方账号后，可以使用该账号快速登录。每个第三方账号只能绑定到一个本站账号。</div>
+    </div>
+    
+    <!-- 绑定列表 -->
+    <div id="bindingsList" style="padding:16px 20px;">
+        <div class="empty-state" style="padding:30px 0;">加载中...</div>
+    </div>
+    
+    <!-- 底部提示 -->
+    <div style="padding:14px 20px;border-top:1px solid #e8edf4;background:#f8fafc;border-radius:0 0 16px 16px;">
+        <div style="font-size:12px;color:#94a3b8;text-align:center;" data-i18n="binding_footer_tip">如果您的账号没有设置密码，取消唯一的登录方式绑定前请先设置密码</div>
+    </div>
 </div>
 </div>
 
@@ -711,6 +704,49 @@ img{
 </div>
 </div>
 
+<!-- 添加好友弹窗 -->
+<div class="modal-overlay" id="addFriendModal" onclick="if(event.target===this) closeAddFriendModal()">
+<div class="modal-box" style="max-width:420px;">
+<h3 data-i18n="add_friend">添加好友</h3>
+<div style="display:flex;gap:8px;margin-bottom:12px;">
+    <input type="text" id="addFriendInput" placeholder="输入用户名或ID..." style="flex:1;padding:10px 12px;border:1px solid #d8dee8;border-radius:8px;font-size:14px;outline:none;" onkeydown="if(event.key==='Enter') searchAddFriend()">
+    <button onclick="searchAddFriend()" style="background:#2563eb;color:#fff;border:none;padding:10px 16px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;" data-i18n="btn_search">搜索</button>
+    <button onclick="openSearchTypeModal()" style="background:#f0f2f5;color:#1a2a3a;border:1px solid #d8dee8;padding:10px 12px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;" title="选择搜索方式">⚙️</button>
+</div>
+<div style="font-size:12px;color:#8a9baa;margin-bottom:8px;" id="addFriendSearchType">当前搜索方式：全部（用户名+ID模糊匹配）</div>
+<div id="addFriendResults" style="max-height:350px;overflow-y:auto;">
+    <div class="empty-state" style="padding:20px 0;">输入关键词开始搜索</div>
+</div>
+<div class="btn-group" style="margin-top:12px;">
+<button class="btn-secondary" data-i18n="btn_close" onclick="closeAddFriendModal()">关闭</button>
+</div>
+</div>
+</div>
+
+<!-- 搜索方式选择弹窗 -->
+<div class="modal-overlay" id="searchTypeModal" onclick="if(event.target===this) closeSearchTypeModal()">
+<div class="modal-box" style="max-width:350px;">
+<h3 data-i18n="search_type">选择搜索方式</h3>
+<div style="display:flex;flex-direction:column;gap:10px;margin:16px 0;">
+    <button onclick="setSearchType('all')" id="searchTypeAll" style="padding:14px;border:2px solid #2563eb;background:rgba(37,99,235,0.05);border-radius:10px;cursor:pointer;text-align:left;">
+        <div style="font-size:15px;font-weight:700;color:#1a2a3a;">🔍 全部搜索</div>
+        <div style="font-size:12px;color:#8a9baa;margin-top:4px;">同时搜索用户名和ID（模糊匹配）</div>
+    </button>
+    <button onclick="setSearchType('name')" id="searchTypeName" style="padding:14px;border:2px solid #e8edf4;background:#fff;border-radius:10px;cursor:pointer;text-align:left;">
+        <div style="font-size:15px;font-weight:700;color:#1a2a3a;">👤 按名字搜索</div>
+        <div style="font-size:12px;color:#8a9baa;margin-top:4px;">模糊匹配，包括这个名字的用户都会显示</div>
+    </button>
+    <button onclick="setSearchType('id')" id="searchTypeId" style="padding:14px;border:2px solid #e8edf4;background:#fff;border-radius:10px;cursor:pointer;text-align:left;">
+        <div style="font-size:15px;font-weight:700;color:#1a2a3a;">🆔 按游戏ID搜索</div>
+        <div style="font-size:12px;color:#8a9baa;margin-top:4px;">精确匹配，只显示完全等于这个ID的用户</div>
+    </button>
+</div>
+<div class="btn-group">
+<button class="btn-secondary" data-i18n="btn_close" onclick="closeSearchTypeModal()">关闭</button>
+</div>
+</div>
+</div>
+
 <div class="modal-overlay" id="chatModal" onclick="if(event.target===this) closeChat()" style="background:rgba(0,0,0,0.3);align-items:flex-start;padding:56px 0 0 0;">
 <div class="modal-box" style="max-width:100%;width:100%;height:calc(100vh - 56px);max-height:calc(100vh - 56px);border-radius:0;padding:12px 16px;display:flex;flex-direction:column;margin:0;">
 <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #e8edf4;padding-bottom:10px;margin-bottom:10px;flex-shrink:0;">
@@ -789,6 +825,15 @@ function formatTime(input){
     localStorage.removeItem('cached_search');
 })();
 
+(function(){
+    var refreshFlag = sessionStorage.getItem('dashboard_refreshed');
+    if (!refreshFlag) {
+        sessionStorage.setItem('dashboard_refreshed', '1');
+        location.reload(true);
+        return;
+    }
+})();
+
 var API_URL = 'api.php';
 var token = localStorage.getItem('token') || '';
 var username = localStorage.getItem('username') || '';
@@ -813,168 +858,6 @@ if (!token) {
     window.location.href = 'index.html';
 }
 
-
-// ===== 首次进入引导 Onboarding =====
-var onboardingStorageGranted = false;
-var onboardingLocationGranted = false;
-
-function checkOnboardingStatus() {
-    var formData = new FormData();
-    formData.append('action', 'checkOnboarding');
-    formData.append('token', token);
-    fetch('api.php', {method: 'POST', body: formData})
-        .then(function(r){return r.json();})
-        .then(function(d){
-            if (d.success && d.data && d.data.done) {
-                // 已完成引导，直接进入
-            } else {
-                showOnboarding();
-            }
-        })
-        .catch(function(){
-            // 网络错误，显示引导
-            showOnboarding();
-        });
-}
-
-function showOnboarding() {
-    document.getElementById('onboardingOverlay').classList.add('show');
-    // 自动检测存储权限
-    setTimeout(checkStoragePermission, 500);
-}
-
-function checkStoragePermission() {
-    var statusEl = document.getElementById('storageStatus');
-    statusEl.className = 'onboarding-status checking';
-    statusEl.textContent = I18N.t('onboarding_step1_checking');
-    if (navigator.storage && navigator.storage.persisted) {
-        navigator.storage.persisted().then(function(persisted){
-            if (persisted) {
-                onboardingStorageGranted = true;
-                statusEl.className = 'onboarding-status granted';
-                statusEl.textContent = I18N.t('onboarding_step1_granted');
-                document.getElementById('grantStorageBtn').style.display = 'none';
-                setTimeout(function(){ goToNextStep(1); }, 800);
-            } else {
-                statusEl.className = 'onboarding-status denied';
-                statusEl.textContent = I18N.t('onboarding_step1_denied');
-            }
-        }).catch(function(){
-            statusEl.className = 'onboarding-status denied';
-            statusEl.textContent = I18N.t('onboarding_step1_denied');
-        });
-    } else {
-        // 浏览器不支持，直接跳过
-        onboardingStorageGranted = true;
-        statusEl.className = 'onboarding-status granted';
-        statusEl.textContent = I18N.t('onboarding_step1_granted');
-        setTimeout(function(){ goToNextStep(1); }, 800);
-    }
-}
-
-function grantStoragePermission() {
-    var statusEl = document.getElementById('storageStatus');
-    statusEl.className = 'onboarding-status checking';
-    statusEl.textContent = I18N.t('onboarding_step1_checking');
-    if (navigator.storage && navigator.storage.persist) {
-        navigator.storage.persist().then(function(granted){
-            if (granted) {
-                onboardingStorageGranted = true;
-                statusEl.className = 'onboarding-status granted';
-                statusEl.textContent = I18N.t('onboarding_step1_granted');
-                document.getElementById('grantStorageBtn').style.display = 'none';
-                setTimeout(function(){ goToNextStep(1); }, 800);
-            } else {
-                statusEl.className = 'onboarding-status denied';
-                statusEl.textContent = I18N.t('onboarding_step1_denied');
-            }
-        }).catch(function(){
-            statusEl.className = 'onboarding-status denied';
-            statusEl.textContent = I18N.t('onboarding_step1_denied');
-        });
-    } else {
-        onboardingStorageGranted = true;
-        statusEl.className = 'onboarding-status granted';
-        statusEl.textContent = I18N.t('onboarding_step1_granted');
-        setTimeout(function(){ goToNextStep(1); }, 800);
-    }
-}
-
-function getDeviceLocation() {
-    var statusEl = document.getElementById('locationStatus');
-    statusEl.className = 'onboarding-status checking';
-    statusEl.textContent = I18N.t('onboarding_step2_checking');
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-            function(position){
-                onboardingLocationGranted = true;
-                // 保存时区信息
-                var timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-                localStorage.setItem('user_timezone', timezone);
-                statusEl.className = 'onboarding-status granted';
-                statusEl.textContent = I18N.t('onboarding_step2_granted');
-                document.getElementById('getLocationBtn').style.display = 'none';
-                setTimeout(function(){ showDoneButton(); }, 800);
-            },
-            function(error){
-                onboardingLocationGranted = false;
-                localStorage.setItem('user_timezone', 'America/New_York');
-                statusEl.className = 'onboarding-status denied';
-                statusEl.textContent = I18N.t('onboarding_step2_denied');
-                setTimeout(function(){ showDoneButton(); }, 800);
-            },
-            {timeout: 10000, enableHighAccuracy: false}
-        );
-    } else {
-        onboardingLocationGranted = false;
-        localStorage.setItem('user_timezone', 'America/New_York');
-        statusEl.className = 'onboarding-status denied';
-        statusEl.textContent = I18N.t('onboarding_step2_denied');
-        setTimeout(function(){ showDoneButton(); }, 800);
-    }
-}
-
-function skipOnboardingStep(step) {
-    if (step === 1) {
-        goToNextStep(1);
-    } else if (step === 2) {
-        localStorage.setItem('user_timezone', 'America/New_York');
-        showDoneButton();
-    }
-}
-
-function goToNextStep(currentStep) {
-    if (currentStep === 1) {
-        document.getElementById('onboardingStep1').classList.remove('active');
-        document.getElementById('onboardingStep2').classList.add('active');
-        document.getElementById('dot1').classList.remove('active');
-        document.getElementById('dot2').classList.add('active');
-        document.getElementById('onboardingStepText').textContent = '第 2 步 / 共 2 步';
-        // 自动检测位置
-        setTimeout(getDeviceLocation, 500);
-    }
-}
-
-function showDoneButton() {
-    document.getElementById('onboardingDoneSection').style.display = 'block';
-}
-
-function completeOnboarding() {
-    var formData = new FormData();
-    formData.append('action', 'completeOnboarding');
-    formData.append('token', token);
-    fetch('api.php', {method: 'POST', body: formData})
-        .then(function(r){return r.json();})
-        .catch(function(){})
-        .finally(function(){
-            document.getElementById('onboardingOverlay').classList.remove('show');
-        });
-}
-
-// 页面加载后检测引导状态
-setTimeout(checkOnboardingStatus, 1000);
-
-
 var rcoinsDisplay = document.getElementById('rcoinsDisplay');
 var gameGrid = document.getElementById('gameGrid');
 var myGameGrid = document.getElementById('myGameGrid');
@@ -998,23 +881,18 @@ function loadHotGames() {
     var fd = new FormData();
     fd.append('action','getHotGames');
     fd.append('token',token);
-    var controller = new AbortController();
-    var timeoutId = setTimeout(function(){ controller.abort(); }, 10000);
-    fetch(API_URL,{method:'POST',body:fd,signal:controller.signal})
+    fetch(API_URL,{method:'POST',body:fd})
     .then(r=>r.json())
     .then(d=>{
-        clearTimeout(timeoutId);
         if(d.success && d.games){
             renderGames(d.games, gameGrid, false, 'hot');
-            var badge = document.querySelector('.tab-item[data-tab="hot"] .badge');
-            if(badge) badge.textContent = d.games.length;
+            document.querySelector('.tab-item[data-tab="hot"] .badge').textContent = d.games.length;
         }else{
             gameGrid.innerHTML = '<div class="empty-state"><div class="icon">📭</div>'+I18N.t('no_hot_games')+'</div>';
         }
     })
     .catch(function(e){
-        clearTimeout(timeoutId);
-        gameGrid.innerHTML = '<div class="empty-state"><div class="icon">❌</div>'+I18N.t('load_failed')+'<br><small style="font-size:12px;color:#999;">'+(e.name==='AbortError'?'请求超时，请刷新重试':e.message)+'</small></div>';
+        gameGrid.innerHTML = '<div class="empty-state"><div class="icon">❌</div>'+I18N.t('load_failed')+'</div>';
     });
 }
 
@@ -1438,79 +1316,7 @@ function submitCreate() {
         statusEl.style.display='block';
         statusEl.className='status-msg pending';
         
-        var defaultCode = '<!DOCTYPE html>\n<html>\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1.0">\n<title>' + title + '</title>\n<style>\nbody{background:#0a0a1a;display:flex;justify-content:center;align-items:center;height:100vh;margin:0;color:#fff;font-family:Arial,sans-serif;}\n.hello{font-size:48px;color:#ffd700;text-align:center;}\n.hello span{color:#4488ff;}\n
-/* ===== 首次进入引导 Onboarding ===== */
-#onboardingOverlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.75);z-index:99999;display:none;justify-content:center;align-items:center;backdrop-filter:blur(4px)}
-#onboardingOverlay.show{display:flex}
-.onboarding-card{background:#fff;border-radius:20px;padding:32px 28px;max-width:420px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3);position:relative;animation:onboardingSlideIn 0.4s ease}
-@keyframes onboardingSlideIn{from{opacity:0;transform:translateY(30px) scale(0.95)}to{opacity:1;transform:translateY(0) scale(1)}}
-.onboarding-welcome{text-align:center;margin-bottom:24px}
-.onboarding-welcome h2{margin:0 0 8px;font-size:22px;color:#1a1a2e;background:linear-gradient(135deg,#667eea,#764ba2);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.onboarding-welcome p{margin:0;font-size:13px;color:#6b7f94}
-.onboarding-step{display:none}
-.onboarding-step.active{display:block;animation:stepFadeIn 0.3s ease}
-@keyframes stepFadeIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
-.onboarding-step-icon{font-size:48px;text-align:center;margin-bottom:16px}
-.onboarding-step-title{font-size:18px;font-weight:700;color:#1a1a2e;text-align:center;margin-bottom:12px}
-.onboarding-step-desc{font-size:14px;color:#4a5568;text-align:center;line-height:1.6;margin-bottom:20px;padding:0 8px}
-.onboarding-status{text-align:center;padding:12px 16px;background:#f7fafc;border-radius:12px;margin-bottom:20px;font-size:14px;font-weight:600;min-height:44px;display:flex;align-items:center;justify-content:center}
-.onboarding-status.checking{color:#667eea}
-.onboarding-status.granted{color:#38a169;background:#f0fff4}
-.onboarding-status.denied{color:#e53e3e;background:#fff5f5}
-.onboarding-btn{width:100%;padding:14px;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;transition:all 0.2s;margin-bottom:10px}
-.onboarding-btn-primary{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff}
-.onboarding-btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(102,126,234,0.4)}
-.onboarding-btn-primary:disabled{opacity:0.5;cursor:not-allowed;transform:none}
-.onboarding-btn-secondary{background:#edf2f7;color:#4a5568}
-.onboarding-btn-secondary:hover{background:#e2e8f0}
-.onboarding-btn-done{background:linear-gradient(135deg,#38a169,#2f855a);color:#fff}
-.onboarding-btn-done:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(56,161,105,0.4)}
-.onboarding-indicator{display:flex;justify-content:center;gap:8px;margin-top:20px}
-.onboarding-dot{width:8px;height:8px;border-radius:50%;background:#cbd5e0;transition:all 0.3s}
-.onboarding-dot.active{background:#667eea;width:24px;border-radius:4px}
-.onboarding-step-text{text-align:center;font-size:12px;color:#a0aec0;margin-top:8px}
-</style>\n</head>\n<body>\n<div class="hello">🐉 龙<span>黑</span>化<br><small style="font-size:24px;color:#6b7f94;">编辑器 2.0</small></div>\n
-<!-- ===== 首次进入引导 Onboarding ===== -->
-<div id="onboardingOverlay">
-    <div class="onboarding-card">
-        <div class="onboarding-welcome">
-            <h2 data-i18n="onboarding_welcome">欢迎来到龙黑化创作工坊</h2>
-            <p>只需两步，开启创作之旅</p>
-        </div>
-
-        <!-- 第一步：存储权限 -->
-        <div class="onboarding-step active" id="onboardingStep1">
-            <div class="onboarding-step-icon">📁</div>
-            <div class="onboarding-step-title" data-i18n="onboarding_step1_title">存储权限</div>
-            <div class="onboarding-step-desc" data-i18n="onboarding_step1_desc">存储权限用于游戏中上传文件（作品图标、封面、导入文件等）</div>
-            <div class="onboarding-status checking" id="storageStatus" data-i18n="onboarding_step1_checking">正在检测存储权限...</div>
-            <button class="onboarding-btn onboarding-btn-primary" id="grantStorageBtn" onclick="grantStoragePermission()" data-i18n="onboarding_btn_grant">开启存储权限</button>
-            <button class="onboarding-btn onboarding-btn-secondary" onclick="skipOnboardingStep(1)" data-i18n="onboarding_btn_skip">跳过</button>
-        </div>
-
-        <!-- 第二步：设备位置 -->
-        <div class="onboarding-step" id="onboardingStep2">
-            <div class="onboarding-step-icon">📍</div>
-            <div class="onboarding-step-title" data-i18n="onboarding_step2_title">设备位置</div>
-            <div class="onboarding-step-desc" data-i18n="onboarding_step2_desc">获取设备位置用于适配时区时间，否则将自动使用美国地区时间</div>
-            <div class="onboarding-status checking" id="locationStatus" data-i18n="onboarding_step2_checking">正在获取设备位置...</div>
-            <button class="onboarding-btn onboarding-btn-primary" id="getLocationBtn" onclick="getDeviceLocation()" data-i18n="onboarding_btn_get_location">获取设备位置</button>
-            <button class="onboarding-btn onboarding-btn-secondary" onclick="skipOnboardingStep(2)" data-i18n="onboarding_btn_skip">跳过</button>
-        </div>
-
-        <!-- 完成按钮 -->
-        <div id="onboardingDoneSection" style="display:none;margin-top:16px">
-            <button class="onboarding-btn onboarding-btn-done" onclick="completeOnboarding()" data-i18n="onboarding_btn_done">✓ 已经设置，进入主界面</button>
-        </div>
-
-        <div class="onboarding-indicator">
-            <div class="onboarding-dot active" id="dot1"></div>
-            <div class="onboarding-dot" id="dot2"></div>
-        </div>
-        <div class="onboarding-step-text" id="onboardingStepText">第 1 步 / 共 2 步</div>
-    </div>
-</div>
-</body>\n</html>';
+        var defaultCode = '<!DOCTYPE html>\n<html>\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1.0">\n<title>' + title + '</title>\n<style>\nbody{background:#0a0a1a;display:flex;justify-content:center;align-items:center;height:100vh;margin:0;color:#fff;font-family:Arial,sans-serif;}\n.hello{font-size:48px;color:#ffd700;text-align:center;}\n.hello span{color:#4488ff;}\n</style>\n</head>\n<body>\n<div class="hello">🐉 龙<span>黑</span>化<br><small style="font-size:24px;color:#6b7f94;">编辑器 2.0</small></div>\n</body>\n</html>';
         
         var fd = new FormData();
         fd.append('action','createGame');
@@ -1935,6 +1741,304 @@ function followUser(targetId){
     .catch(function(){});
 }
 
+// ========== 添加好友功能 ==========
+var currentAddFriendSearchType = 'all'; // all=全部, name=按名字, id=按ID
+
+function openAddFriendModal(){
+    document.getElementById('addFriendModal').style.display = 'flex';
+    document.getElementById('addFriendInput').value = '';
+    document.getElementById('addFriendResults').innerHTML = '<div class="empty-state" style="padding:20px 0;">输入关键词开始搜索</div>';
+    updateSearchTypeDisplay();
+}
+
+function closeAddFriendModal(){
+    document.getElementById('addFriendModal').style.display = 'none';
+}
+
+function openSearchTypeModal(){
+    document.getElementById('searchTypeModal').style.display = 'flex';
+    updateSearchTypeButtons();
+}
+
+function closeSearchTypeModal(){
+    document.getElementById('searchTypeModal').style.display = 'none';
+}
+
+function setSearchType(type){
+    currentAddFriendSearchType = type;
+    updateSearchTypeDisplay();
+    updateSearchTypeButtons();
+    closeSearchTypeModal();
+    // 如果输入框有内容，自动重新搜索
+    var keyword = document.getElementById('addFriendInput').value.trim();
+    if(keyword){
+        searchAddFriend();
+    }
+}
+
+function updateSearchTypeDisplay(){
+    var el = document.getElementById('addFriendSearchType');
+    if(currentAddFriendSearchType === 'all'){
+        el.textContent = '当前搜索方式：全部（用户名+ID模糊匹配）';
+    }else if(currentAddFriendSearchType === 'name'){
+        el.textContent = '当前搜索方式：按名字搜索（模糊匹配）';
+    }else if(currentAddFriendSearchType === 'id'){
+        el.textContent = '当前搜索方式：按游戏ID搜索（精确匹配）';
+    }
+}
+
+function updateSearchTypeButtons(){
+    var allBtn = document.getElementById('searchTypeAll');
+    var nameBtn = document.getElementById('searchTypeName');
+    var idBtn = document.getElementById('searchTypeId');
+    
+    // 重置所有按钮样式
+    [allBtn, nameBtn, idBtn].forEach(function(btn){
+        btn.style.border = '2px solid #e8edf4';
+        btn.style.background = '#fff';
+    });
+    
+    // 高亮当前选中的按钮
+    var activeBtn = currentAddFriendSearchType === 'all' ? allBtn : 
+                    currentAddFriendSearchType === 'name' ? nameBtn : idBtn;
+    activeBtn.style.border = '2px solid #2563eb';
+    activeBtn.style.background = 'rgba(37,99,235,0.05)';
+}
+
+function searchAddFriend(){
+    var keyword = document.getElementById('addFriendInput').value.trim();
+    if(!keyword){
+        alert('请输入搜索关键词');
+        return;
+    }
+    
+    var resultsEl = document.getElementById('addFriendResults');
+    resultsEl.innerHTML = '<div class="empty-state" style="padding:20px 0;">搜索中...</div>';
+    
+    var fd = new FormData();
+    fd.append('action','searchUsers');
+    fd.append('token',token);
+    fd.append('keyword',keyword);
+    fd.append('search_type',currentAddFriendSearchType);
+    
+    fetch(API_URL,{method:'POST',body:fd})
+    .then(r=>r.json())
+    .then(d=>{
+        if(d.success && d.users){
+            renderAddFriendResults(d.users);
+        }else{
+            resultsEl.innerHTML = '<div class="empty-state" style="padding:20px 0;">未找到匹配的用户</div>';
+        }
+    })
+    .catch(function(e){
+        resultsEl.innerHTML = '<div class="empty-state" style="padding:20px 0;">搜索失败：'+e.message+'</div>';
+    });
+}
+
+function renderAddFriendResults(users){
+    var resultsEl = document.getElementById('addFriendResults');
+    
+    if(!users || users.length === 0){
+        resultsEl.innerHTML = '<div class="empty-state" style="padding:20px 0;">未找到匹配的用户</div>';
+        return;
+    }
+    
+    var html = '';
+    users.forEach(function(u){
+        var avatar = u.avatar ? u.avatar : 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0MCA0MCI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiNlZWYyZjYiLz48Y2lyY2xlIGN4PSIyMCIgY3k9IjE2IiByPSI2IiBmaWxsPSIjOGE5YmFhIi8+PHBhdGggZD0iTTggMzRjMC02LjYyNyA1LjM3My0xMiAxMi0xMnMxMiA1LjM3MyAxMiAxMnoiIGZpbGw9IiM4YTliYWEiLz48L3N2Zz4=';
+        var followBtnText = u.is_following ? '已关注' : '关注';
+        var followBtnBg = u.is_following ? '#4a5a6a' : '#2563eb';
+        
+        html += '<div class="friend-list-item" style="cursor:default;">';
+        html += '<img class="favatar" src="'+avatar+'" alt="头像" onclick="viewUserProfile('+u.id+')" style="cursor:pointer;">';
+        html += '<div class="finfo" onclick="viewUserProfile('+u.id+')" style="cursor:pointer;">';
+        html += '<div class="fname">'+escapeHtml(u.username)+'</div>';
+        html += '<div class="fstatus">ID #'+u.id+' · R币 '+(u.rcoins||0)+'</div>';
+        if(u.bio){
+            html += '<div style="font-size:11px;color:#8a9baa;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px;">'+escapeHtml(u.bio)+'</div>';
+        }
+        html += '</div>';
+        html += '<button onclick="quickFollowUser('+u.id+', this)" style="background:'+followBtnBg+';color:#fff;border:none;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;flex-shrink:0;">'+followBtnText+'</button>';
+        html += '</div>';
+    });
+    
+    resultsEl.innerHTML = html;
+}
+
+function quickFollowUser(targetId, btn){
+    if(targetId == userId){
+        alert('不能关注自己');
+        return;
+    }
+    var isFollowing = btn.textContent === '已关注';
+    var fd = new FormData();
+    fd.append('action', isFollowing?'unfollow':'follow');
+    fd.append('token',token);
+    fd.append('target_id',targetId);
+    fetch(API_URL,{method:'POST',body:fd})
+    .then(r=>r.json())
+    .then(d=>{
+        if(d.success){
+            if(isFollowing){
+                btn.textContent = '关注';
+                btn.style.background = '#2563eb';
+            }else{
+                btn.textContent = '已关注';
+                btn.style.background = '#4a5a6a';
+                // 关注成功后检查是否互相关注，如果是则自动发送好友申请
+                checkAndSendFriendRequest(targetId);
+            }
+        }else{
+            alert(d.message||'操作失败');
+        }
+    })
+    .catch(function(){});
+}
+
+function viewUserProfile(userId){
+    closeAddFriendModal();
+    var fd = new FormData();
+    fd.append('action','getUserProfile');
+    fd.append('token',token);
+    fd.append('target_id',userId);
+    fetch(API_URL,{method:'POST',body:fd})
+    .then(r=>r.json())
+    .then(d=>{
+        if(d.success){
+            showUserProfile(d);
+        }else{
+            alert(d.message||'加载失败');
+        }
+    })
+    .catch(function(){});
+}
+
+// ========== 账号绑定管理 ==========
+function openBindingsModal(){
+    document.getElementById('bindingsModal').style.display = 'flex';
+    loadBindings();
+}
+
+function closeBindingsModal(){
+    document.getElementById('bindingsModal').style.display = 'none';
+}
+
+function loadBindings(){
+    var listEl = document.getElementById('bindingsList');
+    listEl.innerHTML = '<div class="empty-state" style="padding:30px 0;">加载中...</div>';
+    
+    var fd = new FormData();
+    fd.append('action','getBindings');
+    fd.append('token',token);
+    
+    fetch(API_URL,{method:'POST',body:fd})
+    .then(r=>r.json())
+    .then(d=>{
+        if(d.success && d.bindings){
+            renderBindings(d.bindings);
+        }else{
+            listEl.innerHTML = '<div class="empty-state" style="padding:30px 0;">加载失败：'+(d.message||'未知错误')+'</div>';
+        }
+    })
+    .catch(function(e){
+        listEl.innerHTML = '<div class="empty-state" style="padding:30px 0;">网络错误：'+e.message+'</div>';
+    });
+}
+
+function renderBindings(bindings){
+    var listEl = document.getElementById('bindingsList');
+    var html = '';
+    
+    // 平台配置
+    var platforms = [
+        {
+            key: 'github',
+            name: 'GitHub',
+            icon: '<svg viewBox="0 0 24 24" width="28" height="28" fill="#fff"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>',
+            color: '#24292e',
+            desc: '全球最大的代码托管平台'
+        },
+        {
+            key: 'gitee',
+            name: 'Gitee',
+            icon: '<svg viewBox="0 0 24 24" width="28" height="28" fill="#fff"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.5 13.5c-.5 1.5-2 2.5-4 2.5-1.5 0-2.5-.5-3-1.5-.5-1-.5-2 0-3 .5-1 1.5-1.5 3-1.5h1c.5 0 1-.5 1-1s-.5-1-1-1h-1c-2 0-3.5 1-4 2.5-.5 1.5-.5 3 0 4.5.5 1.5 2 2.5 4 2.5 2.5 0 4.5-1.5 5-3.5.5-2 0-3.5-1-4.5-1-1-2.5-1.5-4-1.5h-1c-.5 0-1 .5-1 1s.5 1 1 1h1c1 0 2 .5 2.5 1.5.5 1 .5 2 0 3z"/></svg>',
+            color: '#C71D23',
+            desc: '国内最大的代码托管平台'
+        }
+    ];
+    
+    platforms.forEach(function(p){
+        var binding = bindings[p.key] || {bound: false, username: ''};
+        var statusText = binding.bound ? '已绑定' : '未绑定';
+        var statusColor = binding.bound ? '#10b981' : '#94a3b8';
+        var btnText = binding.bound ? '取消绑定' : '绑定';
+        var btnColor = binding.bound ? '#ef4444' : p.color;
+        var usernameText = binding.bound && binding.username ? '账号：' + binding.username : '';
+        
+        html += '<div style="display:flex;align-items:center;gap:14px;padding:16px;background:#f8fafc;border:1px solid #e8edf4;border-radius:12px;margin-bottom:12px;">';
+        // 图标
+        html += '<div style="width:52px;height:52px;border-radius:12px;background:'+p.color+';display:flex;align-items:center;justify-content:center;flex-shrink:0;">'+p.icon+'</div>';
+        // 信息
+        html += '<div style="flex:1;min-width:0;">';
+        html += '<div style="display:flex;align-items:center;gap:8px;">';
+        html += '<span style="font-size:16px;font-weight:700;color:#1a2a3a;">'+p.name+'</span>';
+        html += '<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:'+(binding.bound?'rgba(16,185,129,0.1)':'rgba(148,163,184,0.1)')+';color:'+statusColor+';font-weight:600;">'+statusText+'</span>';
+        html += '</div>';
+        html += '<div style="font-size:12px;color:#64748b;margin-top:2px;">'+p.desc+'</div>';
+        if(usernameText){
+            html += '<div style="font-size:12px;color:#2563eb;margin-top:2px;font-weight:600;">'+usernameText+'</div>';
+        }
+        html += '</div>';
+        // 按钮
+        html += '<button onclick="'+(binding.bound?'unbindAccount(\''+p.key+'\')':'bindAccount(\''+p.key+'\')')+'" style="background:'+btnColor+';color:#fff;border:none;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;flex-shrink:0;white-space:nowrap;">'+btnText+'</button>';
+        html += '</div>';
+    });
+    
+    listEl.innerHTML = html;
+}
+
+function bindAccount(platform){
+    if(platform === 'github'){
+        var clientId = 'Ov23liASYrS51uIyeC9m';
+        var redirectUri = window.location.origin + '/callback.html';
+        var scope = 'read:user user:email';
+        var state = 'bind_mode=1';
+        var authUrl = 'https://github.com/login/oauth/authorize?client_id=' + clientId + '&redirect_uri=' + encodeURIComponent(redirectUri) + '&scope=' + encodeURIComponent(scope) + '&state=' + encodeURIComponent(state);
+        window.location.href = authUrl;
+    }else if(platform === 'gitee'){
+        var clientId = 'b889443affb4a406a4535a032d2d3ae35c4846a0158892894b01dc9b68aee19e';
+        var redirectUri = window.location.origin + '/callback_gitee.html';
+        var scope = 'user_info';
+        var state = 'bind_mode=1';
+        var authUrl = 'https://gitee.com/oauth/authorize?client_id=' + clientId + '&redirect_uri=' + encodeURIComponent(redirectUri) + '&response_type=code&scope=' + encodeURIComponent(scope) + '&state=' + encodeURIComponent(state);
+        window.location.href = authUrl;
+    }
+}
+
+function unbindAccount(platform){
+    var platformName = platform === 'github' ? 'GitHub' : (platform === 'gitee' ? 'Gitee' : platform);
+    if(!confirm('确定要取消绑定 ' + platformName + ' 账号吗？')) return;
+    
+    var fd = new FormData();
+    fd.append('action','unbindAccount');
+    fd.append('token',token);
+    fd.append('platform',platform);
+    
+    fetch(API_URL,{method:'POST',body:fd})
+    .then(r=>r.json())
+    .then(d=>{
+        if(d.success){
+            alert(platformName + '账号已取消绑定');
+            loadBindings();
+        }else{
+            alert('取消绑定失败：' + (d.message||'未知错误'));
+        }
+    })
+    .catch(function(e){
+        alert('网络错误：' + e.message);
+    });
+}
+
 function deleteComment(commentId, gameId){
     if(!confirm(I18N.t('delete_comment_confirm'))) return;
     var fd = new FormData();
@@ -2161,6 +2265,149 @@ function saveEditProfile(){
     .catch(function(e){
         statusEl.textContent='保存失败: '+e.message;
         statusEl.className='status-msg error';
+    });
+}
+
+// 修改密码功能
+var changePasswordCodeSent = false;
+var changePasswordCountdown = 0;
+
+function toggleChangePassword(){
+    var form = document.getElementById('changePasswordForm');
+    if(form.style.display === 'none' || !form.style.display){
+        form.style.display = 'block';
+        // 获取用户邮箱
+        var fd = new FormData();
+        fd.append('action','getUserEmail');
+        fd.append('token',token);
+        fetch(API_URL,{method:'POST',body:fd})
+        .then(r=>r.json())
+        .then(d=>{
+            if(d.success && d.email){
+                document.getElementById('changePasswordEmail').textContent = d.email;
+            }
+        })
+        .catch(function(){});
+    }else{
+        form.style.display = 'none';
+    }
+}
+
+function sendChangePasswordCode(){
+    var btn = document.getElementById('sendCodeBtn');
+    var statusEl = document.getElementById('changePasswordStatus');
+    var email = document.getElementById('changePasswordEmail').textContent;
+    if(!email || email === '-'){
+        statusEl.textContent = '无法获取邮箱，请稍后重试';
+        statusEl.className = 'status-msg error';
+        statusEl.style.display = 'block';
+        return;
+    }
+    btn.disabled = true;
+    btn.textContent = '发送中...';
+    var fd = new FormData();
+    fd.append('action','sendChangePasswordCode');
+    fd.append('token',token);
+    fetch(API_URL,{method:'POST',body:fd})
+    .then(r=>r.json())
+    .then(d=>{
+        if(d.success){
+            changePasswordCodeSent = true;
+            statusEl.textContent = '验证码已发送到 ' + email + '，请查收';
+            statusEl.className = 'status-msg success';
+            statusEl.style.display = 'block';
+            // 60秒倒计时
+            changePasswordCountdown = 60;
+            var timer = setInterval(function(){
+                changePasswordCountdown--;
+                if(changePasswordCountdown <= 0){
+                    clearInterval(timer);
+                    btn.disabled = false;
+                    btn.textContent = '重新发送';
+                }else{
+                    btn.textContent = changePasswordCountdown + 's后重发';
+                }
+            }, 1000);
+        }else{
+            btn.disabled = false;
+            btn.textContent = '发送验证码';
+            statusEl.textContent = d.message || '发送失败';
+            statusEl.className = 'status-msg error';
+            statusEl.style.display = 'block';
+        }
+    })
+    .catch(function(e){
+        btn.disabled = false;
+        btn.textContent = '发送验证码';
+        statusEl.textContent = '网络错误: ' + e.message;
+        statusEl.className = 'status-msg error';
+        statusEl.style.display = 'block';
+    });
+}
+
+function submitChangePassword(){
+    var code = document.getElementById('changePasswordCode').value.trim();
+    var newPwd = document.getElementById('newPassword').value;
+    var confirmPwd = document.getElementById('confirmPassword').value;
+    var statusEl = document.getElementById('changePasswordStatus');
+    var email = document.getElementById('changePasswordEmail').textContent;
+    
+    if(!changePasswordCodeSent){
+        statusEl.textContent = '请先获取验证码';
+        statusEl.className = 'status-msg error';
+        statusEl.style.display = 'block';
+        return;
+    }
+    if(!code || code.length !== 6){
+        statusEl.textContent = '请输入6位验证码';
+        statusEl.className = 'status-msg error';
+        statusEl.style.display = 'block';
+        return;
+    }
+    if(!newPwd || newPwd.length < 6 || newPwd.length > 20){
+        statusEl.textContent = '新密码长度应为6-20位';
+        statusEl.className = 'status-msg error';
+        statusEl.style.display = 'block';
+        return;
+    }
+    if(newPwd !== confirmPwd){
+        statusEl.textContent = '两次输入的密码不一致';
+        statusEl.className = 'status-msg error';
+        statusEl.style.display = 'block';
+        return;
+    }
+    
+    statusEl.textContent = '修改中...';
+    statusEl.className = 'status-msg pending';
+    statusEl.style.display = 'block';
+    
+    var fd = new FormData();
+    fd.append('action','changePassword');
+    fd.append('token',token);
+    fd.append('email',email);
+    fd.append('code',code);
+    fd.append('new_password',newPwd);
+    
+    fetch(API_URL,{method:'POST',body:fd})
+    .then(r=>r.json())
+    .then(d=>{
+        if(d.success){
+            statusEl.textContent = '密码修改成功！请重新登录';
+            statusEl.className = 'status-msg success';
+            statusEl.style.display = 'block';
+            setTimeout(function(){
+                logout();
+            }, 1500);
+        }else{
+            statusEl.textContent = d.message || '修改失败';
+            statusEl.className = 'status-msg error';
+            statusEl.style.display = 'block';
+        }
+    })
+    .catch(function(e){
+        statusEl.textContent = '网络错误: ' + e.message;
+        statusEl.className = 'status-msg error';
+        statusEl.style.display = 'block';
     });
 }
 
@@ -3194,6 +3441,18 @@ function escapeHtml(text){if(!text)return '';var d=document.createElement('div')
 loadHotGames();
 loadProfile();
 
+// 检查URL参数，如果有open_bindings=1，自动打开绑定管理界面
+(function(){
+    var urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('open_bindings') === '1') {
+        setTimeout(function() {
+            if (typeof openBindingsModal === 'function') {
+                openBindingsModal();
+            }
+        }, 800);
+    }
+})();
+
 setInterval(function(){
     if(currentTab === 'hot' && document.getElementById('homePage').style.display !== 'none'){
         loadHotGames();
@@ -3283,47 +3542,235 @@ console.log('👥 好友系统已启用！互相关注自动发起好友请求')
 })();
 
 
+/* ========== 启动页控制 ========== */
+(function(){
+    var splash = document.getElementById('splashScreen');
+    var progress = document.getElementById('splashProgress');
+    if(!splash) return;
+    
+    // 进度条动画
+    var p = 0;
+    var iv = setInterval(function(){
+        p += Math.random() * 15;
+        if(p > 90) p = 90;
+        if(progress) progress.style.width = p + '%';
+    }, 200);
+    
+    // 页面加载完成后隐藏启动页
+    function hideSplash(){
+        clearInterval(iv);
+        if(progress) progress.style.width = '100%';
+        setTimeout(function(){
+            splash.style.opacity = '0';
+            setTimeout(function(){
+                splash.style.display = 'none';
+            }, 500);
+        }, 300);
+    }
+    
+    if(document.readyState === 'complete'){
+        setTimeout(hideSplash, 800);
+    } else {
+        window.addEventListener('load', function(){
+            setTimeout(hideSplash, 800);
+        });
+    }
+    
+    // 最多3秒后强制隐藏
+    setTimeout(hideSplash, 3000);
+})();
+
 </script>
 
-<!-- ===== 首次进入引导 Onboarding ===== -->
-<div id="onboardingOverlay">
-    <div class="onboarding-card">
-        <div class="onboarding-welcome">
-            <h2 data-i18n="onboarding_welcome">欢迎来到龙黑化创作工坊</h2>
-            <p>只需两步，开启创作之旅</p>
-        </div>
+<!-- ===== 首次进入权限引导 Onboarding JS ===== -->
+<script>
+(function(){
+    var storageDone = false;
+    var locationDone = false;
+    
+    // 检查是否需要显示引导
+    function checkOnboarding(){
+        var token = localStorage.getItem('token') || '';
+        if(!token) return;
+        var fd = new FormData();
+        fd.append('action', 'checkOnboarding');
+        fd.append('token', token);
+        fetch('api.php', {method: 'POST', body: fd})
+        .then(function(r){ return r.json(); })
+        .then(function(d){
+            if(d.success && d.done === 0){
+                showOnboarding();
+            }
+        })
+        .catch(function(){});
+    }
+    
+    function showOnboarding(){
+        var overlay = document.getElementById('onboardingOverlay');
+        if(overlay){
+            overlay.style.display = 'flex';
+        }
+    }
+    
+    function hideOnboarding(){
+        var overlay = document.getElementById('onboardingOverlay');
+        if(overlay){
+            overlay.style.display = 'none';
+        }
+    }
+    
+    // 存储权限
+    function requestStoragePermission(){
+        var btn = document.getElementById('onboardingStorageBtn');
+        var status = document.getElementById('onboardingStorageStatus');
+        if(btn) btn.disabled = true;
+        if(btn) btn.textContent = '正在检测...';
+        
+        // 尝试请求持久化存储权限
+        if(navigator.storage && navigator.storage.persist){
+            navigator.storage.persist().then(function(granted){
+                storageDone = true;
+                if(status){
+                    status.style.display = 'block';
+                    status.textContent = granted ? '✓ 存储权限已开启' : '✓ 已设置（浏览器限制）';
+                }
+                setTimeout(goToStep2, 800);
+            }).catch(function(){
+                storageDone = true;
+                if(status){
+                    status.style.display = 'block';
+                    status.textContent = '✓ 已设置';
+                }
+                setTimeout(goToStep2, 800);
+            });
+        } else {
+            // 浏览器不支持，直接跳过
+            storageDone = true;
+            if(status){
+                status.style.display = 'block';
+                status.textContent = '✓ 已设置（浏览器不支持）';
+            }
+            setTimeout(goToStep2, 800);
+        }
+    }
+    
+    function goToStep2(){
+        var step1 = document.getElementById('onboardingStep1');
+        var step2 = document.getElementById('onboardingStep2');
+        if(step1) step1.style.display = 'none';
+        if(step2) step2.style.display = 'block';
+    }
+    
+    // 位置权限
+    function requestLocationPermission(){
+        var btn = document.getElementById('onboardingLocationBtn');
+        var status = document.getElementById('onboardingLocationStatus');
+        if(btn) btn.disabled = true;
+        if(btn) btn.textContent = '正在获取...';
+        
+        if(navigator.geolocation){
+            navigator.geolocation.getCurrentPosition(
+                function(position){
+                    locationDone = true;
+                    if(status){
+                        status.style.display = 'block';
+                        status.textContent = '✓ 位置已获取';
+                    }
+                    // 保存时区信息
+                    try{
+                        var tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                        localStorage.setItem('user_timezone', tz || 'America/New_York');
+                    }catch(e){}
+                    setTimeout(showDoneButton, 800);
+                },
+                function(error){
+                    locationDone = true;
+                    if(status){
+                        status.style.display = 'block';
+                        status.textContent = '✓ 已设置（将使用美国时区）';
+                    }
+                    localStorage.setItem('user_timezone', 'America/New_York');
+                    setTimeout(showDoneButton, 800);
+                },
+                {timeout: 10000, enableHighAccuracy: false}
+            );
+        } else {
+            locationDone = true;
+            if(status){
+                status.style.display = 'block';
+                status.textContent = '✓ 已设置（浏览器不支持，使用美国时区）';
+            }
+            localStorage.setItem('user_timezone', 'America/New_York');
+            setTimeout(showDoneButton, 800);
+        }
+    }
+    
+    function showDoneButton(){
+        var doneSection = document.getElementById('onboardingDoneSection');
+        if(doneSection) doneSection.style.display = 'block';
+    }
+    
+    // 完成引导
+    function completeOnboarding(){
+        var token = localStorage.getItem('token') || '';
+        var fd = new FormData();
+        fd.append('action', 'completeOnboarding');
+        fd.append('token', token);
+        fetch('api.php', {method: 'POST', body: fd})
+        .then(function(r){ return r.json(); })
+        .catch(function(){})
+        .finally(function(){
+            hideOnboarding();
+        });
+    }
+    
+    // 绑定按钮事件
+    document.addEventListener('DOMContentLoaded', function(){
+        var storageBtn = document.getElementById('onboardingStorageBtn');
+        if(storageBtn) storageBtn.addEventListener('click', requestStoragePermission);
+        
+        var locationBtn = document.getElementById('onboardingLocationBtn');
+        if(locationBtn) locationBtn.addEventListener('click', requestLocationPermission);
+        
+        var doneBtn = document.getElementById('onboardingDoneBtn');
+        if(doneBtn) doneBtn.addEventListener('click', completeOnboarding);
+    });
+    
+    // 页面加载后1秒检查引导状态
+    setTimeout(checkOnboarding, 1500);
+})();
+</script>
 
+<!-- ===== 首次进入权限引导 Onboarding ===== -->
+<div id="onboardingOverlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:99999;justify-content:center;align-items:center;">
+    <div style="background:#1a1a2e;border-radius:16px;padding:30px;max-width:400px;width:90%;text-align:center;color:#fff;box-shadow:0 10px 40px rgba(0,0,0,0.5);">
+        <h2 style="margin:0 0 10px 0;font-size:22px;">欢迎来到龙黑化创作工坊</h2>
+        <p style="margin:0 0 25px 0;color:#aaa;font-size:14px;">只需两步，开启创作之旅</p>
+        
         <!-- 第一步：存储权限 -->
-        <div class="onboarding-step active" id="onboardingStep1">
-            <div class="onboarding-step-icon">📁</div>
-            <div class="onboarding-step-title" data-i18n="onboarding_step1_title">存储权限</div>
-            <div class="onboarding-step-desc" data-i18n="onboarding_step1_desc">存储权限用于游戏中上传文件（作品图标、封面、导入文件等）</div>
-            <div class="onboarding-status checking" id="storageStatus" data-i18n="onboarding_step1_checking">正在检测存储权限...</div>
-            <button class="onboarding-btn onboarding-btn-primary" id="grantStorageBtn" onclick="grantStoragePermission()" data-i18n="onboarding_btn_grant">开启存储权限</button>
-            <button class="onboarding-btn onboarding-btn-secondary" onclick="skipOnboardingStep(1)" data-i18n="onboarding_btn_skip">跳过</button>
+        <div id="onboardingStep1" style="display:block;">
+            <div style="font-size:40px;margin-bottom:15px;">📁</div>
+            <h3 style="margin:0 0 10px 0;font-size:18px;">第 1 步 / 共 2 步：存储权限</h3>
+            <p style="margin:0 0 20px 0;color:#ccc;font-size:14px;line-height:1.6;">存储权限用于游戏中上传文件使用<br>请点击下方按钮开启存储权限</p>
+            <button id="onboardingStorageBtn" style="background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;padding:12px 30px;border-radius:8px;font-size:15px;cursor:pointer;width:100%;">开启存储权限</button>
+            <p id="onboardingStorageStatus" style="margin:15px 0 0 0;font-size:13px;color:#4ade80;display:none;">✓ 存储权限已开启</p>
         </div>
-
-        <!-- 第二步：设备位置 -->
-        <div class="onboarding-step" id="onboardingStep2">
-            <div class="onboarding-step-icon">📍</div>
-            <div class="onboarding-step-title" data-i18n="onboarding_step2_title">设备位置</div>
-            <div class="onboarding-step-desc" data-i18n="onboarding_step2_desc">获取设备位置用于适配时区时间，否则将自动使用美国地区时间</div>
-            <div class="onboarding-status checking" id="locationStatus" data-i18n="onboarding_step2_checking">正在获取设备位置...</div>
-            <button class="onboarding-btn onboarding-btn-primary" id="getLocationBtn" onclick="getDeviceLocation()" data-i18n="onboarding_btn_get_location">获取设备位置</button>
-            <button class="onboarding-btn onboarding-btn-secondary" onclick="skipOnboardingStep(2)" data-i18n="onboarding_btn_skip">跳过</button>
+        
+        <!-- 第二步：位置权限 -->
+        <div id="onboardingStep2" style="display:none;">
+            <div style="font-size:40px;margin-bottom:15px;">📍</div>
+            <h3 style="margin:0 0 10px 0;font-size:18px;">第 2 步 / 共 2 步：设备位置</h3>
+            <p style="margin:0 0 20px 0;color:#ccc;font-size:14px;line-height:1.6;">获取设备位置用于适配时间使用<br>否则将自动使用美国地区时间</p>
+            <button id="onboardingLocationBtn" style="background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;padding:12px 30px;border-radius:8px;font-size:15px;cursor:pointer;width:100%;">获取设备位置</button>
+            <p id="onboardingLocationStatus" style="margin:15px 0 0 0;font-size:13px;color:#4ade80;display:none;">✓ 位置已获取</p>
         </div>
-
+        
         <!-- 完成按钮 -->
-        <div id="onboardingDoneSection" style="display:none;margin-top:16px">
-            <button class="onboarding-btn onboarding-btn-done" onclick="completeOnboarding()" data-i18n="onboarding_btn_done">✓ 已经设置，进入主界面</button>
+        <div id="onboardingDoneSection" style="display:none;margin-top:25px;">
+            <button id="onboardingDoneBtn" style="background:linear-gradient(135deg,#10b981,#059669);color:#fff;border:none;padding:14px 30px;border-radius:8px;font-size:16px;cursor:pointer;width:100%;font-weight:bold;">已经设置，进入主界面</button>
         </div>
-
-        <div class="onboarding-indicator">
-            <div class="onboarding-dot active" id="dot1"></div>
-            <div class="onboarding-dot" id="dot2"></div>
-        </div>
-        <div class="onboarding-step-text" id="onboardingStepText">第 1 步 / 共 2 步</div>
     </div>
 </div>
+
 </body>
 </html>

@@ -561,8 +561,9 @@ elseif ($action === 'searchGames') {
     try {
         $pdo = getDB();
         $keyword = '%' . $keyword . '%';
-        $stmt = $pdo->prepare("SELECT id, user_id, username as author, title, file_path, icon, description, likes, collects, views, unique_views, created_at FROM user_games WHERE status = 'approved' AND (title LIKE ? OR username LIKE ?) ORDER BY created_at DESC LIMIT 50");
-        $stmt->execute([$keyword, $keyword]);
+        // 只搜索作品标题，不搜索作者名字
+        $stmt = $pdo->prepare("SELECT id, user_id, username as author, title, file_path, icon, description, likes, collects, views, unique_views, created_at FROM user_games WHERE status = 'approved' AND title LIKE ? ORDER BY created_at DESC LIMIT 50");
+        $stmt->execute([$keyword]);
         $games = $stmt->fetchAll(PDO::FETCH_ASSOC);
         foreach ($games as &$g) {
             $stmt = $pdo->prepare("SELECT id FROM game_likes WHERE game_id = ? AND user_id = ?");
@@ -1420,6 +1421,7 @@ elseif ($action === 'getFriends') {
 elseif ($action === 'searchUsers') {
     $token = isset($_POST['token']) ? trim($_POST['token']) : '';
     $keyword = isset($_POST['keyword']) ? trim($_POST['keyword']) : '';
+    $searchType = isset($_POST['search_type']) ? trim($_POST['search_type']) : 'all'; // all=全部, name=按名字, id=按ID
     if (empty($token) || !isset($_SESSION['user_token']) || $_SESSION['user_token'] !== $token) {
         response(false, '未登录');
     }
@@ -1429,22 +1431,53 @@ elseif ($action === 'searchUsers') {
     $userId = $_SESSION['user_id'];
     try {
         $pdo = getDB();
-        $keyword = '%' . $keyword . '%';
-        $stmt = $pdo->prepare("
-            SELECT id, username, avatar, rcoins, bio 
-            FROM users 
-            WHERE id != ? AND (username LIKE ? OR id LIKE ?)
-            ORDER BY 
-                CASE 
-                    WHEN username = ? THEN 1
-                    WHEN username LIKE ? THEN 2
-                    ELSE 3
-                END,
-                username ASC
-            LIMIT 15
-        ");
-        $searchTerm = isset($_POST['keyword']) ? trim($_POST['keyword']) : '';
-        $stmt->execute([$userId, $keyword, $keyword, $searchTerm, $keyword]);
+        $searchTerm = $keyword;
+        
+        if ($searchType === 'id') {
+            // 按ID精确搜索：只显示完全等于这个ID的结果
+            $stmt = $pdo->prepare("
+                SELECT id, username, avatar, rcoins, bio 
+                FROM users 
+                WHERE id != ? AND id = ?
+                LIMIT 15
+            ");
+            $stmt->execute([$userId, intval($keyword)]);
+        } elseif ($searchType === 'name') {
+            // 按名字模糊搜索：包括这个名字的都显示
+            $keyword = '%' . $keyword . '%';
+            $stmt = $pdo->prepare("
+                SELECT id, username, avatar, rcoins, bio 
+                FROM users 
+                WHERE id != ? AND username LIKE ?
+                ORDER BY 
+                    CASE 
+                        WHEN username = ? THEN 1
+                        WHEN username LIKE ? THEN 2
+                        ELSE 3
+                    END,
+                    username ASC
+                LIMIT 15
+            ");
+            $stmt->execute([$userId, $keyword, $searchTerm, $keyword]);
+        } else {
+            // 默认：同时搜索用户名和ID（模糊匹配）
+            $keyword = '%' . $keyword . '%';
+            $stmt = $pdo->prepare("
+                SELECT id, username, avatar, rcoins, bio 
+                FROM users 
+                WHERE id != ? AND (username LIKE ? OR id LIKE ?)
+                ORDER BY 
+                    CASE 
+                        WHEN username = ? THEN 1
+                        WHEN username LIKE ? THEN 2
+                        ELSE 3
+                    END,
+                    username ASC
+                LIMIT 15
+            ");
+            $stmt->execute([$userId, $keyword, $keyword, $searchTerm, $keyword]);
+        }
+        
         $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
         foreach ($users as &$u) {
             $stmt2 = $pdo->prepare("SELECT id FROM user_friends WHERE ((user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)) AND status = 'accepted'");
@@ -1469,7 +1502,7 @@ elseif ($action === 'searchUsers') {
     }
 }
 
-elseif ($action === 'sendFriendRequestDirect') {
+elseif ($action === 'sendFriendRequest' || $action === 'sendFriendRequestDirect') {
     $token = isset($_POST['token']) ? trim($_POST['token']) : '';
     $targetId = isset($_POST['target_id']) ? intval($_POST['target_id']) : 0;
     if (empty($token) || !isset($_SESSION['user_token']) || $_SESSION['user_token'] !== $token) {
@@ -2233,56 +2266,879 @@ elseif ($action === 'adminDeleteCode') {
     }
 }
 
-
-elseif ( === 'checkOnboarding') {
-     = isset(['token']) ? trim(['token']) : '';
-    if (empty() || !isset(['user_token']) || ['user_token'] !== ) {
+elseif ($action === 'checkOnboarding') {
+    $token = isset($_POST['token']) ? trim($_POST['token']) : '';
+    if (empty($token) || !isset($_SESSION['user_token']) || $_SESSION['user_token'] !== $token) {
         response(false, '未登录');
     }
-     = isset(['user_id']) ? intval(['user_id']) : 0;
+    $userId = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0;
     session_write_close();
     try {
-         = getDB();
-         = 0;
+        $pdo = getDB();
+        $done = 0;
         try {
-             = ->prepare("SELECT onboarding_done FROM users WHERE id = ?");
-            ->execute([]);
-             = ->fetch();
-            if ( && isset(['onboarding_done'])) {
-                 = intval(['onboarding_done']);
+            $stmt = $pdo->prepare("SELECT onboarding_done FROM users WHERE id = ?");
+            $stmt->execute([$userId]);
+            $row = $stmt->fetch();
+            if ($row && isset($row['onboarding_done'])) {
+                $done = intval($row['onboarding_done']);
             }
-        } catch (PDOException ) {
-             = 0;
+        } catch (PDOException $e2) {
+            $done = 0;
         }
-        response(true, '', ['done' => ]);
-    } catch (PDOException ) {
+        response(true, '', ['done' => $done]);
+    } catch (PDOException $e) {
         response(true, '', ['done' => 0]);
     }
 }
 
-elseif ( === 'completeOnboarding') {
-     = isset(['token']) ? trim(['token']) : '';
-    if (empty() || !isset(['user_token']) || ['user_token'] !== ) {
+elseif ($action === 'completeOnboarding') {
+    $token = isset($_POST['token']) ? trim($_POST['token']) : '';
+    if (empty($token) || !isset($_SESSION['user_token']) || $_SESSION['user_token'] !== $token) {
         response(false, '未登录');
     }
-     = isset(['user_id']) ? intval(['user_id']) : 0;
+    $userId = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0;
     session_write_close();
     try {
-         = getDB();
+        $pdo = getDB();
         try {
-             = ->prepare("UPDATE users SET onboarding_done = 1 WHERE id = ?");
-            ->execute([]);
-        } catch (PDOException ) {
-            try {
-                ->exec("ALTER TABLE users ADD COLUMN onboarding_done TINYINT DEFAULT 0");
-                 = ->prepare("UPDATE users SET onboarding_done = 1 WHERE id = ?");
-                ->execute([]);
-            } catch (PDOException ) {
-            }
+            $stmt = $pdo->prepare("UPDATE users SET onboarding_done = 1 WHERE id = ?");
+            $stmt->execute([$userId]);
+        } catch (PDOException $e2) {
+            // 字段不存在时忽略
         }
         response(true, '引导完成');
-    } catch (PDOException ) {
-        response(false, '操作失败: ' . ->getMessage());
+    } catch (PDOException $e) {
+        response(false, '操作失败: ' . $e->getMessage());
+    }
+}
+
+elseif ($action === 'getUserEmail') {
+    $token = isset($_POST['token']) ? trim($_POST['token']) : '';
+    if (empty($token) || !isset($_SESSION['user_token']) || $_SESSION['user_token'] !== $token) {
+        response(false, '未登录');
+    }
+    $userId = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0;
+    session_write_close();
+    try {
+        $pdo = getDB();
+        $stmt = $pdo->prepare("SELECT email FROM users WHERE id = ?");
+        $stmt->execute([$userId]);
+        $row = $stmt->fetch();
+        if ($row && !empty($row['email'])) {
+            response(true, '', ['email' => $row['email']]);
+        } else {
+            response(false, '未找到邮箱');
+        }
+    } catch (PDOException $e) {
+        response(false, '数据库错误: ' . $e->getMessage());
+    }
+}
+
+elseif ($action === 'sendChangePasswordCode') {
+    $token = isset($_POST['token']) ? trim($_POST['token']) : '';
+    if (empty($token) || !isset($_SESSION['user_token']) || $_SESSION['user_token'] !== $token) {
+        response(false, '未登录');
+    }
+    $userId = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0;
+    try {
+        $pdo = getDB();
+        $stmt = $pdo->prepare("SELECT email FROM users WHERE id = ?");
+        $stmt->execute([$userId]);
+        $row = $stmt->fetch();
+        if (!$row || empty($row['email'])) {
+            response(false, '未找到邮箱');
+        }
+        $email = $row['email'];
+        $code = generateCode();
+        $_SESSION['verify_code'] = $code;
+        $_SESSION['verify_email'] = $email;
+        $_SESSION['verify_time'] = time();
+        if (sendVerificationEmail($email, $code)) {
+            response(true, '验证码已发送到 ' . $email . '，请查收');
+        } else {
+            response(false, '邮件发送失败，请稍后重试');
+        }
+    } catch (PDOException $e) {
+        response(false, '数据库错误: ' . $e->getMessage());
+    }
+}
+
+elseif ($action === 'changePassword') {
+    $token = isset($_POST['token']) ? trim($_POST['token']) : '';
+    if (empty($token) || !isset($_SESSION['user_token']) || $_SESSION['user_token'] !== $token) {
+        response(false, '未登录');
+    }
+    $email = isset($_POST['email']) ? trim($_POST['email']) : '';
+    $code = isset($_POST['code']) ? trim($_POST['code']) : '';
+    $newPassword = isset($_POST['new_password']) ? $_POST['new_password'] : '';
+    
+    if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        response(false, '邮箱无效');
+    }
+    if (empty($code) || strlen($code) !== 6) {
+        response(false, '请输入6位验证码');
+    }
+    if (empty($newPassword) || strlen($newPassword) < 6 || strlen($newPassword) > 20) {
+        response(false, '新密码长度应为6-20位');
+    }
+    if (!isset($_SESSION['verify_code']) || !isset($_SESSION['verify_email'])) {
+        response(false, '请先获取验证码');
+    }
+    if ($_SESSION['verify_email'] !== $email) {
+        response(false, '验证码与邮箱不匹配');
+    }
+    if ($_SESSION['verify_code'] !== $code) {
+        response(false, '验证码错误');
+    }
+    if (time() - $_SESSION['verify_time'] > 300) {
+        response(false, '验证码已过期，请重新获取');
+    }
+    
+    $userId = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0;
+    try {
+        $pdo = getDB();
+        $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+        $stmt = $pdo->prepare("UPDATE users SET password = ? WHERE id = ? AND email = ?");
+        $stmt->execute([$hashedPassword, $userId, $email]);
+        // 清除验证码
+        unset($_SESSION['verify_code']);
+        unset($_SESSION['verify_email']);
+        unset($_SESSION['verify_time']);
+        response(true, '密码修改成功');
+    } catch (PDOException $e) {
+        response(false, '修改失败: ' . $e->getMessage());
+    }
+}
+
+elseif ($action === 'githubLogin') {
+    // GitHub OAuth 登录
+    $code = isset($_POST['code']) ? trim($_POST['code']) : '';
+    if (empty($code)) {
+        response(false, '缺少授权码');
+    }
+    
+    $clientId = 'Ov23liASYrS51uIyeC9m';
+    $clientSecret = 'afb61385c2c2b35638d2dcec91877d4776f74faa';
+    
+    // 第一步：用授权码换 access_token
+    $tokenUrl = 'https://github.com/login/oauth/access_token';
+    $tokenData = [
+        'client_id' => $clientId,
+        'client_secret' => $clientSecret,
+        'code' => $code
+    ];
+    
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $tokenUrl);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($tokenData));
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Accept: application/json'
+    ]);
+    $tokenResponse = curl_exec($ch);
+    $tokenHttpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $tokenCurlError = curl_error($ch);
+    curl_close($ch);
+    
+    if ($tokenCurlError) {
+        response(false, '获取GitHub token网络错误: ' . $tokenCurlError);
+    }
+    
+    if ($tokenHttpCode !== 200 || !$tokenResponse) {
+        response(false, '获取GitHub token失败 [HTTP ' . $tokenHttpCode . ']: ' . substr($tokenResponse, 0, 200));
+    }
+    
+    $tokenResult = json_decode($tokenResponse, true);
+    if (!$tokenResult || empty($tokenResult['access_token'])) {
+        response(false, 'GitHub token解析失败: ' . substr($tokenResponse, 0, 200));
+    }
+    
+    $accessToken = $tokenResult['access_token'];
+    
+    // 第二步：用 access_token 获取用户信息
+    $userUrl = 'https://api.github.com/user';
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $userUrl);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Authorization: token ' . $accessToken,
+        'User-Agent: LongHeiHua-App',
+        'Accept: application/vnd.github.v3+json'
+    ]);
+    $userResponse = curl_exec($ch);
+    $userHttpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $userCurlError = curl_error($ch);
+    curl_close($ch);
+    
+    if ($userCurlError) {
+        response(false, '获取GitHub用户信息网络错误: ' . $userCurlError);
+    }
+    
+    if ($userHttpCode !== 200 || !$userResponse) {
+        response(false, '获取GitHub用户信息失败 [HTTP ' . $userHttpCode . ']: ' . substr($userResponse, 0, 200));
+    }
+    
+    $githubUser = json_decode($userResponse, true);
+    if (!$githubUser) {
+        response(false, 'GitHub用户信息解析失败: ' . substr($userResponse, 0, 200));
+    }
+    
+    $githubId = $githubUser['id'] ?? '';
+    $githubUsername = $githubUser['login'] ?? '';
+    $githubName = $githubUser['name'] ?? ($githubUsername ?: 'GitHub用户');
+    $githubAvatar = $githubUser['avatar_url'] ?? '';
+    $githubEmail = $githubUser['email'] ?? '';
+    
+    if (empty($githubId)) {
+        response(false, '未获取到GitHub用户ID');
+    }
+    
+    // 检查是否是绑定模式（已登录用户绑定第三方账号）
+    $bindMode = isset($_POST['bind_mode']) && $_POST['bind_mode'] === '1';
+    $bindToken = isset($_POST['token']) ? trim($_POST['token']) : '';
+    if ($bindMode) {
+        if (empty($bindToken) || !isset($_SESSION['user_token']) || $_SESSION['user_token'] !== $bindToken) {
+            response(false, '未登录，无法绑定');
+        }
+        $currentUserId = $_SESSION['user_id'];
+        try {
+            $pdo = getDB();
+            // 检查该GitHub账号是否已经绑定到其他账号
+            $stmt = $pdo->prepare("SELECT id, username FROM users WHERE github_id = ? AND id != ? LIMIT 1");
+            $stmt->execute([$githubId, $currentUserId]);
+            $otherUser = $stmt->fetch();
+            if ($otherUser) {
+                response(false, '你的GitHub账号（' . $githubUsername . '）已绑定到账号「' . $otherUser['username'] . '」，请先在该账号取消绑定后再试');
+            }
+            // 绑定到当前账号
+            try {
+                $pdo->prepare("UPDATE users SET github_id = ?, github_access_token = ?, github_username = ? WHERE id = ?")
+                    ->execute([$githubId, $accessToken, $githubUsername, $currentUserId]);
+            } catch (Exception $e) {
+                // 如果github_id字段不存在，用taptap_openid字段兼容
+                $pdo->prepare("UPDATE users SET taptap_openid = ?, taptap_access_token = ? WHERE id = ?")
+                    ->execute(['github_' . $githubId, $accessToken, $currentUserId]);
+            }
+            response(true, 'GitHub账号绑定成功', ['platform' => 'github', 'username' => $githubUsername]);
+        } catch (PDOException $e) {
+            response(false, '绑定失败: ' . $e->getMessage());
+        }
+    }
+    
+    // 第三步：在数据库中查找或创建用户（正常登录模式）
+    try {
+        $pdo = getDB();
+        
+        // 查找是否已有绑定的账号（用github_id字段，如果没有则用taptap_openid字段兼容）
+        $stmt = $pdo->prepare("SELECT id, username, email FROM users WHERE github_id = ? LIMIT 1");
+        $stmt->execute([$githubId]);
+        $existingUser = $stmt->fetch();
+        
+        // 如果github_id字段不存在，尝试用taptap_openid字段（兼容旧数据库）
+        if (!$existingUser) {
+            try {
+                $stmt = $pdo->prepare("SELECT id, username, email FROM users WHERE taptap_openid = ? LIMIT 1");
+                $stmt->execute(['github_' . $githubId]);
+                $existingUser = $stmt->fetch();
+            } catch (Exception $e) {
+                // 忽略字段不存在的错误
+            }
+        }
+        
+        if ($existingUser) {
+            // 已有账号，直接登录
+            $userId = $existingUser['id'];
+            $username = $existingUser['username'];
+            $email = $existingUser['email'];
+            
+            // 更新github_id和access_token
+            try {
+                $pdo->prepare("UPDATE users SET github_id = ?, github_access_token = ?, avatar = ? WHERE id = ?")
+                    ->execute([$githubId, $accessToken, $githubAvatar, $userId]);
+            } catch (Exception $e) {
+                // 如果字段不存在，忽略
+            }
+        } else {
+            // 新账号，创建用户
+            $username = $githubName;
+            // 检查用户名是否重复，重复则加随机后缀
+            $stmt = $pdo->prepare("SELECT id FROM users WHERE username = ? LIMIT 1");
+            $stmt->execute([$username]);
+            if ($stmt->fetch()) {
+                $username = $githubName . '_' . substr(md5(time()), 0, 4);
+            }
+            
+            $randomPassword = bin2hex(random_bytes(16));
+            $hashedPassword = password_hash($randomPassword, PASSWORD_DEFAULT);
+            $email = $githubEmail ?: ($githubUsername . '@github.local');
+            
+            // 尝试用github_id字段插入，如果字段不存在则用taptap_openid字段兼容
+            try {
+                $stmt = $pdo->prepare("INSERT INTO users (username, email, password, github_id, github_access_token, github_username, avatar, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())");
+                $stmt->execute([$username, $email, $hashedPassword, $githubId, $accessToken, $githubUsername, $githubAvatar]);
+            } catch (Exception $e) {
+                // 如果github_id字段不存在，用taptap_openid字段兼容
+                $stmt = $pdo->prepare("INSERT INTO users (username, email, password, taptap_openid, taptap_access_token, avatar, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())");
+                $stmt->execute([$username, $email, $hashedPassword, 'github_' . $githubId, $accessToken, $githubAvatar]);
+            }
+            $userId = $pdo->lastInsertId();
+        }
+        
+        // 生成系统 token
+        $token = bin2hex(random_bytes(32));
+        $_SESSION['user_id'] = $userId;
+        $_SESSION['username'] = $username;
+        $_SESSION['user_token'] = $token;
+        $_SESSION['login_time'] = time();
+        
+        // 更新用户最后登录时间（加容错，字段不存在也不报错）
+        try {
+            $pdo->prepare("UPDATE users SET last_login = NOW() WHERE id = ?")->execute([$userId]);
+        } catch (Exception $e) {
+            // 忽略字段不存在的错误
+        }
+        
+        response(true, '登录成功', [
+            'token' => $token,
+            'user_id' => $userId,
+            'username' => $username,
+            'email' => $email
+        ]);
+        
+    } catch (PDOException $e) {
+        response(false, '数据库错误: ' . $e->getMessage());
+    }
+}
+
+elseif ($action === 'discordLogin') {
+    // Discord OAuth 登录
+    $code = isset($_POST['code']) ? trim($_POST['code']) : '';
+    if (empty($code)) {
+        response(false, '缺少授权码');
+    }
+    
+    $clientId = '1547608690750656552';
+    $clientSecret = '1ZsyOWE25yia8G-fYcFwF75ojkezUcfP';
+    $redirectUri = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . '/callback_discord.html';
+    
+    // 第一步：用授权码换 access_token
+    $tokenUrl = 'https://discord.com/api/oauth2/token';
+    $tokenData = [
+        'client_id' => $clientId,
+        'client_secret' => $clientSecret,
+        'grant_type' => 'authorization_code',
+        'code' => $code,
+        'redirect_uri' => $redirectUri
+    ];
+    
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $tokenUrl);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($tokenData));
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Content-Type: application/x-www-form-urlencoded'
+    ]);
+    $tokenResponse = curl_exec($ch);
+    $tokenHttpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $tokenCurlError = curl_error($ch);
+    curl_close($ch);
+    
+    if ($tokenCurlError) {
+        response(false, '获取Discord token网络错误: ' . $tokenCurlError);
+    }
+    
+    if ($tokenHttpCode !== 200 || !$tokenResponse) {
+        response(false, '获取Discord token失败 [HTTP ' . $tokenHttpCode . ']: ' . substr($tokenResponse, 0, 200));
+    }
+    
+    $tokenResult = json_decode($tokenResponse, true);
+    if (!$tokenResult || empty($tokenResult['access_token'])) {
+        response(false, 'Discord token解析失败: ' . substr($tokenResponse, 0, 200));
+    }
+    
+    $accessToken = $tokenResult['access_token'];
+    
+    // 第二步：用 access_token 获取用户信息
+    $userUrl = 'https://discord.com/api/users/@me';
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $userUrl);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Authorization: Bearer ' . $accessToken,
+        'Content-Type: application/json'
+    ]);
+    $userResponse = curl_exec($ch);
+    $userHttpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $userCurlError = curl_error($ch);
+    curl_close($ch);
+    
+    if ($userCurlError) {
+        response(false, '获取Discord用户信息网络错误: ' . $userCurlError);
+    }
+    
+    if ($userHttpCode !== 200 || !$userResponse) {
+        response(false, '获取Discord用户信息失败 [HTTP ' . $userHttpCode . ']: ' . substr($userResponse, 0, 200));
+    }
+    
+    $discordUser = json_decode($userResponse, true);
+    if (!$discordUser) {
+        response(false, 'Discord用户信息解析失败: ' . substr($userResponse, 0, 200));
+    }
+    
+    $discordId = $discordUser['id'] ?? '';
+    $discordUsername = $discordUser['username'] ?? '';
+    $discordDiscriminator = $discordUser['discriminator'] ?? '0';
+    $discordAvatarHash = $discordUser['avatar'] ?? '';
+    $discordEmail = $discordUser['email'] ?? '';
+    
+    if (empty($discordId)) {
+        response(false, '未获取到Discord用户ID');
+    }
+    
+    // 拼接头像URL
+    if (!empty($discordAvatarHash)) {
+        $discordAvatar = 'https://cdn.discordapp.com/avatars/' . $discordId . '/' . $discordAvatarHash . '.png';
+    } else {
+        // 默认头像
+        $defaultAvatarIndex = intval($discordDiscriminator) % 5;
+        $discordAvatar = 'https://cdn.discordapp.com/embed/avatars/' . $defaultAvatarIndex . '.png';
+    }
+    
+    // 显示名称（用户名#区分符，新用户名系统可能没有区分符）
+    if ($discordDiscriminator !== '0' && !empty($discordDiscriminator)) {
+        $displayName = $discordUsername . '#' . $discordDiscriminator;
+    } else {
+        $displayName = $discordUsername;
+    }
+    
+    // 第三步：在数据库中查找或创建用户
+    try {
+        $pdo = getDB();
+        
+        // 查找是否已有绑定的账号
+        $stmt = $pdo->prepare("SELECT id, username, email FROM users WHERE discord_id = ? LIMIT 1");
+        $stmt->execute([$discordId]);
+        $existingUser = $stmt->fetch();
+        
+        // 如果discord_id字段不存在，尝试用taptap_openid字段兼容
+        if (!$existingUser) {
+            try {
+                $stmt = $pdo->prepare("SELECT id, username, email FROM users WHERE taptap_openid = ? LIMIT 1");
+                $stmt->execute(['discord_' . $discordId]);
+                $existingUser = $stmt->fetch();
+            } catch (Exception $e) {
+                // 忽略字段不存在的错误
+            }
+        }
+        
+        if ($existingUser) {
+            // 已有账号，直接登录
+            $userId = $existingUser['id'];
+            $username = $existingUser['username'];
+            $email = $existingUser['email'];
+            
+            // 更新discord_id和access_token
+            try {
+                $pdo->prepare("UPDATE users SET discord_id = ?, discord_access_token = ?, avatar = ? WHERE id = ?")
+                    ->execute([$discordId, $accessToken, $discordAvatar, $userId]);
+            } catch (Exception $e) {
+                // 如果字段不存在，忽略
+            }
+        } else {
+            // 新账号，创建用户
+            $username = $displayName;
+            // 检查用户名是否重复，重复则加随机后缀
+            $stmt = $pdo->prepare("SELECT id FROM users WHERE username = ? LIMIT 1");
+            $stmt->execute([$username]);
+            if ($stmt->fetch()) {
+                $username = $discordUsername . '_' . substr(md5(time()), 0, 4);
+            }
+            
+            $randomPassword = bin2hex(random_bytes(16));
+            $hashedPassword = password_hash($randomPassword, PASSWORD_DEFAULT);
+            $email = $discordEmail ?: ($discordUsername . '@discord.local');
+            
+            // 尝试用discord_id字段插入，如果字段不存在则用taptap_openid字段兼容
+            try {
+                $stmt = $pdo->prepare("INSERT INTO users (username, email, password, discord_id, discord_access_token, discord_username, avatar, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())");
+                $stmt->execute([$username, $email, $hashedPassword, $discordId, $accessToken, $discordUsername, $discordAvatar]);
+            } catch (Exception $e) {
+                // 如果discord_id字段不存在，用taptap_openid字段兼容
+                $stmt = $pdo->prepare("INSERT INTO users (username, email, password, taptap_openid, taptap_access_token, avatar, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())");
+                $stmt->execute([$username, $email, $hashedPassword, 'discord_' . $discordId, $accessToken, $discordAvatar]);
+            }
+            $userId = $pdo->lastInsertId();
+        }
+        
+        // 生成系统 token
+        $token = bin2hex(random_bytes(32));
+        $_SESSION['user_id'] = $userId;
+        $_SESSION['username'] = $username;
+        $_SESSION['user_token'] = $token;
+        $_SESSION['login_time'] = time();
+        
+        // 更新用户最后登录时间（加容错）
+        try {
+            $pdo->prepare("UPDATE users SET last_login = NOW() WHERE id = ?")->execute([$userId]);
+        } catch (Exception $e) {
+            // 忽略字段不存在的错误
+        }
+        
+        response(true, '登录成功', [
+            'token' => $token,
+            'user_id' => $userId,
+            'username' => $username,
+            'email' => $email
+        ]);
+        
+    } catch (PDOException $e) {
+        response(false, '数据库错误: ' . $e->getMessage());
+    }
+}
+
+elseif ($action === 'giteeLogin') {
+    // Gitee OAuth 登录
+    $code = isset($_POST['code']) ? trim($_POST['code']) : '';
+    if (empty($code)) {
+        response(false, '缺少授权码');
+    }
+    
+    $clientId = 'b889443affb4a406a4535a032d2d3ae35c4846a0158892894b01dc9b68aee19e';
+    $clientSecret = 'f3e8951f63936902c7d4007d93f5cf3b50ccdfd746799cfc12aadd018278b515';
+    $redirectUri = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . '/callback_gitee.html';
+    
+    // 第一步：用授权码换 access_token
+    $tokenUrl = 'https://gitee.com/oauth/token';
+    $tokenData = [
+        'grant_type' => 'authorization_code',
+        'code' => $code,
+        'client_id' => $clientId,
+        'client_secret' => $clientSecret,
+        'redirect_uri' => $redirectUri
+    ];
+    
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $tokenUrl);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($tokenData));
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Accept: application/json',
+        'Content-Type: application/x-www-form-urlencoded'
+    ]);
+    $tokenResponse = curl_exec($ch);
+    $tokenHttpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $tokenCurlError = curl_error($ch);
+    curl_close($ch);
+    
+    if ($tokenCurlError) {
+        response(false, '获取Gitee token网络错误: ' . $tokenCurlError);
+    }
+    
+    if ($tokenHttpCode !== 200 || !$tokenResponse) {
+        response(false, '获取Gitee token失败 [HTTP ' . $tokenHttpCode . ']: ' . substr($tokenResponse, 0, 200));
+    }
+    
+    $tokenResult = json_decode($tokenResponse, true);
+    if (!$tokenResult || empty($tokenResult['access_token'])) {
+        response(false, 'Gitee token解析失败: ' . substr($tokenResponse, 0, 200));
+    }
+    
+    $accessToken = $tokenResult['access_token'];
+    
+    // 第二步：用 access_token 获取用户信息
+    $userUrl = 'https://gitee.com/api/v5/user?access_token=' . urlencode($accessToken);
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $userUrl);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Accept: application/json',
+        'User-Agent: LongHeiHua-App'
+    ]);
+    $userResponse = curl_exec($ch);
+    $userHttpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $userCurlError = curl_error($ch);
+    curl_close($ch);
+    
+    if ($userCurlError) {
+        response(false, '获取Gitee用户信息网络错误: ' . $userCurlError);
+    }
+    
+    if ($userHttpCode !== 200 || !$userResponse) {
+        response(false, '获取Gitee用户信息失败 [HTTP ' . $userHttpCode . ']: ' . substr($userResponse, 0, 200));
+    }
+    
+    $giteeUser = json_decode($userResponse, true);
+    if (!$giteeUser) {
+        response(false, 'Gitee用户信息解析失败: ' . substr($userResponse, 0, 200));
+    }
+    
+    $giteeId = $giteeUser['id'] ?? '';
+    $giteeLogin = $giteeUser['login'] ?? '';
+    $giteeName = $giteeUser['name'] ?? ($giteeLogin ?: 'Gitee用户');
+    $giteeAvatar = $giteeUser['avatar_url'] ?? '';
+    $giteeEmail = $giteeUser['email'] ?? '';
+    
+    if (empty($giteeId)) {
+        response(false, '未获取到Gitee用户ID');
+    }
+    
+    // 检查是否是绑定模式（已登录用户绑定第三方账号）
+    $bindMode = isset($_POST['bind_mode']) && $_POST['bind_mode'] === '1';
+    $bindToken = isset($_POST['token']) ? trim($_POST['token']) : '';
+    if ($bindMode) {
+        if (empty($bindToken) || !isset($_SESSION['user_token']) || $_SESSION['user_token'] !== $bindToken) {
+            response(false, '未登录，无法绑定');
+        }
+        $currentUserId = $_SESSION['user_id'];
+        try {
+            $pdo = getDB();
+            // 检查该Gitee账号是否已经绑定到其他账号
+            $stmt = $pdo->prepare("SELECT id, username FROM users WHERE gitee_id = ? AND id != ? LIMIT 1");
+            $stmt->execute([$giteeId, $currentUserId]);
+            $otherUser = $stmt->fetch();
+            if ($otherUser) {
+                response(false, '你的Gitee账号（' . $giteeLogin . '）已绑定到账号「' . $otherUser['username'] . '」，请先在该账号取消绑定后再试');
+            }
+            // 绑定到当前账号
+            try {
+                $pdo->prepare("UPDATE users SET gitee_id = ?, gitee_access_token = ?, gitee_username = ? WHERE id = ?")
+                    ->execute([$giteeId, $accessToken, $giteeLogin, $currentUserId]);
+            } catch (Exception $e) {
+                // 如果gitee_id字段不存在，用taptap_openid字段兼容
+                $pdo->prepare("UPDATE users SET taptap_openid = ?, taptap_access_token = ? WHERE id = ?")
+                    ->execute(['gitee_' . $giteeId, $accessToken, $currentUserId]);
+            }
+            response(true, 'Gitee账号绑定成功', ['platform' => 'gitee', 'username' => $giteeLogin]);
+        } catch (PDOException $e) {
+            response(false, '绑定失败: ' . $e->getMessage());
+        }
+    }
+    
+    // 第三步：在数据库中查找或创建用户
+    try {
+        $pdo = getDB();
+        
+        // 查找是否已有绑定的账号
+        $stmt = $pdo->prepare("SELECT id, username, email FROM users WHERE gitee_id = ? LIMIT 1");
+        $stmt->execute([$giteeId]);
+        $existingUser = $stmt->fetch();
+        
+        // 如果gitee_id字段不存在，尝试用taptap_openid字段兼容
+        if (!$existingUser) {
+            try {
+                $stmt = $pdo->prepare("SELECT id, username, email FROM users WHERE taptap_openid = ? LIMIT 1");
+                $stmt->execute(['gitee_' . $giteeId]);
+                $existingUser = $stmt->fetch();
+            } catch (Exception $e) {
+                // 忽略字段不存在的错误
+            }
+        }
+        
+        if ($existingUser) {
+            // 已有账号，直接登录
+            $userId = $existingUser['id'];
+            $username = $existingUser['username'];
+            $email = $existingUser['email'];
+            
+            // 更新gitee_id和access_token
+            try {
+                $pdo->prepare("UPDATE users SET gitee_id = ?, gitee_access_token = ?, avatar = ? WHERE id = ?")
+                    ->execute([$giteeId, $accessToken, $giteeAvatar, $userId]);
+            } catch (Exception $e) {
+                // 如果字段不存在，忽略
+            }
+        } else {
+            // 新账号，创建用户
+            $username = $giteeName;
+            // 检查用户名是否重复，重复则加随机后缀
+            $stmt = $pdo->prepare("SELECT id FROM users WHERE username = ? LIMIT 1");
+            $stmt->execute([$username]);
+            if ($stmt->fetch()) {
+                $username = $giteeLogin . '_' . substr(md5(time()), 0, 4);
+            }
+            
+            $randomPassword = bin2hex(random_bytes(16));
+            $hashedPassword = password_hash($randomPassword, PASSWORD_DEFAULT);
+            $email = $giteeEmail ?: ($giteeLogin . '@gitee.local');
+            
+            // 尝试用gitee_id字段插入，如果字段不存在则用taptap_openid字段兼容
+            try {
+                $stmt = $pdo->prepare("INSERT INTO users (username, email, password, gitee_id, gitee_access_token, gitee_username, avatar, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())");
+                $stmt->execute([$username, $email, $hashedPassword, $giteeId, $accessToken, $giteeLogin, $giteeAvatar]);
+            } catch (Exception $e) {
+                // 如果gitee_id字段不存在，用taptap_openid字段兼容
+                $stmt = $pdo->prepare("INSERT INTO users (username, email, password, taptap_openid, taptap_access_token, avatar, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())");
+                $stmt->execute([$username, $email, $hashedPassword, 'gitee_' . $giteeId, $accessToken, $giteeAvatar]);
+            }
+            $userId = $pdo->lastInsertId();
+        }
+        
+        // 生成系统 token
+        $token = bin2hex(random_bytes(32));
+        $_SESSION['user_id'] = $userId;
+        $_SESSION['username'] = $username;
+        $_SESSION['user_token'] = $token;
+        $_SESSION['login_time'] = time();
+        
+        // 更新用户最后登录时间（加容错）
+        try {
+            $pdo->prepare("UPDATE users SET last_login = NOW() WHERE id = ?")->execute([$userId]);
+        } catch (Exception $e) {
+            // 忽略字段不存在的错误
+        }
+        
+        response(true, '登录成功', [
+            'token' => $token,
+            'user_id' => $userId,
+            'username' => $username,
+            'email' => $email
+        ]);
+        
+    } catch (PDOException $e) {
+        response(false, '数据库错误: ' . $e->getMessage());
+    }
+}
+
+elseif ($action === 'getBindings') {
+    // 获取当前账号的第三方登录绑定状态
+    $token = isset($_POST['token']) ? trim($_POST['token']) : '';
+    if (empty($token) || !isset($_SESSION['user_token']) || $_SESSION['user_token'] !== $token) {
+        response(false, '未登录');
+    }
+    $userId = $_SESSION['user_id'];
+    try {
+        $pdo = getDB();
+        
+        // 初始化绑定状态
+        $bindings = [
+            'github' => ['bound' => false, 'id' => '', 'username' => ''],
+            'gitee' => ['bound' => false, 'id' => '', 'username' => ''],
+            'discord' => ['bound' => false, 'id' => '', 'username' => '']
+        ];
+        
+        // 尝试查询所有绑定字段（加容错，字段不存在也不报错）
+        $user = null;
+        try {
+            $stmt = $pdo->prepare("SELECT github_id, github_username, gitee_id, gitee_username, discord_id, discord_username FROM users WHERE id = ? LIMIT 1");
+            $stmt->execute([$userId]);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            // 字段不存在，忽略，继续用兼容方式查询
+            $user = null;
+        }
+        
+        if ($user) {
+            $bindings['github']['bound'] = !empty($user['github_id']);
+            $bindings['github']['id'] = $user['github_id'] ?? '';
+            $bindings['github']['username'] = $user['github_username'] ?? '';
+            $bindings['gitee']['bound'] = !empty($user['gitee_id']);
+            $bindings['gitee']['id'] = $user['gitee_id'] ?? '';
+            $bindings['gitee']['username'] = $user['gitee_username'] ?? '';
+            $bindings['discord']['bound'] = !empty($user['discord_id']);
+            $bindings['discord']['id'] = $user['discord_id'] ?? '';
+            $bindings['discord']['username'] = $user['discord_username'] ?? '';
+        }
+        
+        // 如果github_id/gitee_id字段不存在或为空，尝试用taptap_openid字段兼容
+        if (!$bindings['github']['bound'] && !$bindings['gitee']['bound']) {
+            try {
+                $stmt2 = $pdo->prepare("SELECT taptap_openid FROM users WHERE id = ? LIMIT 1");
+                $stmt2->execute([$userId]);
+                $compat = $stmt2->fetch();
+                if ($compat && !empty($compat['taptap_openid'])) {
+                    if (strpos($compat['taptap_openid'], 'github_') === 0) {
+                        $bindings['github']['bound'] = true;
+                        $bindings['github']['id'] = substr($compat['taptap_openid'], 7);
+                    } elseif (strpos($compat['taptap_openid'], 'gitee_') === 0) {
+                        $bindings['gitee']['bound'] = true;
+                        $bindings['gitee']['id'] = substr($compat['taptap_openid'], 6);
+                    }
+                }
+            } catch (Exception $e) {
+                // 忽略字段不存在的错误
+            }
+        }
+        
+        response(true, '获取成功', ['bindings' => $bindings]);
+    } catch (PDOException $e) {
+        response(false, '获取失败: ' . $e->getMessage());
+    }
+}
+
+elseif ($action === 'unbindAccount') {
+    // 取消第三方账号绑定
+    $token = isset($_POST['token']) ? trim($_POST['token']) : '';
+    $platform = isset($_POST['platform']) ? trim($_POST['platform']) : '';
+    if (empty($token) || !isset($_SESSION['user_token']) || $_SESSION['user_token'] !== $token) {
+        response(false, '未登录');
+    }
+    if (!in_array($platform, ['github', 'gitee', 'discord'])) {
+        response(false, '不支持的平台');
+    }
+    $userId = $_SESSION['user_id'];
+    try {
+        $pdo = getDB();
+        
+        // 检查用户是否设置了密码，如果没有密码且只有这一个登录方式，不允许取消绑定
+        $stmt = $pdo->prepare("SELECT password, email FROM users WHERE id = ? LIMIT 1");
+        $stmt->execute([$userId]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        // 统计已绑定的第三方账号数量
+        $boundCount = 0;
+        try {
+            $stmt2 = $pdo->prepare("SELECT github_id, gitee_id, discord_id FROM users WHERE id = ? LIMIT 1");
+            $stmt2->execute([$userId]);
+            $bindInfo = $stmt2->fetch();
+            if (!empty($bindInfo['github_id'])) $boundCount++;
+            if (!empty($bindInfo['gitee_id'])) $boundCount++;
+            if (!empty($bindInfo['discord_id'])) $boundCount++;
+        } catch (Exception $e) {}
+        
+        // 如果没有密码且只有这一个绑定方式，不允许取消
+        if (empty($user['password']) && $boundCount <= 1) {
+            response(false, '您的账号没有设置密码，且这是唯一的登录方式，取消绑定后将无法登录。请先设置密码后再取消绑定。');
+        }
+        
+        // 取消绑定
+        $fieldMap = [
+            'github' => ['github_id', 'github_access_token', 'github_username'],
+            'gitee' => ['gitee_id', 'gitee_access_token', 'gitee_username'],
+            'discord' => ['discord_id', 'discord_access_token', 'discord_username']
+        ];
+        $fields = $fieldMap[$platform];
+        
+        try {
+            $sql = "UPDATE users SET " . implode(" = NULL, ", $fields) . " = NULL WHERE id = ?";
+            $pdo->prepare($sql)->execute([$userId]);
+        } catch (Exception $e) {
+            // 如果字段不存在，尝试用taptap_openid字段兼容
+            if ($platform === 'github' || $platform === 'gitee') {
+                try {
+                    $pdo->prepare("UPDATE users SET taptap_openid = NULL, taptap_access_token = NULL WHERE id = ?")->execute([$userId]);
+                } catch (Exception $e2) {}
+            }
+        }
+        
+        response(true, '已取消' . strtoupper($platform) . '账号绑定');
+    } catch (PDOException $e) {
+        response(false, '取消绑定失败: ' . $e->getMessage());
     }
 }
 

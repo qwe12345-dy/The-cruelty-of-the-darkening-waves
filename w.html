@@ -229,55 +229,215 @@ body{background:#f0f4fa;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
 }
 #rechargeModal .modal .btn-group .btn-cancel:hover{background:rgba(255,255,255,0.1)}
 </style>
-<script src="i18n.js"></script>
+<script>
+// ===== 多语言系统 =====
+var I18N = {
+    currentLang: 'zh-CN',
+    translations: {
+        'zh-CN': {
+            'page_title': '💰 R币明细',
+            'btn_recharge': '💳 充值',
+            'btn_redeem': '🎫 兑换码',
+            'total_income': '💰 总收入',
+            'total_expense': '💸 总支出',
+            'total_count': '📊 总笔数',
+            'loading': '加载中...',
+            'no_records': '📭 暂无记录',
+            'load_failed': '❌ 加载失败，请重试',
+            'redeem_title': '🎫 兑换码',
+            'redeem_sub': '输入兑换码领取R币奖励',
+            'redeem_placeholder': '输入兑换码',
+            'btn_do_redeem': '🎫 兑换',
+            'btn_cancel': '取消',
+            'err_enter_code': '❌ 请输入兑换码',
+            'verifying': '⏳ 验证中...',
+            'success_prefix': '✅ ',
+            'error_prefix': '❌ ',
+            'network_error': '❌ 网络错误，请重试',
+            'recharge_title': '💰 充值中心',
+            'recharge_sub': '购买完成后R币自动到账，请刷新余额查看',
+            'rcoin_50': '50 R币',
+            'price_50': '¥ 1.00｜入门套餐',
+            'rcoin_1000': '1000 R币',
+            'price_1000': '¥ 9.80｜超值套餐',
+            'btn_buy': '去购买',
+            'btn_close': '关闭',
+            'rcoin_change': 'R币变动',
+            'in_game': '在 ',
+            'received_tip': ' 中收到打赏',
+            'spent_tip': ' 中打赏支出',
+            'income_desc': '充值、兑换码或系统奖励',
+            'expense_desc': '消费或扣款',
+            'recharge_success': '✅ 充值成功！',
+            'rcoin_arrived': ' R币已到账',
+        },
+        'zh-TW': {
+            'page_title': '💰 R幣明細',
+            'btn_recharge': '💳 儲值',
+            'btn_redeem': '🎫 兌換碼',
+            'total_income': '💰 總收入',
+            'total_expense': '💸 總支出',
+            'total_count': '📊 總筆數',
+            'loading': '載入中...',
+            'no_records': '📭 暫無記錄',
+            'load_failed': '❌ 載入失敗，請重試',
+            'redeem_title': '🎫 兌換碼',
+            'redeem_sub': '輸入兌換碼領取R幣獎勵',
+            'redeem_placeholder': '輸入兌換碼',
+            'btn_do_redeem': '🎫 兌換',
+            'btn_cancel': '取消',
+            'err_enter_code': '❌ 請輸入兌換碼',
+            'verifying': '⏳ 驗證中...',
+            'success_prefix': '✅ ',
+            'error_prefix': '❌ ',
+            'network_error': '❌ 網路錯誤，請重試',
+            'recharge_title': '💰 儲值中心',
+            'recharge_sub': '購買完成後R幣自動到帳，請重新整理餘額查看',
+            'rcoin_50': '50 R幣',
+            'price_50': '¥ 1.00｜入門套餐',
+            'rcoin_1000': '1000 R幣',
+            'price_1000': '¥ 9.80｜超值套餐',
+            'btn_buy': '去購買',
+            'btn_close': '關閉',
+            'rcoin_change': 'R幣變動',
+            'in_game': '在 ',
+            'received_tip': ' 中收到打賞',
+            'spent_tip': '中打賞支出',
+            'income_desc': '儲值、兌換碼或系統獎勵',
+            'expense_desc': '消費或扣款',
+            'recharge_success': '✅ 儲值成功！',
+            'rcoin_arrived': ' R幣已到帳',
+        },
+        'en': {
+            'page_title': '💰 R-Coin Details',
+            'btn_recharge': '💳 Recharge',
+            'btn_redeem': '🎫 Redeem Code',
+            'total_income': '💰 Total Income',
+            'total_expense': '💸 Total Expense',
+            'total_count': '📊 Total Count',
+            'loading': 'Loading...',
+            'no_records': '📭 No records',
+            'load_failed': '❌ Load failed, please retry',
+            'redeem_title': '🎫 Redeem Code',
+            'redeem_sub': 'Enter code to claim R-Coin reward',
+            'redeem_placeholder': 'Enter code',
+            'btn_do_redeem': '🎫 Redeem',
+            'btn_cancel': 'Cancel',
+            'err_enter_code': '❌ Please enter code',
+            'verifying': '⏳ Verifying...',
+            'success_prefix': '✅ ',
+            'error_prefix': '❌ ',
+            'network_error': '❌ Network error, please retry',
+            'recharge_title': '💰 Recharge Center',
+            'recharge_sub': 'R-Coins auto-credit after purchase, refresh balance to view',
+            'rcoin_50': '50 R-Coins',
+            'price_50': '$0.99 | Starter Pack',
+            'rcoin_1000': '1000 R-Coins',
+            'price_1000': '$4.99 | Value Pack',
+            'btn_buy': 'Buy',
+            'btn_close': 'Close',
+            'rcoin_change': 'R-Coin Change',
+            'in_game': 'In ',
+            'received_tip': ' received tip',
+            'spent_tip': ' tipped',
+            'income_desc': 'Recharge, redeem or system reward',
+            'expense_desc': 'Purchase or deduction',
+            'recharge_success': '✅ Recharge successful!',
+            'rcoin_arrived': ' R-Coins credited',
+        }
+    },
+    t: function(key) {
+        var lang = this.currentLang;
+        if (this.translations[lang] && this.translations[lang][key] !== undefined) {
+            return this.translations[lang][key];
+        }
+        return key;
+    },
+    setLanguage: function(lang) {
+        this.currentLang = lang;
+        try { localStorage.setItem('app_lang', lang); } catch(e) {}
+        this.applyLanguage();
+    },
+    applyLanguage: function() {
+        var nodes = document.querySelectorAll('[data-i18n]');
+        for (var i = 0; i < nodes.length; i++) {
+            var key = nodes[i].getAttribute('data-i18n');
+            if (key) nodes[i].textContent = this.t(key);
+        }
+        var phNodes = document.querySelectorAll('[data-i18n-placeholder]');
+        for (var j = 0; j < phNodes.length; j++) {
+            var pkey = phNodes[j].getAttribute('data-i18n-placeholder');
+            if (pkey) phNodes[j].placeholder = this.t(pkey);
+        }
+        document.title = this.t('page_title');
+    },
+    init: function() {
+        try {
+            var saved = localStorage.getItem('app_lang');
+            if (saved && this.translations[saved]) {
+                this.currentLang = saved;
+            }
+        } catch(e) {}
+        this.applyLanguage();
+    }
+};
+I18N.init();
+</script>
 </head>
 <body>
 <div class="card">
     <div class="header">
         <div class="header-left">
             <button class="back-btn" onclick="history.back()">‹</button>
-            <span class="header-title" data-i18n="w_page_title">💰 R币明细</span>
+            <span class="header-title" data-i18n="page_title">💰 R币明细</span>
         </div>
         <div class="header-right">
-            <button class="btn-recharge" onclick="openRechargeModal()" data-i18n="w_btn_recharge">💳 充值</button>
-            <button class="btn-redeem" onclick="openRedeemModal()" data-i18n="w_btn_redeem">🎫 兑换码</button>
+            <button class="btn-lang" onclick="toggleLangMenu()" title="语言" style="background:transparent;border:none;font-size:18px;cursor:pointer;color:#4a5a6a;padding:4px 8px;">🌐</button>
+            <button class="btn-recharge" onclick="openRechargeModal()" data-i18n="btn_recharge">💳 充值</button>
+            <button class="btn-redeem" onclick="openRedeemModal()" data-i18n="btn_redeem">🎫 兑换码</button>
             <span class="rcoins" onclick="location.reload()"><span class="coin">🪙</span> <span id="rcoinsDisplay">0</span></span>
         </div>
     </div>
+    <!-- 语言选择菜单 -->
+    <div id="langMenu" style="display:none;position:absolute;top:50px;right:16px;background:#fff;border:1px solid #e8edf4;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,0.1);z-index:50;overflow:hidden;">
+        <button onclick="selectLang('zh-CN')" style="display:block;width:100%;padding:10px 20px;background:transparent;border:none;text-align:left;cursor:pointer;font-size:14px;color:#1a2a3a;">简体中文</button>
+        <button onclick="selectLang('zh-TW')" style="display:block;width:100%;padding:10px 20px;background:transparent;border:none;text-align:left;cursor:pointer;font-size:14px;color:#1a2a3a;">繁體中文</button>
+        <button onclick="selectLang('en')" style="display:block;width:100%;padding:10px 20px;background:transparent;border:none;text-align:left;cursor:pointer;font-size:14px;color:#1a2a3a;">English</button>
+    </div>
     <div class="content" id="contentArea">
         <div class="summary" id="summaryArea">
-            <div class="box"><div class="num income" id="totalIncome">0</div><div class="label" data-i18n="w_total_income">💰 总收入</div></div>
-            <div class="box"><div class="num expense" id="totalExpense">0</div><div class="label" data-i18n="w_total_expense">💸 总支出</div></div>
-            <div class="box"><div class="num" id="totalCount">0</div><div class="label" data-i18n="w_total_count">📊 总笔数</div></div>
+            <div class="box"><div class="num income" id="totalIncome">0</div><div class="label" data-i18n="total_income">💰 总收入</div></div>
+            <div class="box"><div class="num expense" id="totalExpense">0</div><div class="label" data-i18n="total_expense">💸 总支出</div></div>
+            <div class="box"><div class="num" id="totalCount">0</div><div class="label" data-i18n="total_count">📊 总笔数</div></div>
         </div>
         <div id="recordList">
-            <div class="loading" data-i18n="w_loading">加载中...</div>
+            <div class="loading" data-i18n="loading">加载中...</div>
         </div>
     </div>
 </div>
 <div id="redeemModal">
     <div class="modal">
-        <h3 data-i18n="w_redeem_title">🎫 兑换码</h3>
-        <div class="sub" data-i18n="w_redeem_sub">输入兑换码领取R币奖励</div>
-        <input type="text" id="redeemInput" placeholder="输入兑换码" data-i18n-placeholder="w_redeem_placeholder" maxlength="50" onkeyup="if(event.key==='Enter') doRedeem()">
+        <h3 data-i18n="redeem_title">🎫 兑换码</h3>
+        <div class="sub" data-i18n="redeem_sub">输入兑换码领取R币奖励</div>
+        <input type="text" id="redeemInput" placeholder="输入兑换码" data-i18n-placeholder="redeem_placeholder" maxlength="50" onkeyup="if(event.key==='Enter') doRedeem()">
         <div id="redeemStatus" class="status"></div>
         <div class="btn-group">
-            <button class="btn-redeem" onclick="doRedeem()" data-i18n="w_btn_do_redeem">🎫 兑换</button>
-            <button class="btn-cancel" onclick="closeRedeemModal()" data-i18n="w_btn_cancel">取消</button>
+            <button class="btn-redeem" onclick="doRedeem()" data-i18n="btn_do_redeem">🎫 兑换</button>
+            <button class="btn-cancel" onclick="closeRedeemModal()" data-i18n="btn_cancel">取消</button>
         </div>
     </div>
 </div>
 <div id="rechargeModal">
     <div class="modal">
-        <h3 data-i18n="w_recharge_title">💰 充值中心</h3>
-        <div class="sub" data-i18n="w_recharge_sub">购买完成后R币自动到账，请刷新余额查看</div>
+        <h3 data-i18n="recharge_title">💰 充值中心</h3>
+        <div class="sub" data-i18n="recharge_sub">购买完成后R币自动到账，请刷新余额查看</div>
 
         <div class="recharge-item" onclick="openBuy50()">
             <div>
                 <div class="recharge-name" data-i18n="rcoin_50">50 R币</div>
                 <div class="recharge-price" data-i18n="price_50">¥ 1.00｜入门套餐</div>
             </div>
-            <button class="btn-buy" data-i18n="w_btn_buy">去购买</button>
+            <button class="btn-buy" data-i18n="btn_buy">去购买</button>
         </div>
 
         <div class="recharge-item" onclick="openBuy1000()">
@@ -285,11 +445,11 @@ body{background:#f0f4fa;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
                 <div class="recharge-name" data-i18n="rcoin_1000">1000 R币</div>
                 <div class="recharge-price" data-i18n="price_1000">¥ 9.80｜超值套餐</div>
             </div>
-            <button class="btn-buy" data-i18n="w_btn_buy">去购买</button>
+            <button class="btn-buy" data-i18n="btn_buy">去购买</button>
         </div>
 
         <div class="btn-group">
-            <button class="btn-cancel" onclick="closeRechargeModal()" data-i18n="w_btn_close">关闭</button>
+            <button class="btn-cancel" onclick="closeRechargeModal()" data-i18n="btn_close">关闭</button>
         </div>
     </div>
 </div>
@@ -313,6 +473,26 @@ var token = getToken();
 if (!token) {
     window.location.href = 'index.html';
 }
+// 语言切换功能
+function toggleLangMenu() {
+    var menu = document.getElementById('langMenu');
+    if (menu) {
+        menu.style.display = (menu.style.display === 'none' || !menu.style.display) ? 'block' : 'none';
+    }
+}
+function selectLang(lang) {
+    I18N.setLanguage(lang);
+    var menu = document.getElementById('langMenu');
+    if (menu) menu.style.display = 'none';
+}
+// 点击页面其他地方关闭语言菜单
+document.addEventListener('click', function(e) {
+    var menu = document.getElementById('langMenu');
+    var btn = e.target.closest('.btn-lang');
+    if (menu && !btn && !e.target.closest('#langMenu')) {
+        menu.style.display = 'none';
+    }
+});
 function loadBalance() {
     var fd = new FormData();
     fd.append('action', 'getRcoins');
@@ -328,7 +508,7 @@ function loadBalance() {
 }
 function loadRecords() {
     var container = document.getElementById('recordList');
-    container.innerHTML = '<div class="loading" data-i18n="w_loading">加载中...</div>';
+    container.innerHTML = '<div class="loading" data-i18n="loading">加载中...</div>';
     
     var fd = new FormData();
     fd.append('action', 'getRcoinRecords');
@@ -341,17 +521,17 @@ function loadRecords() {
                 renderRecords(d.records);
                 renderSummary(d.records);
             } else {
-                container.innerHTML = '<div class="empty-state"><div class="icon">📭</div>'+I18N.t('w_no_records')+'</div>';
+                container.innerHTML = '<div class="empty-state"><div class="icon">📭</div>'+I18N.t('no_records')+'</div>';
             }
         })
         .catch(function() {
-            container.innerHTML = '<div class="empty-state"><div class="icon">❌</div>'+I18N.t('w_load_failed')+'</div>';
+            container.innerHTML = '<div class="empty-state"><div class="icon">❌</div>'+I18N.t('load_failed')+'</div>';
         });
 }
 function renderRecords(records) {
     var container = document.getElementById('recordList');
     if (!records || records.length === 0) {
-        container.innerHTML = '<div class="empty-state"><div class="icon">📭</div>'+I18N.t('w_no_records')+'</div>';
+        container.innerHTML = '<div class="empty-state"><div class="icon">📭</div>'+I18N.t('no_records')+'</div>';
         return;
     }
     
@@ -371,19 +551,19 @@ function renderRecords(records) {
             iconHtml = '<div class="icon">🪙</div>';
         }
         
-        var title = r.title || I18N.t('w_rcoin_change');
+        var title = r.title || I18N.t('rcoin_change');
         var desc = '';
         if (r.game_id > 0 && r.game_name) {
-            desc = I18N.t('w_in_game') + '<span class="game-name">' + escapeHtml(r.game_name) + '</span>';
+            desc = I18N.t('in_game') + '<span class="game-name">' + escapeHtml(r.game_name) + '</span>';
             if (isIncome) {
-                desc += I18N.t('w_received_tip');
+                desc += I18N.t('received_tip');
             } else {
-                desc += I18N.t('w_spent_tip');
+                desc += I18N.t('spent_tip');
             }
         } else if (isIncome) {
-            desc = I18N.t('w_income_desc');
+            desc = I18N.t('income_desc');
         } else {
-            desc = I18N.t('w_expense_desc');
+            desc = I18N.t('expense_desc');
         }
         
         var time = r.created_at ? r.created_at.replace('T', ' ') : '';
@@ -426,13 +606,13 @@ function doRedeem() {
     var statusEl = document.getElementById('redeemStatus');
     
     if (!code) {
-        statusEl.textContent = I18N.t('w_err_enter_code');
+        statusEl.textContent = I18N.t('err_enter_code');
         statusEl.className = 'status error';
         statusEl.style.display = 'block';
         return;
     }
     
-    statusEl.textContent = I18N.t('w_verifying');
+    statusEl.textContent = I18N.t('verifying');
     statusEl.className = 'status pending';
     statusEl.style.display = 'block';
     
@@ -445,7 +625,7 @@ function doRedeem() {
         .then(r => r.json())
         .then(d => {
             if (d.success) {
-                statusEl.textContent = I18N.t('w_success_prefix') + d.message;
+                statusEl.textContent = I18N.t('success_prefix') + d.message;
                 statusEl.className = 'status success';
                 loadBalance();
                 loadRecords();
@@ -453,12 +633,12 @@ function doRedeem() {
                     closeRedeemModal();
                 }, 2000);
             } else {
-                statusEl.textContent = I18N.t('w_error_prefix') + d.message;
+                statusEl.textContent = I18N.t('error_prefix') + d.message;
                 statusEl.className = 'status error';
             }
         })
         .catch(function() {
-            statusEl.textContent = I18N.t('w_network_error');
+            statusEl.textContent = I18N.t('network_error');
             statusEl.className = 'status error';
         });
 }
@@ -513,7 +693,7 @@ function autoCheckRecharge() {
                 localStorage.removeItem('pending_recharge_order');
                 loadBalance();
                 loadRecords();
-                alert(I18N.t('w_recharge_success') + d.rcoins + I18N.t('w_rcoin_arrived'));
+                alert(I18N.t('recharge_success') + d.rcoins + I18N.t('rcoin_arrived'));
                 if (window.location.search) {
                     history.replaceState(null, '', window.location.pathname);
                 }
