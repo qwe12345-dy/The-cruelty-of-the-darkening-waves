@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>龙黑化 · 登录</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{min-height:100vh;display:flex;justify-content:center;align-items:center;background:linear-gradient(135deg,#0b0f16,#1a1f2e);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;padding:16px}
+.card{background:#12161e;padding:32px 28px;border-radius:18px;border:1px solid #2a313c;box-shadow:0 12px 40px rgba(0,0,0,0.5);width:100%;max-width:420px}
+.logo{text-align:center;font-size:14px;color:#ff5e00;letter-spacing:4px;font-weight:700}
+h1{text-align:center;font-size:24px;color:#f0e6d0;margin:4px 0 6px;letter-spacing:2px}
+.sub{text-align:center;color:#6b7a8f;font-size:12px;letter-spacing:1px;margin-bottom:24px}
+.input-group{margin-bottom:14px}
+label{display:block;font-size:13px;font-weight:600;color:#b7c4d4;margin-bottom:4px}
+input{width:100%;padding:11px 14px;background:#0b0f16;border:2px solid #2a313c;border-radius:10px;font-size:14px;color:#f0e6d0;outline:none;transition:.3s}
+input:focus{border-color:#ff5e00;box-shadow:0 0 0 3px rgba(255,94,0,0.12)}
+.code-row{display:flex;gap:10px;align-items:center}
+.code-row input{flex:1}
+.btn{width:100%;padding:12px;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;transition:.3s;margin-top:4px}
+.btn-primary{background:linear-gradient(135deg,#ff5e00,#e64a00);color:#fff}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 5px 20px rgba(255,94,0,0.3)}
+.btn-primary:disabled{background:#3d4a5a;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-secondary{background:#2a313c;color:#b7c4d4;padding:10px 16px;width:auto;border:none;border-radius:8px;cursor:pointer;font-size:13px}
+.btn-secondary:hover{background:#3d4a5a}
+.btn-secondary:disabled{opacity:.5;cursor:not-allowed}
+.toggle{text-align:center;margin-top:14px;font-size:13px;color:#6b7a8f}
+.toggle a{color:#ff5e00;cursor:pointer;text-decoration:none}
+.toggle a:hover{text-decoration:underline}
+#status{margin-top:14px;padding:10px 12px;border-radius:8px;display:none;font-size:13px;text-align:center}
+.error{background:#2a0f12;color:#f28b82;border:1px solid #5c2020;display:block}
+.success{background:#0d2818;color:#66d9a8;border:1px solid #1a4a32;display:block}
+.hidden{display:none}
+
+/* 协议提示 放大字号 */
+.agreement-tip{margin-top:14px;text-align:center;font-size:14px;color:#a0aec0;line-height:1.6}
+.link‑agreement{color:#ff5e00;cursor:pointer;text-decoration:underline}
+.link‑agreement:hover{opacity:0.8}
+
+@media(max-width:480px){
+body{padding:10px}.card{padding:20px 16px;border-radius:14px;max-width:100%}
+.logo{font-size:12px}h1{font-size:20px}.sub{font-size:11px}
+input{padding:10px 12px;font-size:13px}.btn{padding:10px;font-size:14px}
+.btn-secondary{padding:8px 14px;font-size:12px}
+.agreement-tip{font-size:13px;}
+}
+@media(min-width:1024px){
+body{padding:60px}.card{padding:56px 52px;max-width:520px;border-radius:24px}
+.logo{font-size:18px}h1{font-size:32px}.sub{font-size:15px}
+input{padding:16px 20px;font-size:17px}.btn{padding:16px;font-size:18px}
+.btn-secondary{padding:13px 24px;font-size:15px}
+}
+
+/* 语言切换按钮 */
+.lang-switch{margin-top:18px;text-align:center}
+.lang-switch .lang-label{font-size:12px;color:#6b7a8f;margin-bottom:8px;letter-spacing:1px}
+.lang-switch .lang-btns{display:flex;gap:8px;justify-content:center}
+.lang-btn{flex:1;max-width:110px;padding:8px 6px;border:2px solid #2a313c;border-radius:8px;background:transparent;color:#b7c4d4;font-size:12px;font-weight:600;cursor:pointer;transition:.3s}
+.lang-btn:hover{border-color:#ff5e00;color:#ff5e00}
+.lang-btn.active{border-color:#ff5e00;background:rgba(255,94,0,0.1);color:#ff5e00}
+
+/* WebView 体验优化 */
+html,body{
+    overscroll-behavior:none;
+    -webkit-overflow-scrolling:touch;
+    -webkit-tap-highlight-color:transparent;
+    user-select:none;
+    -webkit-user-select:none;
+}
+input{
+    user-select:text;
+    -webkit-user-select:text;
+}
+button{
+    -webkit-tap-highlight-color:rgba(255,94,0,0.15);
+    touch-action:manipulation;
+}
+button:active{
+    transform:scale(0.97);
+    transition:transform 0.1s ease;
+}
+
+</style>
+<script src="i18n.js"></script>
+
+
+<!-- PWA / 上架优化 -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#ff5e00">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="龙黑化">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileColor" content="#ff5e00">
+<meta name="msapplication-TileImage" content="icon-192.png">
+
+</head>
+<body>
+<div id="splashScreen" style="position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,#0b0f16,#1a1f2e);display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:99999;transition:opacity 0.5s ease;">
+    <div style="font-size:64px;margin-bottom:16px;">🐉</div>
+    <div style="font-size:24px;font-weight:700;color:#ff5e00;letter-spacing:4px;margin-bottom:8px;">龙黑化</div>
+    <div style="font-size:12px;color:#6b7a8f;letter-spacing:2px;">创作工坊</div>
+    <div style="margin-top:32px;width:120px;height:3px;background:#2a313c;border-radius:2px;overflow:hidden;">
+        <div id="splashProgress" style="height:100%;width:0%;background:linear-gradient(90deg,#ff5e00,#ff8c00);border-radius:2px;transition:width 0.3s ease;"></div>
+    </div>
+</div>
+
+<div class="card">
+<div class="logo">⚔️ 龙黑化</div>
+<h1 id="pageTitle" data-i18n="login_title">登录</h1>
+<p class="sub">——— DRAGON AUTH ———</p>
+<div id="loginBox">
+<div class="input-group"><label data-i18n="label_email">📬 邮箱</label><input type="email" id="loginEmail" data-i18n-placeholder="ph_email" placeholder="输入邮箱..."></div>
+<div class="input-group"><label data-i18n="label_password">🔑 密码</label><input type="password" id="loginPassword" data-i18n-placeholder="ph_password" placeholder="输入密码..." onkeydown="if(event.key==='Enter')handleLogin()"></div>
+<button class="btn btn-primary" data-i18n="btn_login" onclick="handleLogin()">登录</button>
+<div class="agreement-tip"><span data-i18n="agreement_tip">注册或登录代表着你同意 </span><span class="link‑agreement" data-i18n="agreement_link" onclick="location.href='pls.html'">协议</span></div>
+<div class="toggle"><span data-i18n="no_account">还没有账号？ </span><a data-i18n="register_now" onclick="showRegister()">立即注册</a></div>
+</div>
+<div id="registerBox" class="hidden">
+<div class="input-group"><label data-i18n="label_email">📬 邮箱</label><input type="email" id="regEmail" data-i18n-placeholder="ph_email" placeholder="输入邮箱..."></div>
+<div class="input-group"><label data-i18n="label_username">👤 用户名</label><input type="text" id="regUsername" data-i18n-placeholder="ph_username" placeholder="输入用户名..."></div>
+<div class="input-group"><label data-i18n="label_code">📧 验证码</label><div class="code-row"><input type="text" id="regCode" data-i18n-placeholder="ph_code" placeholder="输入6位验证码..."><button class="btn-secondary" id="codeBtn" data-i18n="btn_get_code" onclick="sendCode()">获取验证码</button></div></div>
+<div class="input-group"><label data-i18n="label_password">🔑 密码</label><input type="password" id="regPassword" data-i18n-placeholder="ph_password_reg" placeholder="至少6位..." onkeydown="if(event.key==='Enter')handleRegister()"></div>
+<button class="btn btn-primary" data-i18n="btn_register" onclick="handleRegister()">注册</button>
+<div class="agreement-tip"><span data-i18n="agreement_tip">注册或登录代表着你同意 </span><span class="link‑agreement" data-i18n="agreement_link" onclick="location.href='pls.html'">协议</span></div>
+<div class="toggle"><span data-i18n="has_account">已有账号？ </span><a data-i18n="go_login" onclick="showLogin()">去登录</a></div>
+</div>
+<div id="status"></div>
+
+<div class="lang-switch">
+<div class="lang-label">🌐 Language / 语言</div>
+<div class="lang-btns" id="langSelector">
+<button type="button" class="lang-btn active" data-lang="zh-CN" onclick="I18N.setLanguage('zh-CN')">简体中文</button>
+<button type="button" class="lang-btn" data-lang="zh-TW" onclick="I18N.setLanguage('zh-TW')">繁體中文</button>
+<button type="button" class="lang-btn" data-lang="en" onclick="I18N.setLanguage('en')">English</button>
+</div>
+</div>
+
+</div>
+<script>
+if (!sessionStorage.getItem('reloaded_index')) {
+    sessionStorage.setItem('reloaded_index', '1');
+    location.reload();
+}
+var API_URL = 'api.php';
+var token = localStorage.getItem('token') || '';
+var urlParams = new URLSearchParams(window.location.search);
+var fromParam = urlParams.get('from');
+var clientType = 'web';
+if (fromParam === 'app') { clientType = 'app'; }
+else if (fromParam === 'exe') { clientType = 'exe'; }
+localStorage.setItem('clientType', clientType);
+
+async function verifyTokenAndRedirect() {
+    if (!token) return;
+    try {
+        var fd = new FormData();
+        fd.append('action', 'getUserInfo');
+        fd.append('token', token);
+        var r = await fetch(API_URL, { method: 'POST', body: fd });
+        var d = await r.json();
+        if (d.success) {
+            var suffix = clientType === 'app' ? '?from=app' : clientType === 'exe' ? '?from=exe' : '';
+            window.location.href = 'dashboard.html' + suffix;
+        } else {
+            localStorage.removeItem('token');
+            localStorage.removeItem('username');
+            localStorage.removeItem('email');
+        }
+    } catch (e) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('username');
+        localStorage.removeItem('email');
+    }
+}
+verifyTokenAndRedirect();
+function showLogin() {
+    document.getElementById('loginBox').classList.remove('hidden');
+    document.getElementById('registerBox').classList.add('hidden');
+    document.getElementById('pageTitle').textContent = I18N.t('login_title');
+}
+function showRegister() {
+    document.getElementById('loginBox').classList.add('hidden');
+    document.getElementById('registerBox').classList.remove('hidden');
+    document.getElementById('pageTitle').textContent = I18N.t('register_title');
+}
+function showStatus(msg, type) {
+    var s = document.getElementById('status');
+    s.textContent = msg;
+    s.className = type;
+    s.style.display = 'block';
+}
+function hideStatus() {
+    document.getElementById('status').style.display = 'none';
+}
+async function handleLogin() {
+    var email = document.getElementById('loginEmail').value.trim();
+    var password = document.getElementById('loginPassword').value;
+    if (!email || !password) { showStatus(I18N.t('msg_fill_all'), 'error'); return; }
+    try {
+        var fd = new FormData();
+        fd.append('action', 'login');
+        fd.append('email', email);
+        fd.append('password', password);
+        var r = await fetch(API_URL, { method: 'POST', body: fd });
+        var d = await r.json();
+        if (d.success) {
+            localStorage.setItem('token', d.token);
+            localStorage.setItem('username', d.username);
+            localStorage.setItem('email', d.email);
+            localStorage.setItem('clientType', clientType);
+            showStatus(I18N.t('msg_login_success'), 'success');
+            var suffix = clientType === 'app' ? '?from=app' : clientType === 'exe' ? '?from=exe' : '';
+            window.location.href = 'dashboard.html' + suffix;
+        } else {
+            showStatus('❌ ' + d.message, 'error');
+        }
+    } catch (err) {
+        showStatus('❌ ' + err.message, 'error');
+    }
+}
+async function sendCode() {
+    var email = document.getElementById('regEmail').value.trim();
+    var btn = document.getElementById('codeBtn');
+    if (!email) { showStatus(I18N.t('msg_email_first'), 'error'); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showStatus(I18N.t('msg_email_format'), 'error'); return; }
+    btn.disabled = true;
+    btn.textContent = I18N.t('btn_sending');
+    hideStatus();
+    try {
+        var fd = new FormData();
+        fd.append('action', 'sendCode');
+        fd.append('email', email);
+        var r = await fetch(API_URL, { method: 'POST', body: fd });
+        var d = await r.json();
+        if (d.success) {
+            showStatus(I18N.t('msg_code_sent'), 'success');
+            var t = 60;
+            var iv = setInterval(function() {
+                t--;
+                btn.textContent = t + I18N.t('code_retry');
+                if (t <= 0) {
+                    clearInterval(iv);
+                    btn.disabled = false;
+                    btn.textContent = I18N.t('btn_get_code');
+                }
+            }, 1000);
+        } else {
+            showStatus('❌ ' + d.message, 'error');
+            btn.disabled = false;
+            btn.textContent = I18N.t('btn_get_code');
+        }
+    } catch (err) {
+        showStatus('❌ ' + err.message, 'error');
+        btn.disabled = false;
+        btn.textContent = I18N.t('btn_get_code');
+    }
+}
+async function handleRegister() {
+    var email = document.getElementById('regEmail').value.trim();
+    var username = document.getElementById('regUsername').value.trim();
+    var code = document.getElementById('regCode').value.trim();
+    var password = document.getElementById('regPassword').value;
+    if (!email || !username || !code || !password) { showStatus(I18N.t('msg_fill_fields'), 'error'); return; }
+    if (username.length < 2 || username.length > 20) { showStatus('用户名必须为2‑20个字符', 'error'); return; }
+    if (password.length < 6) { showStatus(I18N.t('msg_password_len'), 'error'); return; }
+    try {
+        var fd = new FormData();
+        fd.append('action', 'register');
+        fd.append('email', email);
+        fd.append('username', username);
+        fd.append('code', code);
+        fd.append('password', password);
+        var r = await fetch(API_URL, { method: 'POST', body: fd });
+        var d = await r.json();
+        if (d.success) {
+            showStatus(I18N.t('msg_register_success'), 'success');
+            showLogin();
+            document.getElementById('loginEmail').value = email;
+        } else {
+            showStatus('❌ ' + d.message, 'error');
+        }
+    } catch (err) {
+        showStatus('❌ ' + err.message, 'error');
+    }
+}
+
+/* 多语言初始化：根据localStorage设置语言按钮active状态 */
+(function(){
+    function syncLangBtns(){
+        var cur = I18N.getLang();
+        var btns = document.querySelectorAll('#langSelector .lang-btn');
+        btns.forEach(function(b){
+            if(b.getAttribute('data-lang')===cur){b.classList.add('active');}
+            else{b.classList.remove('active');}
+        });
+    }
+    syncLangBtns();
+    document.addEventListener('languagechange', syncLangBtns);
+})();
+
+
+/* 启动页控制 */
+(function(){
+    var splash = document.getElementById('splashScreen');
+    var progress = document.getElementById('splashProgress');
+    if(!splash) return;
+    var p = 0;
+    var iv = setInterval(function(){
+        p += Math.random() * 15;
+        if(p > 90) p = 90;
+        if(progress) progress.style.width = p + '%';
+    }, 200);
+    function hideSplash(){
+        clearInterval(iv);
+        if(progress) progress.style.width = '100%';
+        setTimeout(function(){
+            splash.style.opacity = '0';
+            setTimeout(function(){ splash.style.display = 'none'; }, 500);
+        }, 300);
+    }
+    if(document.readyState === 'complete'){
+        setTimeout(hideSplash, 600);
+    } else {
+        window.addEventListener('load', function(){ setTimeout(hideSplash, 600); });
+    }
+    setTimeout(hideSplash, 2500);
+})();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,3329 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>龙黑化 · 社区</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;min-height:100vh;overflow:hidden}
+body{background:#f0f4fa;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:#1a2a3a}
+.card{width:100%;height:100vh;background:#ffffff;display:flex;flex-direction:column;overflow:hidden;position:relative}
+
+.header{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-bottom:1px solid #e8edf4;flex-shrink:0;background:#fff;z-index:5}
+.header-left{display:flex;align-items:center;gap:10px}
+.header-title{font-size:17px;font-weight:700;color:#1a2a3a}
+.header-title .sub{font-size:12px;font-weight:400;color:#8a9baa;margin-left:6px}
+.header-right{display:flex;align-items:center;gap:12px}
+.header-right .rcoins{display:flex;align-items:center;gap:4px;background:#f5f7fa;padding:4px 12px;border-radius:16px;font-size:13px;font-weight:600;color:#2563eb;cursor:pointer}
+.header-right .rcoins:hover{background:#eef2f6}
+.header-right .rcoins img{width:18px;height:18px;vertical-align:middle}
+.menu-btn{background:transparent;border:none;font-size:22px;cursor:pointer;padding:4px 6px;color:#4a5a6a}
+.menu-btn:hover{color:#1a2a3a}
+.menu-dropdown{position:absolute;top:44px;right:8px;background:#fff;border:1px solid #e8edf4;border-radius:12px;padding:4px 0;min-width:160px;display:none;z-index:100;box-shadow:0 8px 30px rgba(0,0,0,0.08)}
+.menu-dropdown.show{display:block}
+.menu-dropdown a{display:block;padding:10px 18px;color:#3a4b5e;text-decoration:none;font-size:13px;transition:.2s;cursor:pointer}
+.menu-dropdown a:hover{background:#f5f7fa}
+.menu-dropdown .danger{color:#c0392b}
+.menu-dropdown .danger:hover{background:#fde8e5}
+
+.tab-bar{display:flex;padding:8px 16px 0 16px;background:#f8fafc;border-bottom:1px solid #e8edf4;flex-shrink:0;gap:20px}
+.tab-bar .tab-item{padding:8px 4px 10px 4px;font-size:15px;font-weight:600;color:#8a9baa;cursor:pointer;border-bottom:3px solid transparent;transition:.3s;position:relative}
+.tab-bar .tab-item.active{color:#1a2a3a;border-bottom-color:#2563eb}
+.tab-bar .tab-item .badge{font-size:10px;background:#2563eb;color:#fff;border-radius:50%;padding:1px 7px;min-width:18px;text-align:center;font-weight:700;margin-left:4px;display:inline-block}
+.tab-bar .tab-item .badge.hot{background:#e74c3c}
+
+.search-bar{padding:10px 16px;background:#f8fafc;border-bottom:1px solid #e8edf4;flex-shrink:0;display:flex;gap:8px}
+.search-bar input{flex:1;padding:8px 14px;border:1px solid #dce3ec;border-radius:20px;font-size:14px;outline:none;background:#fff}
+.search-bar input:focus{border-color:#2563eb;box-shadow:0 0 0 3px rgba(230,126,34,0.1)}
+.search-bar button{padding:8px 18px;background:#2563eb;color:#fff;border:none;border-radius:20px;font-size:14px;font-weight:600;cursor:pointer;transition:.3s}
+.search-bar button:hover{background:#1d4ed8}
+.search-bar.hidden{display:none}
+
+.content{flex:1;overflow-y:auto;padding:12px 16px 80px 16px;background:#f8fafc}
+.content::-webkit-scrollbar{width:3px}
+.content::-webkit-scrollbar-thumb{background:#d0d8e0;border-radius:10px}
+
+.game-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.game-card{background:#fff;border-radius:12px;overflow:hidden;border:1px solid #e8edf4;transition:.3s;cursor:pointer;position:relative}
+.game-card:hover{transform:translateY(-3px);box-shadow:0 6px 24px rgba(0,0,0,0.06)}
+.game-card .cover{width:100%;aspect-ratio:1/1;object-fit:cover;background:#eef2f6}
+.game-card .cover-placeholder{width:100%;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#e8edf4,#d5dee8);color:#8a9baa;font-size:32px}
+.game-card .info{padding:10px 12px}
+.game-card .info .title{font-size:14px;font-weight:600;color:#1a2a3a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.game-card .info .meta{display:flex;justify-content:space-between;font-size:11px;color:#8a9baa;margin-top:4px}
+.game-card .info .meta .stats{display:flex;gap:8px}
+.game-card .info .actions{display:flex;gap:12px;margin-top:6px;padding-top:6px;border-top:1px solid #f0f4fa}
+.game-card .info .actions button{background:transparent;border:none;font-size:13px;cursor:pointer;color:#8a9baa;display:flex;align-items:center;gap:4px;padding:2px 6px;border-radius:4px;transition:.2s}
+.game-card .info .actions button:hover{background:#f5f7fa}
+.game-card .info .actions button.liked{color:#e74c3c}
+.game-card .info .actions button.collected{color:#f39c12}
+.game-card .info .actions button .count{font-weight:600}
+.game-card .status-badge{position:absolute;top:6px;right:6px;font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600;z-index:2}
+.game-card .status-badge.pending{background:#e8f0fe;color:#2c6b9e}
+.game-card .status-badge.approved{background:#e6f7ee;color:#1e7b4a}
+.game-card .status-badge.failed{background:#fde8e5;color:#b03a2e}
+.game-card .delete-btn{position:absolute;top:6px;left:6px;background:#da3633;color:#fff;border:none;border-radius:50%;width:28px;height:28px;font-size:14px;cursor:pointer;z-index:3;display:none;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.2)}
+.game-card .delete-btn:hover{background:#b02a2a}
+.game-card.show-delete .delete-btn{display:flex}
+.game-card .edit-btn{position:absolute;top:6px;left:40px;background:#2563eb;color:#fff;border:none;border-radius:50%;width:28px;height:28px;font-size:12px;cursor:pointer;z-index:3;display:none;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.2)}
+.game-card .edit-btn:hover{background:#1d4ed8}
+.game-card.show-delete .edit-btn{display:flex}
+.game-card .hot-tag{position:absolute;top:6px;left:6px;background:#e74c3c;color:#fff;font-size:10px;font-weight:700;padding:2px 10px;border-radius:10px;z-index:2;box-shadow:0 2px 8px rgba(231,76,60,0.3)}
+.game-card .new-tag{position:absolute;top:6px;left:6px;background:#2ecc71;color:#fff;font-size:10px;font-weight:700;padding:2px 10px;border-radius:10px;z-index:2;box-shadow:0 2px 8px rgba(46,204,113,0.3)}
+
+.profile-page{display:none}
+.profile-page .cover-wrap{width:100%;height:140px;background:linear-gradient(135deg,#e8edf4,#d5dee8);border-radius:12px;overflow:hidden;position:relative;margin-bottom:10px}
+.profile-page .cover-wrap img{width:100%;height:100%;object-fit:cover}
+.profile-page .profile-header{display:flex;align-items:center;gap:14px;padding:0 4px 12px 4px;border-bottom:1px solid #e8edf4}
+.profile-page .avatar{width:64px;height:64px;border-radius:50%;border:3px solid #fff;object-fit:cover;background:#eef2f6;box-shadow:0 2px 8px rgba(0,0,0,0.06);cursor:pointer}
+.profile-page .avatar:hover{opacity:0.8}
+.profile-page .id-info{flex:1}
+.profile-page .id-info .name{font-size:18px;font-weight:700;color:#1a2a3a}
+.profile-page .id-info .name .num{font-size:13px;color:#8a9baa;font-weight:400;margin-left:6px}
+.profile-page .id-info .email{font-size:12px;color:#8a9baa;margin-top:2px}
+.profile-page .id-info .rcoins{font-size:13px;color:#2563eb;font-weight:600;margin-top:2px}
+.profile-page .id-info .rcoins img{width:16px;height:16px;vertical-align:middle;margin-right:2px}
+.profile-page .bio-box{margin-top:10px;padding:10px 14px;background:#f8fafc;border-radius:8px;border:1px solid #e8edf4;font-size:13px;color:#2c3e50;line-height:1.6}
+.profile-page .bio-box .empty{color:#8a9baa;font-style:italic}
+.profile-page .profile-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.profile-page .profile-actions button{padding:8px 18px;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:.3s}
+.profile-page .profile-actions .btn-edit{background:#2563eb;color:#fff}
+.profile-page .profile-actions .btn-edit:hover{background:#1d4ed8}
+.profile-page .profile-actions .btn-cover{background:#eef2f6;color:#4a5a6a}
+.profile-page .profile-actions .btn-cover:hover{background:#d5dee8}
+.profile-page .profile-actions .btn-mail{background:#e8f0fe;color:#2c6b9e}
+.profile-page .profile-actions .btn-mail:hover{background:#c5d9f0}
+.profile-page .profile-stats{display:flex;gap:12px;margin-top:10px;padding:10px 0;border-top:1px solid #e8edf4;flex-wrap:wrap}
+.profile-page .profile-stats .stat-item{text-align:center;flex:1;min-width:50px}
+.profile-page .profile-stats .stat-item .num{font-size:18px;font-weight:700;color:#1a2a3a}
+.profile-page .profile-stats .stat-item .label{font-size:10px;color:#8a9baa;margin-top:2px;display:block}
+.profile-page .badges-container{margin-top:12px;padding:12px 0;border-top:1px solid #e8edf4;display:none}
+.profile-page .badges-container .badge-title{font-size:13px;font-weight:600;color:#1a2a3a;margin-bottom:8px}
+.profile-page .badges-container .badge-list{display:flex;gap:10px;flex-wrap:wrap}
+.profile-page .my-games-title{font-size:15px;font-weight:600;color:#1a2a3a;margin:14px 0 8px 0}
+
+.detail-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;display:none;justify-content:center;align-items:center;padding:20px}
+.detail-modal{background:#fff;border-radius:16px;max-width:480px;width:100%;max-height:90vh;overflow-y:auto;padding:0;position:relative}
+.detail-modal .detail-header{position:relative;padding:16px 16px 0 16px}
+.detail-modal .close-btn{position:absolute;top:12px;right:16px;background:rgba(0,0,0,0.5);border:none;color:#fff;font-size:20px;width:36px;height:36px;border-radius:50%;cursor:pointer;z-index:5;display:flex;align-items:center;justify-content:center}
+.detail-modal .close-btn:hover{background:rgba(0,0,0,0.7)}
+.detail-modal .detail-cover{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:12px;background:#eef2f6}
+.detail-modal .detail-title-row{display:flex;justify-content:space-between;align-items:flex-start;margin-top:12px}
+.detail-modal .detail-title{font-size:20px;font-weight:700;color:#1a2a3a;flex:1}
+.detail-modal .detail-follow-btn{padding:6px 16px;border:none;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;transition:.3s;background:#2563eb;color:#fff;white-space:nowrap;margin-left:10px}
+.detail-modal .detail-follow-btn:hover{background:#1d4ed8}
+.detail-modal .detail-follow-btn.following{background:#4a5a6a}
+.detail-modal .detail-follow-btn.following:hover{background:#da3633}
+.detail-modal .detail-author-row{display:flex;align-items:center;gap:10px;margin:8px 0 4px 0}
+.detail-modal .detail-author-avatar{width:32px;height:32px;border-radius:50%;object-fit:cover;cursor:pointer;border:2px solid #e8edf4;background:#eef2f6}
+.detail-modal .detail-author-avatar:hover{opacity:0.8}
+.detail-modal .detail-author-name{font-size:13px;color:#4a5a6a;cursor:pointer}
+.detail-modal .detail-author-name:hover{color:#2563eb}
+.detail-modal .detail-play-count{font-size:12px;color:#8a9baa;margin:4px 0 0 0}
+.detail-modal .detail-play-count span{color:#2563eb;font-weight:600}
+.detail-modal .detail-body{padding:0 16px 16px 16px}
+.detail-modal .detail-desc{font-size:14px;color:#4a5a6a;padding:10px 0;border-top:1px solid #e8edf4;border-bottom:1px solid #e8edf4;margin:8px 0;line-height:1.6}
+.detail-modal .detail-tags{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.detail-modal .detail-tags .tag{background:#f0f4fa;padding:4px 12px;border-radius:12px;font-size:11px;color:#6b7f94}
+.detail-modal .detail-like-collect{display:flex;gap:12px;margin:8px 0}
+.detail-modal .detail-like-collect button{padding:6px 16px;border:1px solid #dce3ec;border-radius:20px;background:#fff;font-size:13px;cursor:pointer;transition:.3s;display:flex;align-items:center;gap:6px}
+.detail-modal .detail-like-collect button:hover{background:#f5f7fa}
+.detail-modal .detail-like-collect button.liked{background:#fde8e5;border-color:#e74c3c;color:#e74c3c}
+.detail-modal .detail-like-collect button.collected{background:#fef9e7;border-color:#f39c12;color:#f39c12}
+.detail-modal .comment-section{padding:0 16px 16px 16px}
+.detail-modal .comment-section .comment-title{font-size:15px;font-weight:600;color:#1a2a3a;margin-bottom:8px}
+.detail-modal .comment-section .comment-input{display:flex;gap:8px;margin-bottom:8px}
+.detail-modal .comment-section .comment-input input{flex:1;padding:8px 12px;border:1px solid #dce3ec;border-radius:20px;font-size:13px;outline:none}
+.detail-modal .comment-section .comment-input input:focus{border-color:#2563eb}
+.detail-modal .comment-section .comment-input button{padding:8px 16px;background:#2563eb;color:#fff;border:none;border-radius:20px;font-size:13px;cursor:pointer;font-weight:600}
+.detail-modal .comment-item{padding:10px 0;border-bottom:1px solid #f0f4fa;font-size:13px;display:flex;justify-content:space-between;align-items:flex-start}
+.detail-modal .comment-item .c-left{flex:1}
+.detail-modal .comment-item .c-author{font-weight:600;color:#1a2a3a}
+.detail-modal .comment-item .c-time{font-size:11px;color:#8a9baa;margin-left:8px}
+.detail-modal .comment-item .c-text{color:#4a5a6a;margin-top:2px}
+.detail-modal .comment-item .c-delete{background:transparent;border:none;color:#da3633;font-size:12px;cursor:pointer;padding:2px 6px;border-radius:4px}
+.detail-modal .comment-item .c-delete:hover{background:#fde8e5}
+.detail-modal .play-btn{width:100%;padding:12px;background:#2563eb;color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:600;cursor:pointer;margin-top:12px;transition:.3s}
+.detail-modal .play-btn:hover{background:#1d4ed8}
+
+.bottom-nav{display:flex;justify-content:space-around;background:#fff;border-top:1px solid #e8edf4;padding:4px 0;flex-shrink:0;position:absolute;bottom:0;left:0;right:0}
+.nav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;background:transparent;border:none;color:#8a9baa;font-size:14px;cursor:pointer;padding:10px 8px;transition:.3s;flex:1;font-weight:500}
+.nav-item .nav-icon{display:none}
+.nav-item.active{color:#2563eb;font-weight:700}
+.nav-item .nav-label{font-size:14px}
+
+.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);z-index:500;display:none;justify-content:center;align-items:center;padding:20px}
+.modal-overlay .modal-box{background:#fff;border-radius:16px;padding:24px;max-width:440px;width:100%;max-height:90vh;overflow-y:auto}
+.modal-overlay .modal-box h3{color:#1a2a3a;margin-bottom:14px;text-align:center;font-size:18px}
+.modal-overlay .modal-box .mode-btn{flex:1;padding:10px;border:2px solid rgba(255,255,255,0.1);border-radius:10px;background:rgba(255,255,255,0.03);color:#6b7f94;font-weight:600;cursor:pointer;transition:.3s;font-size:14px}
+.modal-overlay .modal-box .mode-btn.active{border-color:#2563eb;background:rgba(230,126,34,0.1);color:#2563eb;font-weight:700}
+.modal-overlay .modal-box input,.modal-overlay .modal-box textarea{width:100%;padding:10px 14px;border:1px solid #dce3ec;border-radius:8px;font-size:14px;margin-bottom:10px;outline:none;font-family:inherit}
+.modal-overlay .modal-box input:focus,.modal-overlay .modal-box textarea:focus{border-color:#2563eb}
+.modal-overlay .modal-box textarea{min-height:80px;resize:vertical}
+.modal-overlay .modal-box .file-label{display:block;padding:10px;background:#f8fafc;border:2px dashed #dce3ec;border-radius:8px;color:#6b7f94;cursor:pointer;text-align:center;margin-bottom:10px;transition:.3s;font-size:13px}
+.modal-overlay .modal-box .file-label:hover{border-color:#2563eb}
+.modal-overlay .modal-box .file-label input{display:none}
+.modal-overlay .modal-box .icon-preview{width:80px;height:80px;border-radius:10px;margin:0 auto 10px;background:#f5f7fa;border:1px solid #e8edf4;display:none;background-size:cover;background-position:center}
+.modal-overlay .modal-box .editor-info{background:rgba(255,215,0,0.05);border:1px solid rgba(255,215,0,0.1);border-radius:12px;padding:20px;text-align:center;margin-bottom:12px}
+.modal-overlay .modal-box .editor-info .icon{font-size:48px;margin-bottom:8px}
+.modal-overlay .modal-box .editor-info .title{color:#ffd700;font-size:16px;font-weight:700}
+.modal-overlay .modal-box .editor-info .desc{color:#6b7f94;font-size:13px;margin-top:4px}
+.modal-overlay .modal-box .editor-info .tip{color:#4a5a6a;font-size:11px;margin-top:8px}
+.modal-overlay .modal-box .btn-group{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.modal-overlay .modal-box .btn-group button{padding:10px 28px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:.3s}
+.modal-overlay .modal-box .btn-group .btn-primary{background:#2563eb;color:#fff}
+.modal-overlay .modal-box .btn-group .btn-primary:hover{background:#1d4ed8}
+.modal-overlay .modal-box .btn-group .btn-secondary{background:#eef2f6;color:#4a5a6a}
+.modal-overlay .modal-box .btn-group .btn-secondary:hover{background:#d5dee8}
+.modal-overlay .modal-box .status-msg{margin-top:10px;padding:10px 12px;border-radius:8px;font-size:13px;text-align:center;display:none}
+.modal-overlay .modal-box .status-msg.success{background:#e6f7ee;color:#1e7b4a;border:1px solid #b8dfc4;display:block}
+.modal-overlay .modal-box .status-msg.error{background:#fde8e5;color:#b03a2e;border:1px solid #f5cdc6;display:block}
+.modal-overlay .modal-box .status-msg.pending{background:#e8f0fe;color:#2c6b9e;border:1px solid #c5d9f0;display:block}
+
+.play-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:2000;display:none;padding:0}
+.play-overlay .play-container{width:100%;height:100vh;display:flex;flex-direction:column;background:#000}
+.play-overlay .play-header{display:flex;justify-content:space-between;align-items:center;padding:8px 16px;background:rgba(0,0,0,0.85);flex-shrink:0;min-height:44px}
+.play-overlay .play-header .title{color:#f0e6d0;font-size:15px;font-weight:600}
+.play-overlay .play-header .close-btn{background:#da3633;border:none;color:#fff;padding:4px 16px;border-radius:6px;font-size:14px;cursor:pointer;font-weight:600}
+.play-overlay .play-frame{flex:1;width:100%;background:#000;overflow:hidden}
+.play-overlay .play-frame iframe{width:100%;height:100%;border:none;background:#000}
+
+.hidden{display:none!important}
+.empty-state{text-align:center;color:#94a3b8;padding:48px 0;font-size:14px}
+.empty-state .icon{display:none}
+
+.friend-list-item{display:flex;align-items:center;gap:12px;padding:12px 14px;background:#fff;border-radius:12px;border:1px solid #e8edf4;margin-bottom:8px;cursor:pointer;transition:.3s}
+.friend-list-item:hover{background:#f5f7fa;transform:scale(1.01)}
+.friend-list-item .favatar{width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid #e8edf4;background:#eef2f6}
+.friend-list-item .finfo{flex:1}
+.friend-list-item .finfo .fname{font-size:15px;font-weight:600;color:#1a2a3a}
+.friend-list-item .finfo .fstatus{font-size:12px;color:#8a9baa}
+.friend-list-item .fbadge{background:#2563eb;color:#fff;font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600}
+
+.chat-container{display:none;flex-direction:column;height:100%;position:relative}
+.chat-header{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #e8edf4;flex-shrink:0}
+.chat-header .back{background:transparent;border:none;font-size:18px;cursor:pointer;color:#4a5a6a}
+.chat-header .cavatar{width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid #e8edf4}
+.chat-header .cname{font-size:16px;font-weight:600;color:#1a2a3a;flex:1}
+.chat-messages{flex:1;overflow-y:auto;padding:8px 0;display:flex;flex-direction:column;gap:6px;min-height:200px}
+.chat-msg{max-width:80%;padding:8px 14px;border-radius:16px;font-size:14px;line-height:1.5;word-wrap:break-word}
+.chat-msg.self{background:#2563eb;color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.chat-msg.other{background:#f0f4fa;color:#1a2a3a;align-self:flex-start;border-bottom-left-radius:4px}
+.chat-msg .ctime{font-size:10px;color:#8a9baa;display:block;margin-top:2px;text-align:right}
+.chat-msg.self .ctime{color:rgba(255,255,255,0.7)}
+.chat-input-row{display:flex;gap:8px;padding:8px 0;border-top:1px solid #e8edf4;flex-shrink:0}
+.chat-input-row input{flex:1;padding:8px 14px;border:1px solid #dce3ec;border-radius:20px;font-size:14px;outline:none}
+.chat-input-row input:focus{border-color:#2563eb}
+.chat-input-row button{padding:8px 20px;background:#2563eb;color:#fff;border:none;border-radius:20px;font-size:14px;font-weight:600;cursor:pointer}
+.msg-row{display:flex;gap:8px;margin:6px 0;align-items:flex-start}
+.msg-row.msg-self{justify-content:flex-end}
+.msg-row.msg-other{justify-content:flex-start}
+.msg-avatar{width:36px;height:36px;border-radius:50%;overflow:hidden;flex-shrink:0;background:#2563eb;position:relative}
+.msg-avatar img{width:100%;height:100%;object-fit:cover;display:block;position:relative;z-index:1}
+.msg-avatar .avatar-letter{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:700;z-index:0}
+.msg-body{max-width:70%;display:flex;flex-direction:column}
+.msg-self .msg-body{align-items:flex-end}
+.msg-other .msg-body{align-items:flex-start}
+.msg-meta{display:flex;align-items:center;gap:8px;margin-bottom:3px;font-size:11px;color:#8a9baa}
+.msg-self .msg-meta{flex-direction:row-reverse}
+.msg-name{font-weight:600;color:#64748b}
+.msg-bubble{padding:9px 14px;border-radius:14px;font-size:14px;line-height:1.5;word-wrap:break-word;max-width:100%}
+.msg-self .msg-bubble{background:#2563eb;color:#fff;border-bottom-right-radius:4px}
+.msg-other .msg-bubble{background:#fff;color:#1a2a3a;border:1px solid #e8edf4;border-bottom-left-radius:4px}
+.msg-recalled{text-align:center;font-size:12px;color:#94a3b8;padding:8px 0;font-style:italic}
+.msg-context-menu{position:fixed;background:#fff;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,0.15);z-index:1000;min-width:100px;overflow:hidden;border:1px solid #e8edf4}
+.msg-menu-item{padding:10px 18px;font-size:14px;color:#1a2a3a;cursor:pointer;transition:background .15s;border-bottom:1px solid #f0f4fa}
+.msg-menu-item:last-child{border-bottom:none}
+.msg-menu-item:hover{background:#f5f7fa}
+.msg-menu-item.danger{color:#dc2626}
+.form-group{margin-bottom:14px}
+.form-label{display:block;font-size:13px;color:#64748b;margin-bottom:6px;font-weight:500}
+.form-group input,.form-group textarea{width:100%;padding:10px 12px;border:1px solid #dce3ec;border-radius:8px;font-size:14px;outline:none;box-sizing:border-box;font-family:inherit}
+.form-group input:focus,.form-group textarea:focus{border-color:#2563eb}
+.form-group textarea{resize:vertical}
+.credit-score{font-size:13px;color:#2563eb;font-weight:600;margin-top:4px}
+.credit-score.low{color:#dc2626}
+
+.friend-requests{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.friend-request-item{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#fff8e7;border-radius:10px;border:1px solid #f0e0c0}
+.friend-request-item .rname{font-size:14px;font-weight:600;color:#1a2a3a}
+.friend-request-item .rbtns{display:flex;gap:6px}
+.friend-request-item .rbtns button{padding:4px 14px;border:none;border-radius:12px;font-size:12px;font-weight:600;cursor:pointer}
+.friend-request-item .rbtns .accept{background:#1e7b4a;color:#fff}
+.friend-request-item .rbtns .accept:hover{background:#15653b}
+.friend-request-item .rbtns .reject{background:#da3633;color:#fff}
+.friend-request-item .rbtns .reject:hover{background:#b02a2a}
+
+.invite-badge{background:#e74c3c;color:#fff;border-radius:50%;padding:1px 6px;font-size:10px;font-weight:700;margin-left:4px;display:none}
+.invite-btn{background:transparent;border:none;font-size:20px;cursor:pointer;position:relative;padding:4px}
+
+@media(max-width:480px){
+    .game-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr))}
+    .detail-modal{max-width:100%;border-radius:12px}
+    .detail-modal .detail-header{padding:12px 12px 0 12px}
+    .detail-modal .detail-body{padding:0 12px 12px 12px}
+    .detail-modal .comment-section{padding:0 12px 12px 12px}
+    .tab-bar{gap:12px}
+    .tab-bar .tab-item{font-size:13px}
+    .modal-overlay .modal-box .mode-btn{font-size:12px;padding:8px}
+}
+
+/* 语言设置（编辑资料弹窗内） */
+.lang-setting{margin-top:16px;padding:14px;background:#f8fafc;border-radius:10px;border:1px solid #e8edf4}
+.lang-setting .lang-label{font-size:13px;font-weight:600;color:#1a2a3a;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.lang-setting .lang-btns{display:flex;gap:8px;flex-wrap:wrap}
+.lang-setting .lang-btn{flex:1;min-width:90px;padding:9px 6px;border:2px solid #dce3ec;border-radius:8px;background:#fff;color:#4a5a6a;font-size:13px;font-weight:600;cursor:pointer;transition:.3s;text-align:center}
+.lang-setting .lang-btn:hover{border-color:#2563eb;color:#2563eb}
+.lang-setting .lang-btn.active{border-color:#2563eb;background:rgba(37,99,235,0.08);color:#2563eb}
+.lang-setting .lang-hint{font-size:11px;color:#8a9baa;margin-top:8px;text-align:center}
+
+/* WebView 体验优化 */
+html,body{
+    overscroll-behavior:none;
+    -webkit-overflow-scrolling:touch;
+    -webkit-tap-highlight-color:transparent;
+    user-select:none;
+    -webkit-user-select:none;
+}
+input,textarea{
+    user-select:text;
+    -webkit-user-select:text;
+}
+button,.nav-item,.tab-item,.game-card,.menu-dropdown a{
+    -webkit-tap-highlight-color:rgba(255,94,0,0.15);
+    touch-action:manipulation;
+}
+button:active,.nav-item:active,.tab-item:active{
+    transform:scale(0.96);
+    transition:transform 0.1s ease;
+}
+.game-card:active{
+    transform:scale(0.97);
+}
+/* 禁用长按选择 */
+img{
+    -webkit-user-drag:none;
+    user-drag:none;
+}
+
+
+/* ===== 首次进入引导 Onboarding ===== */
+#onboardingOverlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.75);z-index:99999;display:none;justify-content:center;align-items:center;backdrop-filter:blur(4px)}
+#onboardingOverlay.show{display:flex}
+.onboarding-card{background:#fff;border-radius:20px;padding:32px 28px;max-width:420px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3);position:relative;animation:onboardingSlideIn 0.4s ease}
+@keyframes onboardingSlideIn{from{opacity:0;transform:translateY(30px) scale(0.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+.onboarding-welcome{text-align:center;margin-bottom:24px}
+.onboarding-welcome h2{margin:0 0 8px;font-size:22px;color:#1a1a2e;background:linear-gradient(135deg,#667eea,#764ba2);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.onboarding-welcome p{margin:0;font-size:13px;color:#6b7f94}
+.onboarding-step{display:none}
+.onboarding-step.active{display:block;animation:stepFadeIn 0.3s ease}
+@keyframes stepFadeIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+.onboarding-step-icon{font-size:48px;text-align:center;margin-bottom:16px}
+.onboarding-step-title{font-size:18px;font-weight:700;color:#1a1a2e;text-align:center;margin-bottom:12px}
+.onboarding-step-desc{font-size:14px;color:#4a5568;text-align:center;line-height:1.6;margin-bottom:20px;padding:0 8px}
+.onboarding-status{text-align:center;padding:12px 16px;background:#f7fafc;border-radius:12px;margin-bottom:20px;font-size:14px;font-weight:600;min-height:44px;display:flex;align-items:center;justify-content:center}
+.onboarding-status.checking{color:#667eea}
+.onboarding-status.granted{color:#38a169;background:#f0fff4}
+.onboarding-status.denied{color:#e53e3e;background:#fff5f5}
+.onboarding-btn{width:100%;padding:14px;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;transition:all 0.2s;margin-bottom:10px}
+.onboarding-btn-primary{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff}
+.onboarding-btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(102,126,234,0.4)}
+.onboarding-btn-primary:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+.onboarding-btn-secondary{background:#edf2f7;color:#4a5568}
+.onboarding-btn-secondary:hover{background:#e2e8f0}
+.onboarding-btn-done{background:linear-gradient(135deg,#38a169,#2f855a);color:#fff}
+.onboarding-btn-done:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(56,161,105,0.4)}
+.onboarding-indicator{display:flex;justify-content:center;gap:8px;margin-top:20px}
+.onboarding-dot{width:8px;height:8px;border-radius:50%;background:#cbd5e0;transition:all 0.3s}
+.onboarding-dot.active{background:#667eea;width:24px;border-radius:4px}
+.onboarding-step-text{text-align:center;font-size:12px;color:#a0aec0;margin-top:8px}
+</style>
+<script src="i18n.js"></script>
+
+
+<!-- PWA / 上架优化 -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#ff5e00">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="龙黑化">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-TileColor" content="#ff5e00">
+<meta name="msapplication-TileImage" content="icon-192.png">
+
+</head>
+<body>
+<!-- 启动页 -->
+<div id="splashScreen" style="position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,#0b0f16,#1a1f2e);display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:99999;transition:opacity 0.5s ease;">
+    <div style="font-size:64px;margin-bottom:16px;">🐉</div>
+    <div style="font-size:24px;font-weight:700;color:#ff5e00;letter-spacing:4px;margin-bottom:8px;">龙黑化</div>
+    <div style="font-size:12px;color:#6b7a8f;letter-spacing:2px;">创作工坊</div>
+    <div style="margin-top:32px;width:120px;height:3px;background:#2a313c;border-radius:2px;overflow:hidden;">
+        <div id="splashProgress" style="height:100%;width:0%;background:linear-gradient(90deg,#ff5e00,#ff8c00);border-radius:2px;transition:width 0.3s ease;"></div>
+    </div>
+</div>
+
+<!-- 启动页强制隐藏（不依赖后续JS，确保即使后续代码出错也能隐藏） -->
+<script>
+(function(){
+    var splash = document.getElementById('splashScreen');
+    var progress = document.getElementById('splashProgress');
+    if(!splash) return;
+    // 进度条动画
+    var p = 0;
+    var iv = setInterval(function(){
+        p += Math.random() * 15;
+        if(p > 90) p = 90;
+        if(progress) progress.style.width = p + '%';
+    }, 200);
+    // 强制隐藏函数
+    function forceHideSplash(){
+        try { clearInterval(iv); } catch(e){}
+        if(progress) progress.style.width = '100%';
+        setTimeout(function(){
+            if(splash) {
+                splash.style.opacity = '0';
+                setTimeout(function(){ if(splash) splash.style.display = 'none'; }, 500);
+            }
+        }, 300);
+    }
+    // 页面加载完成后隐藏
+    if(document.readyState === 'complete'){
+        setTimeout(forceHideSplash, 800);
+    } else {
+        window.addEventListener('load', function(){ setTimeout(forceHideSplash, 800); });
+    }
+    // 最多2.5秒后强制隐藏（比之前的3秒更早，确保不卡住）
+    setTimeout(forceHideSplash, 2500);
+})();
+</script>
+
+
+<div class="card" id="app">
+
+<div class="header">
+<div class="header-left">
+<span class="header-title" id="headerTitle">龙黑化<span class="sub">社区</span></span>
+</div>
+<div class="header-right">
+<span class="rcoins" onclick="location.href='w.html'"><img src="coin.png" alt="R币"> <span id="rcoinsDisplay">0</span></span>
+<button class="menu-btn" onclick="toggleMenu()">⋮</button>
+<div class="menu-dropdown" id="menuDropdown">
+<a data-i18n="menu_edit_profile" onclick="openEditProfile()">编辑资料</a>
+<a onclick="openMails()"><span data-i18n="menu_mails">邮件</span> <span id="mailBadge" style="display:none;background:#2563eb;color:#fff;border-radius:50%;font-size:10px;padding:1px 7px;min-width:18px;text-align:center;font-weight:700;margin-left:6px;">0</span></a>
+<a data-i18n="menu_badge" onclick="openBadgeManager()">勋章设置</a>
+<a class="danger" data-i18n="menu_logout" onclick="logout()">退出登录</a>
+</div>
+</div>
+</div>
+
+<div class="tab-bar" id="tabBar">
+    <div class="tab-item active" data-tab="hot" onclick="switchTabBar('hot',this)"><span data-i18n="tab_hot">首页</span> <span class="badge hot">15</span></div>
+    <div class="tab-item" data-tab="new" onclick="switchTabBar('new',this)"><span data-i18n="tab_new">新品</span> <span class="badge" id="newBadge">0</span></div>
+</div>
+
+<div class="search-bar" id="searchBar">
+<input type="text" id="searchInput" data-i18n-placeholder="search_placeholder" placeholder="搜索作品名称或作者..." onkeyup="if(event.key==='Enter') searchGames()">
+<button data-i18n="btn_search" onclick="searchGames()">搜索</button>
+</div>
+
+<div class="content" id="contentArea">
+
+<div id="homePage">
+<div class="game-grid" id="gameGrid">
+<div class="empty-state">加载中...</div>
+</div>
+</div>
+
+<div id="profilePage" class="profile-page">
+<div class="cover-wrap" id="profileCoverWrap">
+<img id="profileCover" src="" alt="封面" style="display:none;" onerror="this.style.display='none';">
+<div id="coverPlaceholder" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:14px;" data-i18n="no_cover">暂无封面</div>
+</div>
+<div class="profile-header">
+<img class="avatar" id="profileAvatar" src="" alt="头像" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2264%22 height=%2264%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 fill=%22%23eef2f6%22/%3E%3Ctext x=%2232%22 y=%2242%22 text-anchor=%22middle%22 font-size=%2232%22 fill=%22%238a9baa%22%3E👤%3C/text%3E%3C/svg%3E'">
+<div class="id-info">
+<div class="name" id="profileName">加载中... <span class="num" id="profileIdNum">#0</span></div>
+<div class="email" id="profileEmail">加载中...</div>
+<div class="rcoins"><img src="coin.png" alt="R币"> <span id="profileRcoins">0</span></div>
+<div class="credit-score" id="profileCredit">信用分 100</div>
+</div>
+</div>
+<div class="bio-box" id="bioDisplay"><span class="empty" data-i18n="bio_empty">这个人很懒，什么都没写...</span></div>
+<div id="bioStatusDisplay" style="margin-top:6px;font-size:12px;"></div>
+<div class="profile-actions" id="profileActions">
+<button class="btn-edit" data-i18n="btn_edit_profile" onclick="openEditProfile()">编辑资料</button>
+<button class="btn-cover" data-i18n="btn_change_cover" onclick="openCoverUpload()">更换封面</button>
+<button class="btn-mail" data-i18n="btn_mail" onclick="openMails()">邮件</button>
+</div>
+<div class="profile-stats" id="profileStats">
+<div class="stat-item"><div class="num" id="statGames">0</div><span class="label" data-i18n="stat_games">作品</span></div>
+<div class="stat-item"><div class="num" id="statLikes">0</div><span class="label" data-i18n="stat_likes">获赞</span></div>
+<div class="stat-item"><div class="num" id="statCollects">0</div><span class="label" data-i18n="stat_collects">收藏</span></div>
+<div class="stat-item"><div class="num" id="statFollowing">0</div><span class="label" data-i18n="stat_following">关注</span></div>
+<div class="stat-item"><div class="num" id="statFollowers">0</div><span class="label" data-i18n="stat_followers">粉丝</span></div>
+</div>
+<div class="badges-container" id="badgesContainer">
+<div class="badge-title" data-i18n="badge_title">我的勋章</div>
+<div class="badge-list" id="badgeList"></div>
+</div>
+<div class="my-games-title"><span data-i18n="my_games_title">我的作品</span> <span style="font-size:12px;font-weight:400;color:#8a9baa;" data-i18n="long_press_tip">（长按作品可删除）</span></div>
+<div class="game-grid" id="myGameGrid">
+<div class="empty-state">加载中...</div>
+</div>
+</div>
+
+<div id="friendsPage" style="display:none;">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:0 0 12px 0;border-bottom:1px solid #e8edf4;">
+        <span style="font-size:17px;font-weight:700;color:#1a2a3a;" data-i18n="friend_title">好友</span>
+        <button onclick="openFriendRequests()" style="background:transparent;border:none;font-size:16px;cursor:pointer;position:relative;color:#4a5a6a;" id="inviteBellBtn">
+            <span data-i18n="friend_request">请求</span>
+            <span id="inviteBadge" style="display:none;position:absolute;top:-4px;right:-6px;background:#e74c3c;color:#fff;border-radius:50%;font-size:9px;padding:1px 6px;min-width:16px;text-align:center;font-weight:700;">0</span>
+        </button>
+    </div>
+    <div id="friendList" style="margin-top:12px;">
+        <div class="empty-state">加载中...</div>
+    </div>
+</div>
+
+</div>
+
+<div class="bottom-nav">
+<button class="nav-item active" data-tab="home" onclick="switchTab('home',this)">
+<span class="nav-label" data-i18n="nav_home">首页</span>
+</button>
+<button class="nav-item" data-tab="friends" onclick="switchTab('friends',this)">
+<span class="nav-label" data-i18n="nav_friends">好友</span>
+<span id="friendBadge" style="display:none;position:absolute;top:0;right:50%;background:#e74c3c;color:#fff;border-radius:50%;font-size:9px;padding:1px 6px;min-width:16px;text-align:center;font-weight:700;">0</span>
+</button>
+<button class="nav-item" data-tab="create" onclick="openCreate()">
+<span class="nav-label" data-i18n="nav_create">创作</span>
+</button>
+<button class="nav-item" data-tab="profile" onclick="switchTab('profile',this)">
+<span class="nav-label" data-i18n="nav_profile">我的</span>
+</button>
+</div>
+
+</div>
+
+<div class="modal-overlay" id="editProfileModal" style="background:rgba(0,0,0,0.3);align-items:flex-start;padding:56px 0 0 0;">
+<div class="modal-box" style="max-width:100%;width:100%;height:calc(100vh - 56px);max-height:calc(100vh - 56px);border-radius:0;margin:0;overflow-y:auto;">
+<h3 data-i18n="edit_profile_title">编辑资料</h3>
+<img class="avatar-preview" id="editAvatarPreview" src="" alt="头像" style="width:80px;height:80px;border-radius:50%;border:2px solid #dce3ec;object-fit:cover;margin:0 auto 12px;display:block;background:#f5f7fa;">
+<label class="file-label"><span data-i18n="change_avatar">更换头像（≤10MB）</span><input type="file" id="editAvatarInput" accept="image/*" onchange="previewEditAvatar(event)"></label>
+<input type="text" id="editUsername" data-i18n-placeholder="ph_username_edit" placeholder="用户名（2-20个字符）">
+<textarea id="editBio" data-i18n-placeholder="ph_bio" placeholder="个人介绍..."></textarea>
+<div id="editStatus" class="status-msg"></div>
+
+<div class="lang-setting">
+<div class="lang-label">🌐 <span data-i18n="lang_setting">语言设置</span></div>
+<div class="lang-btns" id="profileLangSelector">
+<button type="button" class="lang-btn active" data-lang="zh-CN" onclick="I18N.setLanguage('zh-CN')">简体中文</button>
+<button type="button" class="lang-btn" data-lang="zh-TW" onclick="I18N.setLanguage('zh-TW')">繁體中文</button>
+<button type="button" class="lang-btn" data-lang="en" onclick="I18N.setLanguage('en')">English</button>
+</div>
+<div class="lang-hint" data-i18n="lang_hint">选择后立即生效</div>
+</div>
+
+<div class="btn-group">
+<button class="btn-primary" data-i18n="btn_save" onclick="saveEditProfile()">保存</button>
+<button class="btn-secondary" data-i18n="btn_cancel" onclick="closeEditProfile()">取消</button>
+</div>
+</div>
+</div>
+
+<div class="modal-overlay" id="coverModal">
+<div class="modal-box">
+<h3 data-i18n="cover_title">更换封面</h3>
+<div style="width:100%;height:120px;border-radius:8px;border:2px dashed #dce3ec;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:13px;margin-bottom:12px;overflow:hidden;" id="coverPreviewBox">
+<img id="coverPreviewImg" src="" style="width:100%;height:100%;object-fit:cover;display:none;">
+<span id="coverPreviewText" data-i18n="cover_preview_text">选择图片后预览</span>
+</div>
+<label class="file-label"><span data-i18n="cover_select">选择封面图片（≤10MB）</span><input type="file" id="coverInput" accept="image/*" onchange="previewCoverUpload(event)"></label>
+<div id="coverStatus" class="status-msg"></div>
+<div class="btn-group">
+<button class="btn-primary" data-i18n="btn_save" onclick="saveCover()">保存</button>
+<button class="btn-secondary" data-i18n="btn_cancel" onclick="closeCoverUpload()">取消</button>
+</div>
+</div>
+</div>
+
+<div class="modal-overlay" id="createModal">
+<div class="modal-box">
+<h3 data-i18n="create_title">发布作品</h3>
+<div style="display:flex;gap:12px;margin-bottom:16px;">
+    <button class="mode-btn active" id="modeDirect" onclick="switchCreateMode('direct')" style="border-color:#2563eb;background:rgba(37,99,235,0.1);color:#2563eb;font-weight:700;" data-i18n="editor_mode_direct">直接上传</button>
+    <button class="mode-btn" id="modeEditor" onclick="switchCreateMode('editor')" style="border-color:#dce3ec;background:#f8fafc;color:#64748b;font-weight:600;" data-i18n="editor_mode_editor">2.0编辑器</button>
+</div>
+
+<div id="directMode">
+    <input type="text" id="gameTitle" data-i18n-placeholder="ph_game_title" placeholder="作品名称（2-20字）">
+    <label class="file-label"><span data-i18n="upload_icon">上传作品图标（≤5MB）</span><input type="file" id="gameIcon" accept="image/*" onchange="previewGameIcon(event)"></label>
+    <div class="icon-preview" id="iconPreview"></div>
+    <textarea id="gameCode" data-i18n-placeholder="ph_game_code" placeholder="输入HTML游戏代码..." style="min-height:150px;font-family:monospace;font-size:13px;"></textarea>
+</div>
+
+<div id="editorMode" style="display:none;">
+    <div class="editor-info" style="background:#f0f7ff;border:1px solid #dbeafe;">
+        <div class="title" style="color:#2563eb;">2.0 可视化编辑器</div>
+        <div class="desc" style="color:#64748b;">使用可视化编辑器创作游戏，支持文件管理、属性编辑</div>
+        <div class="tip" style="color:#475569;">需要先创建游戏仓库，再进入编辑器</div>
+    </div>
+    <input type="text" id="editorGameTitle" data-i18n-placeholder="ph_game_title" placeholder="作品名称（2-20字）">
+    <label class="file-label"><span data-i18n="upload_icon">上传作品图标（≤5MB）</span><input type="file" id="editorGameIcon" accept="image/*" onchange="previewEditorIcon(event)"></label>
+    <div class="icon-preview" id="editorIconPreview"></div>
+</div>
+
+<div id="createStatus" class="status-msg"></div>
+<div class="btn-group">
+    <button class="btn-primary" id="submitBtn" data-i18n="btn_publish" onclick="submitCreate()">发布</button>
+    <button class="btn-secondary" data-i18n="btn_cancel" onclick="closeCreate()">取消</button>
+</div>
+</div>
+</div>
+
+<div class="modal-overlay" id="editGameModal">
+<div class="modal-box">
+<h3 data-i18n="edit_game_title">编辑作品</h3>
+<input type="text" id="editGameTitle" data-i18n-placeholder="ph_game_title" placeholder="作品名称（2-20字）">
+<label class="file-label" id="editGameIconLabel" for="editGameIcon">
+    <span id="editGameIconText" data-i18n="upload_icon">上传作品图标（≤5MB）</span>
+    <input type="file" id="editGameIcon" accept="image/*" onchange="previewEditGameIcon(event)" style="display:none;">
+</label>
+<div class="icon-preview" id="editGameIconPreview"></div>
+<textarea id="editGameDesc" data-i18n-placeholder="ph_game_desc" placeholder="作品描述（可选）"></textarea>
+<textarea id="editGameCode" data-i18n-placeholder="ph_game_code_edit" placeholder="HTML游戏代码..." style="min-height:200px;font-family:monospace;font-size:13px;"></textarea>
+<div id="editGameStatus" class="status-msg"></div>
+<div class="btn-group">
+    <button class="btn-primary" data-i18n="btn_save_update" onclick="saveEditGame()">保存更新</button>
+    <button class="btn-secondary" data-i18n="btn_cancel" onclick="closeEditGameModal()">取消</button>
+</div>
+</div>
+</div>
+
+<div class="modal-overlay" id="mailModal">
+<div class="modal-box">
+<h3 data-i18n="mail_title">我的邮件</h3>
+<div id="mailList" style="max-height:300px;overflow-y:auto;margin-bottom:12px;">
+<div class="empty-state">加载中...</div>
+</div>
+<div class="btn-group">
+<button class="btn-secondary" data-i18n="btn_close" onclick="closeMails()">关闭</button>
+</div>
+</div>
+</div>
+
+<div class="modal-overlay" id="badgeModal" onclick="if(event.target===this) closeBadgeManager()">
+<div class="modal-box">
+<h3 data-i18n="badge_manager_title">勋章管理</h3>
+<div style="font-size:13px;color:#94a3b8;text-align:center;margin-bottom:12px;" data-i18n="badge_obtained">查看已获得的勋章</div>
+<div id="badgeManagerList" style="display:flex;flex-direction:column;gap:10px;max-height:300px;overflow-y:auto;"></div>
+<div id="badgeProgress" style="margin-top:12px;padding:12px;background:#f8fafc;border-radius:8px;border:1px solid #e8edf4;">
+<div style="font-size:12px;color:#64748b;font-weight:600;margin-bottom:6px;" data-i18n="badge_progress">勋章进度</div>
+<div id="badgeProgressList" style="font-size:12px;color:#4a5a6a;"></div>
+</div>
+<div class="btn-group" style="margin-top:12px;">
+<button class="btn-secondary" data-i18n="btn_close" onclick="closeBadgeManager()">关闭</button>
+</div>
+</div>
+</div>
+
+<div class="detail-overlay" id="detailModal" onclick="if(event.target===this) closeDetail()">
+<div class="detail-modal">
+<div class="detail-header">
+<button class="close-btn" onclick="closeDetail()">✕</button>
+<img class="detail-cover" id="detailCover" src="" alt="封面" onerror="this.style.display='none';">
+<div class="detail-title-row">
+<div class="detail-title" id="detailTitle">作品名称</div>
+<button class="detail-follow-btn" id="detailFollowBtn" data-i18n="btn_follow" onclick="toggleFollowAuthor()">关注</button>
+</div>
+<div class="detail-author-row">
+<img class="detail-author-avatar" id="detailAuthorAvatar" src="" alt="作者头像" onclick="viewAuthorProfile()">
+<span class="detail-author-name" id="detailAuthorName" onclick="viewAuthorProfile()">作者名</span>
+</div>
+<div class="detail-play-count"><span id="detailPlayCount">0</span> 人玩过 · <span id="detailPlayingCount">0</span> 人在玩</div>
+</div>
+<div class="detail-body">
+<div class="detail-desc" id="detailDesc" data-i18n="no_desc">暂无介绍</div>
+<div class="detail-tags" id="detailTags">
+<span class="tag">Scratch</span>
+<span class="tag">休闲</span>
+</div>
+<div class="detail-like-collect">
+<button id="detailLikeBtn" onclick="toggleLikeDetail(currentGameId)"><span data-i18n="btn_like">赞</span> <span class="count">0</span></button>
+<button id="detailCollectBtn" onclick="toggleCollectDetail(currentGameId)"><span data-i18n="btn_collect">收藏</span> <span class="count">0</span></button>
+</div>
+</div>
+<div class="comment-section">
+<div class="comment-title"><span data-i18n="comment_title">评论</span> <span style="font-size:12px;font-weight:400;color:#8a9baa;" id="commentCount">0</span></div>
+<div class="comment-input">
+<input type="text" id="commentInput" data-i18n-placeholder="ph_comment" placeholder="说点什么..." onkeyup="if(event.key==='Enter') submitComment()">
+<button data-i18n="btn_send" onclick="submitComment()">发送</button>
+</div>
+<div id="commentList"></div>
+</div>
+<button class="play-btn" data-i18n="play_btn" onclick="playGame()">▶ 进入游戏</button>
+</div>
+</div>
+
+<div class="detail-overlay" id="userProfileModal" onclick="if(event.target===this) closeUserProfile()">
+<div class="detail-modal" style="max-width:400px;">
+<div class="detail-header" style="padding:20px 20px 0 20px;">
+<button class="close-btn" onclick="closeUserProfile()">✕</button>
+<div style="display:flex;align-items:center;gap:14px;margin-top:8px;">
+<img class="avatar" id="userProfileAvatar" src="" alt="头像" style="width:64px;height:64px;border-radius:50%;border:3px solid #fff;object-fit:cover;background:#eef2f6;">
+<div style="flex:1;">
+<div style="font-size:18px;font-weight:700;color:#1a2a3a;" id="userProfileName">用户</div>
+<div style="font-size:12px;color:#8a9baa;" id="userProfileId">#0</div>
+<div style="font-size:13px;color:#2563eb;font-weight:600;margin-top:4px;"><img src="coin.png" style="width:16px;height:16px;vertical-align:middle;"> <span id="userProfileRcoins">0</span></div>
+</div>
+</div>
+<div style="margin-top:10px;padding:10px 14px;background:#f8fafc;border-radius:8px;border:1px solid #e8edf4;font-size:13px;color:#2c3e50;line-height:1.6;" id="userProfileBio"><span class="empty" data-i18n="bio_empty">这个人很懒，什么都没写...</span></div>
+<div class="profile-stats" style="margin-top:10px;padding:10px 0;border-top:1px solid #e8edf4;display:flex;gap:12px;flex-wrap:wrap;">
+<div class="stat-item" style="text-align:center;flex:1;min-width:40px;"><div class="num" id="userStatGames">0</div><span class="label" style="font-size:10px;color:#8a9baa;display:block;" data-i18n="stat_games">作品</span></div>
+<div class="stat-item" style="text-align:center;flex:1;min-width:40px;"><div class="num" id="userStatLikes">0</div><span class="label" style="font-size:10px;color:#8a9baa;display:block;" data-i18n="stat_likes">获赞</span></div>
+<div class="stat-item" style="text-align:center;flex:1;min-width:40px;"><div class="num" id="userStatCollects">0</div><span class="label" style="font-size:10px;color:#8a9baa;display:block;" data-i18n="stat_collects">收藏</span></div>
+<div class="stat-item" style="text-align:center;flex:1;min-width:40px;"><div class="num" id="userStatFollowers">0</div><span class="label" style="font-size:10px;color:#8a9baa;display:block;" data-i18n="stat_followers">粉丝</span></div>
+</div>
+<div id="userProfileActions" style="margin-top:10px;display:flex;gap:8px;justify-content:center;">
+<button class="btn-follow" id="userFollowBtn" data-i18n="btn_follow" onclick="followUser()" style="padding:8px 28px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;background:#2563eb;color:#fff;">关注</button>
+</div>
+<div class="my-games-title" style="font-size:14px;margin-top:14px;" data-i18n="his_games">他的作品</div>
+<div class="game-grid" id="userGameGrid" style="grid-template-columns:repeat(auto-fill,minmax(110px,1fr));">
+<div class="empty-state" style="padding:20px 0;">加载中...</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="modal-overlay" id="friendRequestModal" onclick="if(event.target===this) closeFriendRequests()">
+<div class="modal-box" style="max-width:400px;">
+<h3 data-i18n="friend_request_title">好友请求</h3>
+<div id="friendRequestList" style="max-height:300px;overflow-y:auto;margin-bottom:12px;">
+<div class="empty-state">加载中...</div>
+</div>
+<div class="btn-group">
+<button class="btn-secondary" data-i18n="btn_close" onclick="closeFriendRequests()">关闭</button>
+</div>
+</div>
+</div>
+
+<div class="modal-overlay" id="chatModal" onclick="if(event.target===this) closeChat()" style="background:rgba(0,0,0,0.3);align-items:flex-start;padding:56px 0 0 0;">
+<div class="modal-box" style="max-width:100%;width:100%;height:calc(100vh - 56px);max-height:calc(100vh - 56px);border-radius:0;padding:12px 16px;display:flex;flex-direction:column;margin:0;">
+<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #e8edf4;padding-bottom:10px;margin-bottom:10px;flex-shrink:0;">
+<span style="font-size:16px;font-weight:700;color:#1a2a3a;" id="chatFriendName">好友</span>
+<button onclick="closeChat()" style="background:transparent;border:none;font-size:20px;cursor:pointer;color:#8a9baa;">✕</button>
+</div>
+<div id="chatMessages" style="flex:1;overflow-y:auto;padding:8px 4px;min-height:0;background:#f8fafc;border-radius:8px;border:1px solid #e8edf4;margin-bottom:10px;display:flex;flex-direction:column;gap:8px;">
+<div class="empty-state" style="padding:20px 0;">暂无消息</div>
+</div>
+<div class="chat-input-row" style="flex-shrink:0;padding-top:8px;border-top:1px solid #e8edf4;">
+<input type="text" id="chatInput" data-i18n-placeholder="chat_placeholder" placeholder="输入消息（最多500字）" maxlength="500" onkeyup="if(event.key==='Enter') sendChatMessage()" oninput="updateChatCount()">
+<span id="chatCount" style="font-size:11px;color:#8a9baa;align-self:center;min-width:42px;text-align:right;">0/500</span>
+<button data-i18n="btn_send_msg" onclick="sendChatMessage()">发送</button>
+</div>
+</div>
+</div>
+
+<!-- 消息长按菜单 -->
+<div class="msg-context-menu" id="msgContextMenu" style="display:none;">
+    <div class="msg-menu-item" id="menuRecall" data-i18n="msg_recall" onclick="doRecallMessage()">撤回</div>
+    <div class="msg-menu-item" id="menuCopy" data-i18n="msg_copy" onclick="doCopyMessage()">复制</div>
+    <div class="msg-menu-item" id="menuReport" data-i18n="msg_report" onclick="openReportModal()">举报</div>
+</div>
+
+<!-- 举报弹窗 -->
+<div class="modal-overlay" id="reportModal" onclick="if(event.target===this) closeReportModal()">
+<div class="modal-box" style="max-width:400px;">
+<h3 data-i18n="report_title">举报</h3>
+<div class="form-group">
+<label class="form-label" data-i18n="report_label_title">举报标题</label>
+<input type="text" id="reportTitle" data-i18n-placeholder="ph_report_title" placeholder="请输入举报标题（最多50字）" maxlength="50">
+</div>
+<div class="form-group">
+<label class="form-label" data-i18n="report_label_content">举报内容</label>
+<textarea id="reportContent" data-i18n-placeholder="ph_report_content" placeholder="请详细描述举报原因（最多500字）" maxlength="500" rows="4"></textarea>
+</div>
+<div class="form-group">
+<label class="form-label" data-i18n="report_label_contact">联系方式（选填）</label>
+<input type="text" id="reportContact" data-i18n-placeholder="ph_report_contact" placeholder="方便我们联系你核实情况" maxlength="50">
+</div>
+<div id="reportStatus" class="status-msg"></div>
+<div class="btn-group">
+<button class="btn-primary" data-i18n="btn_submit_report" onclick="submitReport()">提交举报</button>
+<button class="btn-secondary" data-i18n="btn_cancel" onclick="closeReportModal()">取消</button>
+</div>
+</div>
+</div>
+
+<div class="play-overlay" id="playModal">
+<div class="play-container">
+<div class="play-header">
+<span class="title" id="playTitle" data-i18n="play_title">游戏</span>
+<button class="close-btn" data-i18n="btn_close" onclick="closePlay()">关闭</button>
+</div>
+<div class="play-frame"><iframe id="playFrame" src=""></iframe></div>
+</div>
+</div>
+
+<script>
+function formatTime(input){
+    if(!input)return '';
+    var ts;
+    if(typeof input==='number'){ts=input*1000;}
+    else{
+        var s=String(input).replace(' ','T');
+        ts=new Date(s+'Z').getTime();
+        if(isNaN(ts))ts=new Date(s).getTime();
+    }
+    if(isNaN(ts))return '';
+    var d=new Date(ts);
+    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+}
+(function(){
+    sessionStorage.removeItem('dashboard_loaded');
+    localStorage.removeItem('cached_games');
+    localStorage.removeItem('cached_search');
+})();
+
+var API_URL = 'api.php';
+var token = localStorage.getItem('token') || '';
+var username = localStorage.getItem('username') || '';
+var email = localStorage.getItem('email') || '';
+var userId = localStorage.getItem('user_id') || '0';
+var currentGameId = null;
+var currentDetailData = null;
+var currentAuthorId = null;
+var longPressTimer = null;
+var longPressTriggered = false;
+var heartbeatTimer = null;
+var currentPlayingGameId = null;
+var currentTab = 'hot';
+var currentCreditScore = 100;
+var newGamesCount = 0;
+var createMode = 'direct';
+var editorIconData = null;
+var currentChatFriendId = null;
+var chatInterval = null;
+
+if (!token) {
+    window.location.href = 'index.html';
+}
+
+
+// ===== 首次进入引导 Onboarding =====
+var onboardingStorageGranted = false;
+var onboardingLocationGranted = false;
+
+function checkOnboardingStatus() {
+    var formData = new FormData();
+    formData.append('action', 'checkOnboarding');
+    formData.append('token', token);
+    fetch('api.php', {method: 'POST', body: formData})
+        .then(function(r){return r.json();})
+        .then(function(d){
+            if (d.success && d.data && d.data.done) {
+                // 已完成引导，直接进入
+            } else {
+                showOnboarding();
+            }
+        })
+        .catch(function(){
+            // 网络错误，显示引导
+            showOnboarding();
+        });
+}
+
+function showOnboarding() {
+    document.getElementById('onboardingOverlay').classList.add('show');
+    // 自动检测存储权限
+    setTimeout(checkStoragePermission, 500);
+}
+
+function checkStoragePermission() {
+    var statusEl = document.getElementById('storageStatus');
+    statusEl.className = 'onboarding-status checking';
+    statusEl.textContent = I18N.t('onboarding_step1_checking');
+    if (navigator.storage && navigator.storage.persisted) {
+        navigator.storage.persisted().then(function(persisted){
+            if (persisted) {
+                onboardingStorageGranted = true;
+                statusEl.className = 'onboarding-status granted';
+                statusEl.textContent = I18N.t('onboarding_step1_granted');
+                document.getElementById('grantStorageBtn').style.display = 'none';
+                setTimeout(function(){ goToNextStep(1); }, 800);
+            } else {
+                statusEl.className = 'onboarding-status denied';
+                statusEl.textContent = I18N.t('onboarding_step1_denied');
+            }
+        }).catch(function(){
+            statusEl.className = 'onboarding-status denied';
+            statusEl.textContent = I18N.t('onboarding_step1_denied');
+        });
+    } else {
+        // 浏览器不支持，直接跳过
+        onboardingStorageGranted = true;
+        statusEl.className = 'onboarding-status granted';
+        statusEl.textContent = I18N.t('onboarding_step1_granted');
+        setTimeout(function(){ goToNextStep(1); }, 800);
+    }
+}
+
+function grantStoragePermission() {
+    var statusEl = document.getElementById('storageStatus');
+    statusEl.className = 'onboarding-status checking';
+    statusEl.textContent = I18N.t('onboarding_step1_checking');
+    if (navigator.storage && navigator.storage.persist) {
+        navigator.storage.persist().then(function(granted){
+            if (granted) {
+                onboardingStorageGranted = true;
+                statusEl.className = 'onboarding-status granted';
+                statusEl.textContent = I18N.t('onboarding_step1_granted');
+                document.getElementById('grantStorageBtn').style.display = 'none';
+                setTimeout(function(){ goToNextStep(1); }, 800);
+            } else {
+                statusEl.className = 'onboarding-status denied';
+                statusEl.textContent = I18N.t('onboarding_step1_denied');
+            }
+        }).catch(function(){
+            statusEl.className = 'onboarding-status denied';
+            statusEl.textContent = I18N.t('onboarding_step1_denied');
+        });
+    } else {
+        onboardingStorageGranted = true;
+        statusEl.className = 'onboarding-status granted';
+        statusEl.textContent = I18N.t('onboarding_step1_granted');
+        setTimeout(function(){ goToNextStep(1); }, 800);
+    }
+}
+
+function getDeviceLocation() {
+    var statusEl = document.getElementById('locationStatus');
+    statusEl.className = 'onboarding-status checking';
+    statusEl.textContent = I18N.t('onboarding_step2_checking');
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            function(position){
+                onboardingLocationGranted = true;
+                // 保存时区信息
+                var timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                localStorage.setItem('user_timezone', timezone);
+                statusEl.className = 'onboarding-status granted';
+                statusEl.textContent = I18N.t('onboarding_step2_granted');
+                document.getElementById('getLocationBtn').style.display = 'none';
+                setTimeout(function(){ showDoneButton(); }, 800);
+            },
+            function(error){
+                onboardingLocationGranted = false;
+                localStorage.setItem('user_timezone', 'America/New_York');
+                statusEl.className = 'onboarding-status denied';
+                statusEl.textContent = I18N.t('onboarding_step2_denied');
+                setTimeout(function(){ showDoneButton(); }, 800);
+            },
+            {timeout: 10000, enableHighAccuracy: false}
+        );
+    } else {
+        onboardingLocationGranted = false;
+        localStorage.setItem('user_timezone', 'America/New_York');
+        statusEl.className = 'onboarding-status denied';
+        statusEl.textContent = I18N.t('onboarding_step2_denied');
+        setTimeout(function(){ showDoneButton(); }, 800);
+    }
+}
+
+function skipOnboardingStep(step) {
+    if (step === 1) {
+        goToNextStep(1);
+    } else if (step === 2) {
+        localStorage.setItem('user_timezone', 'America/New_York');
+        showDoneButton();
+    }
+}
+
+function goToNextStep(currentStep) {
+    if (currentStep === 1) {
+        document.getElementById('onboardingStep1').classList.remove('active');
+        document.getElementById('onboardingStep2').classList.add('active');
+        document.getElementById('dot1').classList.remove('active');
+        document.getElementById('dot2').classList.add('active');
+        document.getElementById('onboardingStepText').textContent = '第 2 步 / 共 2 步';
+        // 自动检测位置
+        setTimeout(getDeviceLocation, 500);
+    }
+}
+
+function showDoneButton() {
+    document.getElementById('onboardingDoneSection').style.display = 'block';
+}
+
+function completeOnboarding() {
+    var formData = new FormData();
+    formData.append('action', 'completeOnboarding');
+    formData.append('token', token);
+    fetch('api.php', {method: 'POST', body: formData})
+        .then(function(r){return r.json();})
+        .catch(function(){})
+        .finally(function(){
+            document.getElementById('onboardingOverlay').classList.remove('show');
+        });
+}
+
+// 页面加载后检测引导状态
+setTimeout(checkOnboardingStatus, 1000);
+
+
+var rcoinsDisplay = document.getElementById('rcoinsDisplay');
+var gameGrid = document.getElementById('gameGrid');
+var myGameGrid = document.getElementById('myGameGrid');
+var searchInput = document.getElementById('searchInput');
+var searchBar = document.getElementById('searchBar');
+var headerTitle = document.getElementById('headerTitle');
+
+function switchTabBar(tab, btn) {
+    document.querySelectorAll('.tab-item').forEach(function(b){b.classList.remove('active');});
+    if(btn) btn.classList.add('active');
+    currentTab = tab;
+    if(tab === 'hot') {
+        loadHotGames();
+    } else if(tab === 'new') {
+        loadNewGames();
+    }
+}
+
+function loadHotGames() {
+    gameGrid.innerHTML = '<div class="empty-state"><div class="icon">🔥</div>'+I18N.t('loading_hot')+'</div>';
+    var fd = new FormData();
+    fd.append('action','getHotGames');
+    fd.append('token',token);
+    var controller = new AbortController();
+    var timeoutId = setTimeout(function(){ controller.abort(); }, 10000);
+    fetch(API_URL,{method:'POST',body:fd,signal:controller.signal})
+    .then(r=>r.json())
+    .then(d=>{
+        clearTimeout(timeoutId);
+        if(d.success && d.games){
+            renderGames(d.games, gameGrid, false, 'hot');
+            var badge = document.querySelector('.tab-item[data-tab="hot"] .badge');
+            if(badge) badge.textContent = d.games.length;
+        }else{
+            gameGrid.innerHTML = '<div class="empty-state"><div class="icon">📭</div>'+I18N.t('no_hot_games')+'</div>';
+        }
+    })
+    .catch(function(e){
+        clearTimeout(timeoutId);
+        gameGrid.innerHTML = '<div class="empty-state"><div class="icon">❌</div>'+I18N.t('load_failed')+'<br><small style="font-size:12px;color:#999;">'+(e.name==='AbortError'?'请求超时，请刷新重试':e.message)+'</small></div>';
+    });
+}
+
+function loadNewGames() {
+    gameGrid.innerHTML = '<div class="empty-state"><div class="icon">✨</div>'+I18N.t('loading_new')+'</div>';
+    var fd = new FormData();
+    fd.append('action','getNewGames');
+    fd.append('token',token);
+    fetch(API_URL,{method:'POST',body:fd})
+    .then(r=>r.json())
+    .then(d=>{
+        if(d.success && d.games){
+            renderGames(d.games, gameGrid, false, 'new');
+            newGamesCount = d.games.length;
+            document.getElementById('newBadge').textContent = newGamesCount;
+            if(newGamesCount === 0){
+                gameGrid.innerHTML = '<div class="empty-state"><div class="icon">📭</div>'+I18N.t('no_new_games')+'</div>';
+            }
+        }else{
+            gameGrid.innerHTML = '<div class="empty-state"><div class="icon">📭</div>'+I18N.t('no_games')+'</div>';
+        }
+    })
+    .catch(function(e){
+        gameGrid.innerHTML = '<div class="empty-state"><div class="icon">❌</div>'+I18N.t('load_failed')+'</div>';
+    });
+}
+
+function renderGames(games, container, showDelete, type){
+    if(!games||games.length===0){
+        container.innerHTML = '<div class="empty-state"><div class="icon">📭</div>'+I18N.t('no_games')+'</div>';
+        return;
+    }
+    var html = '';
+    games.forEach(function(g, index){
+        var icon = g.icon || '';
+        var iconHtml = icon ? '<img class="cover" src="'+icon+'" alt="封面" onerror="this.className=\'cover-placeholder\';this.parentElement.querySelector(\'span\').style.display=\'block\';">' : '<div class="cover-placeholder"><span></span></div>';
+        var statusBadge = '';
+        if(g.status && g.status!=='approved'){
+            var statusMap = {'pending':'审核中','failed':'失败'};
+            statusBadge = '<div class="status-badge '+g.status+'">'+(statusMap[g.status]||g.status)+'</div>';
+        }
+        var deleteBtn = showDelete ? '<button class="delete-btn" onclick="event.stopPropagation();deleteGame('+g.id+')">删</button>' : '';
+        var editBtn = showDelete ? '<button class="edit-btn" onclick="event.stopPropagation();editGame('+g.id+')">编辑</button>' : '';
+        
+        var tagHtml = '';
+        if(type === 'hot' && index < 15){
+            tagHtml = '<div class="hot-tag">'+(index+1)+'</div>';
+        } else if(type === 'new'){
+            tagHtml = '<div class="new-tag">新品</div>';
+        }
+        
+        var actionsHtml = '';
+        if (!showDelete) {
+            var likeClass = g.user_liked ? 'liked' : '';
+            var collectClass = g.user_collected ? 'collected' : '';
+            actionsHtml = '<div class="actions">' +
+                '<button data-type="like" onclick="event.stopPropagation();toggleLike('+g.id+', this)" class="'+likeClass+'">赞 <span class="count">'+(g.likes||0)+'</span></button>' +
+                '<button data-type="collect" onclick="event.stopPropagation();toggleCollect('+g.id+', this)" class="'+collectClass+'">藏 <span class="count">'+(g.collects||0)+'</span></button>' +
+                '</div>';
+        }
+        
+        html += '<div class="game-card" data-gameid="'+g.id+'" onclick="openDetail('+g.id+')">';
+        html += '<div style="position:relative;">'+iconHtml+statusBadge+tagHtml+deleteBtn+editBtn+'</div>';
+        html += '<div class="info"><div class="title">'+escapeHtml(g.title)+'</div>';
+        html += '<div class="meta"><span>'+escapeHtml(g.author||'未知')+'</span>';
+        html += '<span class="stats">'+g.views+' 浏览 · '+g.likes+' 赞</span></div>';
+        html += actionsHtml;
+        html += '</div></div>';
+    });
+    container.innerHTML = html;
+    
+    if(showDelete){
+        var cards = container.querySelectorAll('.game-card');
+        cards.forEach(function(card){
+            card.addEventListener('touchstart', function(e){
+                longPressTriggered = false;
+                longPressTimer = setTimeout(function(){
+                    longPressTriggered = true;
+                    document.querySelectorAll('.game-card.show-delete').forEach(function(c){
+                        c.classList.remove('show-delete');
+                    });
+                    card.classList.toggle('show-delete');
+                }, 800);
+            });
+            card.addEventListener('touchend', function(e){
+                clearTimeout(longPressTimer);
+                if(longPressTriggered){e.preventDefault();}
+            });
+            card.addEventListener('touchmove', function(e){clearTimeout(longPressTimer);});
+            card.addEventListener('mousedown', function(e){
+                if(e.button !== 0) return;
+                longPressTriggered = false;
+                longPressTimer = setTimeout(function(){
+                    longPressTriggered = true;
+                    document.querySelectorAll('.game-card.show-delete').forEach(function(c){
+                        c.classList.remove('show-delete');
+                    });
+                    card.classList.toggle('show-delete');
+                }, 800);
+            });
+            card.addEventListener('mouseup', function(e){
+                clearTimeout(longPressTimer);
+                if(longPressTriggered){e.preventDefault();}
+            });
+            card.addEventListener('mouseleave', function(e){clearTimeout(longPressTimer);});
+        });
+        document.addEventListener('click', function(e){
+            if(!e.target.closest('.game-card')){
+                document.querySelectorAll('.game-card.show-delete').forEach(function(c){
+                    c.classList.remove('show-delete');
+                });
+            }
+        });
+    }
+}
+
+function toggleLike(gameId, btn) {
+    if (!gameId) return;
+    var isLiked = btn.classList.contains('liked');
+    var action = isLiked ? 'unlike' : 'like';
+    var fd = new FormData();
+    fd.append('action', action);
+    fd.append('token', token);
+    fd.append('game_id', gameId);
+    
+    fetch(API_URL, {method:'POST', body:fd})
+    .then(r=>r.json())
+    .then(d=>{
+        if(d.success){
+            if(action === 'like'){
+                btn.classList.add('liked');
+            }else{
+                btn.classList.remove('liked');
+            }
+            var countEl = btn.querySelector('.count');
+            if(countEl) countEl.textContent = d.likes || 0;
+            
+            if(currentGameId == gameId) {
+                openDetail(gameId);
+            }
+            if(currentTab === 'hot') loadHotGames();
+            else loadNewGames();
+        }else{
+            alert(d.message || '操作失败');
+        }
+    })
+    .catch(function(){ alert('网络错误，请重试'); });
+}
+
+function toggleCollect(gameId, btn) {
+    if (!gameId) return;
+    var isCollected = btn.classList.contains('collected');
+    var action = isCollected ? 'uncollect' : 'collect';
+    var fd = new FormData();
+    fd.append('action', action);
+    fd.append('token', token);
+    fd.append('game_id', gameId);
+    
+    fetch(API_URL, {method:'POST', body:fd})
+    .then(r=>r.json())
+    .then(d=>{
+        if(d.success){
+            if(action === 'collect'){
+                btn.classList.add('collected');
+            }else{
+                btn.classList.remove('collected');
+            }
+            var countEl = btn.querySelector('.count');
+            if(countEl) countEl.textContent = d.collects || 0;
+            
+            if(currentGameId == gameId) {
+                openDetail(gameId);
+            }
+            if(currentTab === 'hot') loadHotGames();
+            else loadNewGames();
+        }else{
+            alert(d.message || '操作失败');
+        }
+    })
+    .catch(function(){ alert('网络错误，请重试'); });
+}
+
+function switchTab(tab, btn) {
+    document.querySelectorAll('.nav-item').forEach(function(b){b.classList.remove('active');});
+    if(btn) btn.classList.add('active');
+    
+    var homePage = document.getElementById('homePage');
+    var profilePage = document.getElementById('profilePage');
+    var friendsPage = document.getElementById('friendsPage');
+    
+    if(tab==='home'){
+        if(currentCreditScore < 1){ showBanScreen(); return; }
+        if(currentCreditScore < 40){ showToast('你的信用分低于40，无法访问首页'); switchTab('profile'); return; }
+        homePage.style.display = 'block';
+        profilePage.style.display = 'none';
+        friendsPage.style.display = 'none';
+        searchBar.classList.remove('hidden');
+        headerTitle.innerHTML = I18N.t('app_name')+'<span class="sub">'+I18N.t('app_sub')+'</span>';
+        document.getElementById('tabBar').style.display = 'flex';
+        if(currentTab === 'hot') loadHotGames();
+        else loadNewGames();
+        if (chatInterval) { clearInterval(chatInterval); chatInterval = null; }
+        closeChat();
+    } else if(tab==='profile'){
+        homePage.style.display = 'none';
+        profilePage.style.display = 'block';
+        friendsPage.style.display = 'none';
+        searchBar.classList.add('hidden');
+        headerTitle.innerHTML = I18N.t('profile_page_title');
+        document.getElementById('tabBar').style.display = 'none';
+        loadProfile();
+        loadMyGames();
+        loadBadges();
+        if (chatInterval) { clearInterval(chatInterval); chatInterval = null; }
+        closeChat();
+    } else if(tab==='friends'){
+        homePage.style.display = 'none';
+        profilePage.style.display = 'none';
+        friendsPage.style.display = 'block';
+        searchBar.classList.add('hidden');
+        headerTitle.innerHTML = I18N.t('friend_title');
+        document.getElementById('tabBar').style.display = 'none';
+        loadFriends();
+        loadPendingFriendRequests();
+        checkUnreadMessages();
+        if (chatInterval) { clearInterval(chatInterval); chatInterval = null; }
+        closeChat();
+    } else if(tab==='create'){
+        openCreate();
+        document.querySelectorAll('.nav-item').forEach(function(b){b.classList.remove('active');});
+        document.querySelector('[data-tab="home"]').classList.add('active');
+        document.getElementById('homePage').style.display = 'block';
+        document.getElementById('profilePage').style.display = 'none';
+        document.getElementById('friendsPage').style.display = 'none';
+        searchBar.classList.remove('hidden');
+        headerTitle.innerHTML = I18N.t('app_name')+'<span class="sub">'+I18N.t('app_sub')+'</span>';
+        document.getElementById('tabBar').style.display = 'flex';
+        if (chatInterval) { clearInterval(chatInterval); chatInterval = null; }
+        closeChat();
+    }
+}
+
+function searchGames(){
+    var keyword = searchInput.value.trim();
+    if(!keyword){ 
+        if(currentTab === 'hot') loadHotGames();
+        else loadNewGames();
+        return; 
+    }
+    gameGrid.innerHTML = '<div class="empty-state"><div class="icon">🔍</div>'+I18N.t('searching')+'</div>';
+    var fd = new FormData();
+    fd.append('action','searchGames');
+    fd.append('token',token);
+    fd.append('keyword',keyword);
+    fetch(API_URL,{method:'POST',body:fd})
+    .then(r=>r.json())
+    .then(d=>{
+        if(d.success&&d.games){
+            renderGames(d.games, gameGrid, false);
+        }else{
+            gameGrid.innerHTML = '<div class="empty-state"><div class="icon">🔍</div>'+I18N.t('no_search')+'</div>';
+        }
+    })
+    .catch(function(e){
+        gameGrid.innerHTML = '<div class="empty-state"><div class="icon">❌</div>'+I18N.t('search_failed')+'</div>';
+    });
+}
+
+function toggleMenu(){
+    document.getElementById('menuDropdown').classList.toggle('show');
+}
+document.addEventListener('click',function(e){
+    if(!e.target.closest('.menu-btn')&&!e.target.closest('.menu-dropdown')){
+        document.getElementById('menuDropdown').classList.remove('show');
+    }
+});
+
+function switchCreateMode(mode) {
+    createMode = mode;
+    var directBtn = document.getElementById('modeDirect');
+    var editorBtn = document.getElementById('modeEditor');
+    
+    if (mode === 'direct') {
+        directBtn.style.borderColor = '#2563eb';
+        directBtn.style.background = 'rgba(230,126,34,0.1)';
+        directBtn.style.color = '#2563eb';
+        directBtn.style.fontWeight = '700';
+        editorBtn.style.borderColor = 'rgba(255,255,255,0.1)';
+        editorBtn.style.background = 'rgba(255,255,255,0.03)';
+        editorBtn.style.color = '#6b7f94';
+        editorBtn.style.fontWeight = '600';
+        document.getElementById('directMode').style.display = 'block';
+        document.getElementById('editorMode').style.display = 'none';
+        document.getElementById('submitBtn').textContent = I18N.t('btn_publish');
+    } else {
+        editorBtn.style.borderColor = '#2563eb';
+        editorBtn.style.background = 'rgba(230,126,34,0.1)';
+        editorBtn.style.color = '#2563eb';
+        editorBtn.style.fontWeight = '700';
+        directBtn.style.borderColor = 'rgba(255,255,255,0.1)';
+        directBtn.style.background = 'rgba(255,255,255,0.03)';
+        directBtn.style.color = '#6b7f94';
+        directBtn.style.fontWeight = '600';
+        document.getElementById('directMode').style.display = 'none';
+        document.getElementById('editorMode').style.display = 'block';
+        document.getElementById('submitBtn').textContent = I18N.t('btn_enter_editor');
+    }
+}
+
+function previewEditorIcon(e) {
+    var file = e.target.files[0];
+    var statusEl = document.getElementById('createStatus');
+    if(!file) return;
+    if(file.size > 5 * 1024 * 1024) {
+        statusEl.textContent = I18N.t('img_too_large_5mb');
+        statusEl.className = 'status-msg error';
+        statusEl.style.display = 'block';
+        e.target.value = '';
+        return;
+    }
+    var reader = new FileReader();
+    reader.onload = function(ev) {
+        var preview = document.getElementById('editorIconPreview');
+        preview.style.backgroundImage = 'url(' + ev.target.result + ')';
+        preview.style.display = 'block';
+        editorIconData = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+    statusEl.style.display = 'none';
+}
+
+function submitCreate() {
+    var statusEl = document.getElementById('createStatus');
+    
+    if (createMode === 'direct') {
+        var title = document.getElementById('gameTitle').value.trim();
+        var code = document.getElementById('gameCode').value.trim();
+        var iconFile = document.getElementById('gameIcon').files[0];
+        
+        if(!title){statusEl.textContent=I18N.t('title_required');statusEl.style.display='block';statusEl.className='status-msg error';return;}
+        if(title.length<2||title.length>20){statusEl.textContent=I18N.t('title_length_error');statusEl.style.display='block';statusEl.className='status-msg error';return;}
+        if(!code){statusEl.textContent=I18N.t('code_required');statusEl.style.display='block';statusEl.className='status-msg error';return;}
+        if(!iconFile){statusEl.textContent=I18N.t('icon_required');statusEl.style.display='block';statusEl.className='status-msg error';return;}
+        
+        var fd = new FormData();
+        fd.append('action','createGame');
+        fd.append('token',token);
+        fd.append('title',title);
+        fd.append('code',code);
+        fd.append('icon',iconFile);
+        
+        statusEl.textContent=I18N.t('submitting')+'...';
+        statusEl.style.display='block';
+        statusEl.className='status-msg pending';
+        
+        fetch(API_URL,{method:'POST',body:fd})
+        .then(r=>r.json())
+        .then(d=>{
+            if(d.success){
+                statusEl.textContent=I18N.t('publish_success')+'!';
+                statusEl.className='status-msg success';
+                if(d.game_id){
+                    var checkCount = 0;
+                    var checkInterval = setInterval(function(){
+                        checkCount++;
+                        checkGameStatus(d.game_id, function(status){
+                            if(status === 'approved'){
+                                clearInterval(checkInterval);
+                                statusEl.textContent=I18N.t('game_online');
+                                statusEl.className='status-msg success';
+                                setTimeout(function(){
+                                    closeCreate();
+                                    if(currentTab === 'hot') loadHotGames();
+                                    else loadNewGames();
+                                    loadProfile();
+                                    loadMyGames();
+                                }, 1000);
+                            } else if(checkCount >= 12){
+                                clearInterval(checkInterval);
+                                statusEl.textContent=I18N.t('under_review');
+                                statusEl.className='status-msg pending';
+                                setTimeout(function(){
+                                    closeCreate();
+                                    if(currentTab === 'hot') loadHotGames();
+                                    else loadNewGames();
+                                    loadProfile();
+                                    loadMyGames();
+                                }, 1000);
+                            }
+                        });
+                    }, 5000);
+                }
+                setTimeout(function(){
+                    if(statusEl.textContent.indexOf('审核中') !== -1){
+                        closeCreate();
+                        if(currentTab === 'hot') loadHotGames();
+                        else loadNewGames();
+                        loadProfile();
+                        loadMyGames();
+                    }
+                }, 35000);
+            }else{
+                statusEl.textContent=''+d.message;
+                statusEl.className='status-msg error';
+            }
+        })
+        .catch(function(e){
+            statusEl.textContent='提交失败: '+e.message;
+            statusEl.className='status-msg error';
+        });
+        
+    } else {
+        var title = document.getElementById('editorGameTitle').value.trim();
+        var iconFile = document.getElementById('editorGameIcon').files[0];
+        
+        if(!title){statusEl.textContent=I18N.t('title_required');statusEl.style.display='block';statusEl.className='status-msg error';return;}
+        if(title.length<2||title.length>20){statusEl.textContent=I18N.t('title_length_error');statusEl.style.display='block';statusEl.className='status-msg error';return;}
+        if(!iconFile){statusEl.textContent=I18N.t('icon_required');statusEl.style.display='block';statusEl.className='status-msg error';return;}
+        
+        statusEl.textContent=I18N.t('creating_repo')+'...';
+        statusEl.style.display='block';
+        statusEl.className='status-msg pending';
+        
+        var defaultCode = '<!DOCTYPE html>\n<html>\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1.0">\n<title>' + title + '</title>\n<style>\nbody{background:#0a0a1a;display:flex;justify-content:center;align-items:center;height:100vh;margin:0;color:#fff;font-family:Arial,sans-serif;}\n.hello{font-size:48px;color:#ffd700;text-align:center;}\n.hello span{color:#4488ff;}\n
+/* ===== 首次进入引导 Onboarding ===== */
+#onboardingOverlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.75);z-index:99999;display:none;justify-content:center;align-items:center;backdrop-filter:blur(4px)}
+#onboardingOverlay.show{display:flex}
+.onboarding-card{background:#fff;border-radius:20px;padding:32px 28px;max-width:420px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3);position:relative;animation:onboardingSlideIn 0.4s ease}
+@keyframes onboardingSlideIn{from{opacity:0;transform:translateY(30px) scale(0.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+.onboarding-welcome{text-align:center;margin-bottom:24px}
+.onboarding-welcome h2{margin:0 0 8px;font-size:22px;color:#1a1a2e;background:linear-gradient(135deg,#667eea,#764ba2);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.onboarding-welcome p{margin:0;font-size:13px;color:#6b7f94}
+.onboarding-step{display:none}
+.onboarding-step.active{display:block;animation:stepFadeIn 0.3s ease}
+@keyframes stepFadeIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+.onboarding-step-icon{font-size:48px;text-align:center;margin-bottom:16px}
+.onboarding-step-title{font-size:18px;font-weight:700;color:#1a1a2e;text-align:center;margin-bottom:12px}
+.onboarding-step-desc{font-size:14px;color:#4a5568;text-align:center;line-height:1.6;margin-bottom:20px;padding:0 8px}
+.onboarding-status{text-align:center;padding:12px 16px;background:#f7fafc;border-radius:12px;margin-bottom:20px;font-size:14px;font-weight:600;min-height:44px;display:flex;align-items:center;justify-content:center}
+.onboarding-status.checking{color:#667eea}
+.onboarding-status.granted{color:#38a169;background:#f0fff4}
+.onboarding-status.denied{color:#e53e3e;background:#fff5f5}
+.onboarding-btn{width:100%;padding:14px;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;transition:all 0.2s;margin-bottom:10px}
+.onboarding-btn-primary{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff}
+.onboarding-btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(102,126,234,0.4)}
+.onboarding-btn-primary:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+.onboarding-btn-secondary{background:#edf2f7;color:#4a5568}
+.onboarding-btn-secondary:hover{background:#e2e8f0}
+.onboarding-btn-done{background:linear-gradient(135deg,#38a169,#2f855a);color:#fff}
+.onboarding-btn-done:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(56,161,105,0.4)}
+.onboarding-indicator{display:flex;justify-content:center;gap:8px;margin-top:20px}
+.onboarding-dot{width:8px;height:8px;border-radius:50%;background:#cbd5e0;transition:all 0.3s}
+.onboarding-dot.active{background:#667eea;width:24px;border-radius:4px}
+.onboarding-step-text{text-align:center;font-size:12px;color:#a0aec0;margin-top:8px}
+</style>\n</head>\n<body>\n<div class="hello">🐉 龙<span>黑</span>化<br><small style="font-size:24px;color:#6b7f94;">编辑器 2.0</small></div>\n
+<!-- ===== 首次进入引导 Onboarding ===== -->
+<div id="onboardingOverlay">
+    <div class="onboarding-card">
+        <div class="onboarding-welcome">
+            <h2 data-i18n="onboarding_welcome">欢迎来到龙黑化创作工坊</h2>
+            <p>只需两步，开启创作之旅</p>
+        </div>
+
+        <!-- 第一步：存储权限 -->
+        <div class="onboarding-step active" id="onboardingStep1">
+            <div class="onboarding-step-icon">📁</div>
+            <div class="onboarding-step-title" data-i18n="onboarding_step1_title">存储权限</div>
+            <div class="onboarding-step-desc" data-i18n="onboarding_step1_desc">存储权限用于游戏中上传文件（作品图标、封面、导入文件等）</div>
+            <div class="onboarding-status checking" id="storageStatus" data-i18n="onboarding_step1_checking">正在检测存储权限...</div>
+            <button class="onboarding-btn onboarding-btn-primary" id="grantStorageBtn" onclick="grantStoragePermission()" data-i18n="onboarding_btn_grant">开启存储权限</button>
+            <button class="onboarding-btn onboarding-btn-secondary" onclick="skipOnboardingStep(1)" data-i18n="onboarding_btn_skip">跳过</button>
+        </div>
+
+        <!-- 第二步：设备位置 -->
+        <div class="onboarding-step" id="onboardingStep2">
+            <div class="onboarding-step-icon">📍</div>
+            <div class="onboarding-step-title" data-i18n="onboarding_step2_title">设备位置</div>
+            <div class="onboarding-step-desc" data-i18n="onboarding_step2_desc">获取设备位置用于适配时区时间，否则将自动使用美国地区时间</div>
+            <div class="onboarding-status checking" id="locationStatus" data-i18n="onboarding_step2_checking">正在获取设备位置...</div>
+            <button class="onboarding-btn onboarding-btn-primary" id="getLocationBtn" onclick="getDeviceLocation()" data-i18n="onboarding_btn_get_location">获取设备位置</button>
+            <button class="onboarding-btn onboarding-btn-secondary" onclick="skipOnboardingStep(2)" data-i18n="onboarding_btn_skip">跳过</button>
+        </div>
+
+        <!-- 完成按钮 -->
+        <div id="onboardingDoneSection" style="display:none;margin-top:16px">
+            <button class="onboarding-btn onboarding-btn-done" onclick="completeOnboarding()" data-i18n="onboarding_btn_done">✓ 已经设置，进入主界面</button>
+        </div>
+
+        <div class="onboarding-indicator">
+            <div class="onboarding-dot active" id="dot1"></div>
+            <div class="onboarding-dot" id="dot2"></div>
+        </div>
+        <div class="onboarding-step-text" id="onboardingStepText">第 1 步 / 共 2 步</div>
+    </div>
+</div>
+</body>\n</html>';
+        
+        var fd = new FormData();
+        fd.append('action','createGame');
+        fd.append('token',token);
+        fd.append('title',title);
+        fd.append('code',defaultCode);
+        fd.append('icon',iconFile);
+        
+        fetch(API_URL,{method:'POST',body:fd})
+        .then(r=>r.json())
+        .then(d=>{
+            if(d.success && d.game_id){
+                statusEl.textContent=I18N.t('repo_created')+'...';
+                statusEl.className='status-msg success';
+                setTimeout(function(){
+                    window.location.href = '2htm.html?id=' + d.game_id;
+                }, 1000);
+            }else{
+                statusEl.textContent=''+ (d.message || '创建失败');
+                statusEl.className='status-msg error';
+            }
+        })
+        .catch(function(e){
+            statusEl.textContent='创建失败: '+e.message;
+            statusEl.className='status-msg error';
+        });
+    }
+}
+
+function openCreate(){
+    document.getElementById('createModal').style.display='flex';
+    document.getElementById('gameTitle').value='';
+    document.getElementById('gameCode').value='';
+    document.getElementById('createStatus').style.display='none';
+    document.getElementById('iconPreview').style.display='none';
+    document.getElementById('gameIcon').value='';
+    document.getElementById('editorGameTitle').value='';
+    document.getElementById('editorIconPreview').style.display='none';
+    document.getElementById('editorGameIcon').value='';
+    switchCreateMode('direct');
+}
+
+function closeCreate(){
+    document.getElementById('createModal').style.display='none';
+}
+
+function previewGameIcon(e){
+    var file=e.target.files[0];
+    var statusEl=document.getElementById('createStatus');
+    if(!file)return;
+    if(file.size>5*1024*1024){
+        statusEl.textContent='图标不能超过5MB';
+        statusEl.className='status-msg error';
+        statusEl.style.display='block';
+        e.target.value='';
+        return;
+    }
+    var reader=new FileReader();
+    reader.onload=function(ev){
+        var preview=document.getElementById('iconPreview');
+        preview.style.backgroundImage='url('+ev.target.result+')';
+        preview.style.display='block';
+    };
+    reader.readAsDataURL(file);
+    statusEl.style.display='none';
+}
+
+function checkGameStatus(gameId, callback){
+    var fd=new FormData();
+    fd.append('action','checkGameStatus');
+    fd.append('token',token);
+    fd.append('game_id',gameId);
+    fetch(API_URL,{method:'POST',body:fd})
+    .then(r=>r.json())
+    .then(d=>{
+        if(d.success){
+            if(callback) callback(d.status);
+        }
+    })
+    .catch(function(){});
+}
+
+function openDetail(gameId){
+    currentGameId = gameId;
+    var fd = new FormData();
+    fd.append('action','getGameDetail');
+    fd.append('token',token);
+    fd.append('game_id',gameId);
+    fetch(API_URL,{method:'POST',body:fd})
+    .then(r=>r.json())
+    .then(d=>{
+        if(d.success){
+            currentDetailData = d.game;
+            currentAuthorId = d.game.user_id;
+            showDetail(d.game);
+        } else {
+            alert(d.message || '加载失败');
+        }
+    })
+    .catch(function(e){});
+}
+
+function showDetail(game){
+    document.getElementById('detailTitle').textContent = game.title||'未命名';
+    document.getElementById('detailAuthorName').textContent = game.author||'未知';
+    document.getElementById('detailPlayCount').textContent = game.unique_views || 0;
+    document.getElementById('detailPlayingCount').textContent = game.online_count || 0;
+    document.getElementById('detailDesc').textContent = game.description||I18N.t('no_desc');
+    document.getElementById('commentCount').textContent = (game.comments||[]).length;
+    
+    var cover = document.getElementById('detailCover');
+    if(game.icon){
+        cover.src = game.icon;
+        cover.style.display = 'block';
+    }else{
+        cover.style.display = 'none';
+    }
+    
+    var avatar = document.getElementById('detailAuthorAvatar');
+    if(game.author_avatar){
+        avatar.src = game.author_avatar;
+    }else{
+        avatar.src = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2232%22 height=%2232%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 fill=%22%23eef2f6%22/%3E%3Ctext x=%2216%22 y=%2222%22 text-anchor=%22middle%22 font-size=%2218%22 fill=%22%238a9baa%22%3E👤%3C/text%3E%3C/svg%3E';
+    }
+    
+    var followBtn = document.getElementById('detailFollowBtn');
+    if(game.author_id == userId){
+        followBtn.textContent = I18N.t('btn_yourself');
+        followBtn.className = 'detail-follow-btn following';
+        followBtn.style.pointerEvents = 'none';
+    }else if(game.is_following){
+        followBtn.textContent = I18N.t('btn_followed');
+        followBtn.className = 'detail-follow-btn following';
+    }else{
+        followBtn.textContent = I18N.t('btn_follow');
+        followBtn.className = 'detail-follow-btn';
+    }
+    
+    var tags = document.getElementById('detailTags');
+    var tagList = game.tags ? game.tags.split(',') : ['Scratch', '休闲'];
+    var tagHtml = '';
+    tagList.forEach(function(t){
+        tagHtml += '<span class="tag">'+escapeHtml(t.trim())+'</span>';
+    });
+    tags.innerHTML = tagHtml;
+    
+    var likeBtn = document.getElementById('detailLikeBtn');
+    var collectBtn = document.getElementById('detailCollectBtn');
+    likeBtn.innerHTML = I18N.t('btn_like')+' <span class="count">' + (game.likes||0) + '</span>';
+    collectBtn.innerHTML = I18N.t('btn_collect')+' <span class="count">' + (game.collects||0) + '</span>';
+    likeBtn.className = game.user_liked ? 'liked' : '';
+    collectBtn.className = game.user_collected ? 'collected' : '';
+    
+    var list = document.getElementById('commentList');
+    if(game.comments&&game.comments.length>0){
+        var html = '';
+        game.comments.forEach(function(c){
+            var deleteBtn = '';
+            if(c.user_id == userId){
+                deleteBtn = '<button class="c-delete" onclick="deleteComment('+c.id+','+game.id+')">删除</button>';
+            }
+            html += '<div class="comment-item">';
+            html += '<div class="c-left">';
+            html += '<span class="c-author">'+escapeHtml(c.username||'用户')+'</span>';
+            html += '<span class="c-time">'+formatTime(c.time)+'</span>';
+            html += '<div class="c-text">'+escapeHtml(c.content)+'</div>';
+            html += '</div>'+deleteBtn+'</div>';
+        });
+        list.innerHTML = html;
+    }else{
+        list.innerHTML = '<div style="color:#8a9baa;font-size:13px;padding:8px 0;">'+I18N.t('no_comments')+'</div>';
+    }
+    document.getElementById('detailModal').style.display = 'flex';
+}
+
+function closeDetail(){
+    document.getElementById('detailModal').style.display = 'none';
+    currentGameId = null;
+}
+
+function toggleLikeDetail(gameId) {
+    if (!gameId) return;
+    var btn = document.getElementById('detailLikeBtn');
+    var isLiked = btn.classList.contains('liked');
+    var action = isLiked ? 'unlike' : 'like';
+    var fd = new FormData();
+    fd.append('action', action);
+    fd.append('token', token);
+    fd.append('game_id', gameId);
+    
+    fetch(API_URL, {method:'POST', body:fd})
+    .then(r=>r.json())
+    .then(d=>{
+        if(d.success){
+            if(action === 'like'){
+                btn.classList.add('liked');
+                btn.innerHTML = I18N.t('btn_like')+' <span class="count">' + (d.likes||0) + '</span>';
+            }else{
+                btn.classList.remove('liked');
+                btn.innerHTML = I18N.t('btn_like')+' <span class="count">' + (d.likes||0) + '</span>';
+            }
+            updateCardCount(gameId, 'likes', d.likes||0);
+            if(currentTab === 'hot') loadHotGames();
+            else loadNewGames();
+        }else{
+            alert(d.message || '操作失败');
+        }
+    })
+    .catch(function(){ alert('网络错误，请重试'); });
+}
+
+function toggleCollectDetail(gameId) {
+    if (!gameId) return;
+    var btn = document.getElementById('detailCollectBtn');
+    var isCollected = btn.classList.contains('collected');
+    var action = isCollected ? 'uncollect' : 'collect';
+    var fd = new FormData();
+    fd.append('action', action);
+    fd.append('token', token);
+    fd.append('game_id', gameId);
+    
+    fetch(API_URL, {method:'POST', body:fd})
+    .then(r=>r.json())
+    .then(d=>{
+        if(d.success){
+            if(action === 'collect'){
+                btn.classList.add('collected');
+                btn.innerHTML = I18N.t('btn_collect')+' <span class="count">' + (d.collects||0) + '</span>';
+            }else{
+                btn.classList.remove('collected');
+                btn.innerHTML = I18N.t('btn_collect')+' <span class="count">' + (d.collects||0) + '</span>';
+            }
+            updateCardCount(gameId, 'collects', d.collects||0);
+            if(currentTab === 'hot') loadHotGames();
+            else loadNewGames();
+        }else{
+            alert(d.message || '操作失败');
+        }
+    })
+    .catch(function(){ alert('网络错误，请重试'); });
+}
+
+function updateCardCount(gameId, type, count) {
+    var cards = document.querySelectorAll('.game-card[data-gameid="' + gameId + '"]');
+    cards.forEach(function(card) {
+        var btns = card.querySelectorAll('.actions button');
+        btns.forEach(function(btn) {
+            if (type === 'likes' && btn.dataset.type === 'like') {
+                var span = btn.querySelector('.count');
+                if(span) span.textContent = count;
+            }
+            if (type === 'collects' && btn.dataset.type === 'collect') {
+                var span = btn.querySelector('.count');
+                if(span) span.textContent = count;
+            }
+        });
+    });
+}
+
+function toggleFollowAuthor(){
+    if(!currentDetailData)return;
+    var authorId = currentDetailData.user_id;
+    if(authorId == userId){
+        alert('不能关注自己');
+        return;
+    }
+    var btn = document.getElementById('detailFollowBtn');
+    var isFollowing = btn.className.indexOf('following')>-1;
+    var fd = new FormData();
+    fd.append('action', isFollowing?'unfollow':'follow');
+    fd.append('token',token);
+    fd.append('target_id',authorId);
+    fetch(API_URL,{method:'POST',body:fd})
+    .then(r=>r.json())
+    .then(d=>{
+        if(d.success){
+            if(isFollowing){
+                btn.textContent = '关注';
+                btn.className = 'detail-follow-btn';
+            }else{
+                btn.textContent = '已关注';
+                btn.className = 'detail-follow-btn following';
+                checkAndSendFriendRequest(authorId);
+            }
+            loadProfile();
+        }else{
+            alert(d.message||'操作失败');
+        }
+    })
+    .catch(function(){});
+}
+
+function checkAndSendFriendRequest(targetId) {
+    var fd = new FormData();
+    fd.append('action','sendFriendRequest');
+    fd.append('token',token);
+    fd.append('target_id',targetId);
+    fetch(API_URL,{method:'POST',body:fd})
+    .then(r=>r.json())
+    .then(d=>{
+        if(d.success){
+            showToast(d.message);
+        }
+    })
+    .catch(function(){});
+}
+
+function viewAuthorProfile(){
+    if(!currentDetailData)return;
+    var authorId = currentDetailData.user_id;
+    if(authorId == userId){
+        closeDetail();
+        switchTab('profile', document.querySelector('[data-tab="profile"]'));
+        return;
+    }
+    openUserProfile(authorId);
+}
+
+function openUserProfile(targetId){
+    var fd = new FormData();
+    fd.append('action','getUserProfile');
+    fd.append('token',token);
+    fd.append('target_id',targetId);
+    fetch(API_URL,{method:'POST',body:fd})
+    .then(r=>r.json())
+    .then(d=>{
+        if(d.success){
+            showUserProfile(d);
+        }else{
+            alert(d.message||'加载失败');
+        }
+    })
+    .catch(function(){});
+}
+
+function showUserProfile(data){
+    var user = data.user;
+    document.getElementById('userProfileName').textContent = user.username||'用户';
+    document.getElementById('userProfileId').textContent = '#'+(user.id||'0');
+    document.getElementById('userProfileRcoins').textContent = user.rcoins||0;
+    document.getElementById('userProfileBio').innerHTML = user.bio ? user.bio : '<span class="empty">这个人很懒，什么都没写...</span>';
+    if(user.avatar){
+        document.getElementById('userProfileAvatar').src = user.avatar;
+    }
+    document.getElementById('userStatGames').textContent = data.stats.games||0;
+    document.getElementById('userStatLikes').textContent = data.stats.likes||0;
+    document.getElementById('userStatCollects').textContent = data.stats.collects||0;
+    document.getElementById('userStatFollowers').textContent = data.stats.followers||0;
+    
+    var followBtn = document.getElementById('userFollowBtn');
+    if(user.id == userId){
+        followBtn.style.display = 'none';
+    }else if(data.is_following){
+        followBtn.textContent = I18N.t('btn_followed');
+        followBtn.className = 'btn-follow following';
+        followBtn.style.background = '#4a5a6a';
+    }else{
+        followBtn.textContent = I18N.t('btn_follow');
+        followBtn.className = 'btn-follow';
+        followBtn.style.background = '#2563eb';
+        followBtn.style.color = '#fff';
+    }
+    followBtn.onclick = function(){followUser(user.id);};
+    
+    var grid = document.getElementById('userGameGrid');
+    if(data.games && data.games.length>0){
+        renderGames(data.games, grid, false);
+    }else{
+        grid.innerHTML = '<div class="empty-state" style="padding:20px 0;">📭 '+I18N.t('no_games')+'</div>';
+    }
+    
+    document.getElementById('userProfileModal').style.display = 'flex';
+}
+
+function closeUserProfile(){
+    document.getElementById('userProfileModal').style.display = 'none';
+}
+
+function followUser(targetId){
+    if(!targetId) targetId = currentAuthorId;
+    if(targetId == userId){
+        alert('不能关注自己');
+        return;
+    }
+    var btn = document.getElementById('userFollowBtn');
+    var isFollowing = btn.textContent === '已关注';
+    var fd = new FormData();
+    fd.append('action', isFollowing?'unfollow':'follow');
+    fd.append('token',token);
+    fd.append('target_id',targetId);
+    fetch(API_URL,{method:'POST',body:fd})
+    .then(r=>r.json())
+    .then(d=>{
+        if(d.success){
+            if(isFollowing){
+                btn.textContent = '关注';
+                btn.style.background = '#2563eb';
+                btn.style.color = '#fff';
+                btn.className = 'btn-follow';
+            }else{
+                btn.textContent = '已关注';
+                btn.style.background = '#4a5a6a';
+                btn.style.color = '#fff';
+                btn.className = 'btn-follow following';
+                checkAndSendFriendRequest(targetId);
+            }
+            loadProfile();
+            if(currentDetailData && currentDetailData.user_id == targetId){
+                var dfb = document.getElementById('detailFollowBtn');
+                if(isFollowing){
+                    dfb.textContent = '关注';
+                    dfb.className = 'detail-follow-btn';
+                }else{
+                    dfb.textContent = '已关注';
+                    dfb.className = 'detail-follow-btn following';
+                }
+            }
+        }else{
+            alert(d.message||'操作失败');
+        }
+    })
+    .catch(function(){});
+}
+
+function deleteComment(commentId, gameId){
+    if(!confirm(I18N.t('delete_comment_confirm'))) return;
+    var fd = new FormData();
+    fd.append('action','deleteComment');
+    fd.append('token',token);
+    fd.append('comment_id',commentId);
+    fetch(API_URL,{method:'POST',body:fd})
+    .then(r=>r.json())
+    .then(d=>{
+        if(d.success){
+            openDetail(gameId);
+        }else{
+            alert('删除失败：'+d.message);
+        }
+    })
+    .catch(function(){});
+}
+
+function submitComment(){
+    if(!currentGameId)return;
+    var input = document.getElementById('commentInput');
+    var text = input.value.trim();
+    if(!text)return;
+    var fd = new FormData();
+    fd.append('action','comment');
+    fd.append('token',token);
+    fd.append('game_id',currentGameId);
+    fd.append('content',text);
+    fetch(API_URL,{method:'POST',body:fd})
+    .then(r=>r.json())
+    .then(d=>{
+        if(d.success){
+            input.value = '';
+            openDetail(currentGameId);
+        }
+    })
+    .catch(function(){});
+}
+
+function playGame(){
+    if(!currentDetailData)return;
+    var gameId = currentDetailData.id;
+    var title = currentDetailData.title;
+    
+    var fd = new FormData();
+    fd.append('action','playGame');
+    fd.append('token',token);
+    fd.append('game_id',gameId);
+    fetch(API_URL,{method:'POST',body:fd})
+    .then(r=>r.json())
+    .then(d=>{
+        if(d.success && d.online_count !== undefined){
+            document.getElementById('detailPlayingCount').textContent = d.online_count;
+        }
+    })
+    .catch(function(){});
+    
+    document.getElementById('playTitle').textContent = title;
+    var gameUrl = currentDetailData.file_path || '';
+    if(gameUrl) gameUrl += (gameUrl.indexOf('?') === -1 ? '?' : '&') + 'v=' + Date.now();
+    document.getElementById('playFrame').src = gameUrl;
+    document.getElementById('playModal').style.display = 'flex';
+    forceLandscape();
+    setTimeout(function(){requestFullscreen(document.getElementById('playModal'));},400);
+    
+    startHeartbeat(gameId);
+}
+
+function startHeartbeat(gameId){
+    currentPlayingGameId = gameId;
+    if(heartbeatTimer) clearInterval(heartbeatTimer);
+    sendHeartbeat(gameId);
+    heartbeatTimer = setInterval(function(){
+        sendHeartbeat(gameId);
+    }, 10000);
+}
+
+function sendHeartbeat(gameId){
+    var fd = new FormData();
+    fd.append('action','keepAlive');
+    fd.append('token',token);
+    fd.append('game_id',gameId);
+    fetch(API_URL,{method:'POST',body:fd})
+    .then(r=>r.json())
+    .then(d=>{
+        if(d.success && d.online_count !== undefined){
+            var playingEl = document.getElementById('detailPlayingCount');
+            if(playingEl) playingEl.textContent = d.online_count;
+        }
+    })
+    .catch(function(){});
+}
+
+function stopHeartbeat(){
+    if(heartbeatTimer){
+        clearInterval(heartbeatTimer);
+        heartbeatTimer = null;
+    }
+    if(currentPlayingGameId){
+        var fd = new FormData();
+        fd.append('action','leaveGame');
+        fd.append('token',token);
+        fd.append('game_id',currentPlayingGameId);
+        fetch(API_URL,{method:'POST',body:fd}).catch(function(){});
+        currentPlayingGameId = null;
+    }
+}
+
+function closePlay(){
+    document.getElementById('playModal').style.display = 'none';
+    document.getElementById('playFrame').src = '';
+    exitFullscreen();
+    restorePortrait();
+    stopHeartbeat();
+}
+
+window.addEventListener('beforeunload', function(){
+    if(currentPlayingGameId){
+        var data = new FormData();
+        data.append('action','leaveGame');
+        data.append('token',token);
+        data.append('game_id',currentPlayingGameId);
+        navigator.sendBeacon(API_URL, data);
+    }
+});
+
+function forceLandscape(){
+    try{if(screen&&screen.orientation&&screen.orientation.lock){screen.orientation.lock('landscape').catch(function(){});}}catch(e){}
+    var modal=document.getElementById('playModal');
+    if(window.innerHeight>window.innerWidth){
+        modal.style.transform='rotate(90deg)';
+        modal.style.transformOrigin='center center';
+        modal.style.width='100vh';
+        modal.style.height='100vw';
+        modal.style.position='fixed';
+        modal.style.top='50%';
+        modal.style.left='50%';
+        modal.style.transform='translate(-50%, -50%) rotate(90deg)';
+    }
+}
+function restorePortrait(){
+    try{if(screen&&screen.orientation&&screen.orientation.unlock){screen.orientation.unlock();}}catch(e){}
+    var modal=document.getElementById('playModal');
+    modal.style.transform='';modal.style.transformOrigin='';modal.style.width='';modal.style.height='';modal.style.position='';modal.style.top='';modal.style.left='';
+}
+function requestFullscreen(el){if(!el)el=document.getElementById('playModal');if(el.requestFullscreen){el.requestFullscreen().catch(function(){});}else if(el.webkitRequestFullscreen){el.webkitRequestFullscreen();}else if(el.msRequestFullscreen){el.msRequestFullscreen();}}
+function exitFullscreen(){if(document.exitFullscreen){document.exitFullscreen().catch(function(){});}else if(document.webkitExitFullscreen){document.webkitExitFullscreen();}else if(document.msExitFullscreen){document.msExitFullscreen();}}
+
+if(screen&&screen.orientation){screen.orientation.addEventListener('change',function(){var modal=document.getElementById('playModal');if(modal.style.display==='flex'){setTimeout(forceLandscape,100);}});}
+document.addEventListener('fullscreenchange',function(){var modal=document.getElementById('playModal');if(!document.fullscreenElement&&modal.style.display==='flex'){setTimeout(function(){requestFullscreen(modal);},500);}});
+
+function openEditProfile(){
+    document.getElementById('editProfileModal').style.display='flex';
+    document.getElementById('editUsername').value=username||'';
+    document.getElementById('editBio').value='';
+    document.getElementById('editStatus').style.display='none';
+    document.getElementById('editAvatarInput').value='';
+    var avatar = document.getElementById('profileAvatar').src;
+    if(avatar&&avatar.indexOf('data:')!==-1){
+        document.getElementById('editAvatarPreview').src=avatar;
+    }else{
+        document.getElementById('editAvatarPreview').src='';
+        document.getElementById('editAvatarPreview').onerror();
+    }
+    document.getElementById('menuDropdown').classList.remove('show');
+}
+
+function closeEditProfile(){
+    document.getElementById('editProfileModal').style.display='none';
+}
+
+function previewEditAvatar(e){
+    var file=e.target.files[0];
+    if(!file)return;
+    if(file.size>10*1024*1024){
+        document.getElementById('editStatus').textContent=I18N.t('img_too_large');
+        document.getElementById('editStatus').className='status-msg error';
+        document.getElementById('editStatus').style.display='block';
+        e.target.value='';
+        return;
+    }
+    var reader=new FileReader();
+    reader.onload=function(ev){
+        document.getElementById('editAvatarPreview').src=ev.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+function saveEditProfile(){
+    var newUsername=document.getElementById('editUsername').value.trim();
+    var bio=document.getElementById('editBio').value.trim();
+    var avatarFile=document.getElementById('editAvatarInput').files[0];
+    var statusEl=document.getElementById('editStatus');
+    if(!newUsername){statusEl.textContent=I18N.t('username_required');statusEl.className='status-msg error';statusEl.style.display='block';return;}
+    if(newUsername.length<2||newUsername.length>20){statusEl.textContent=I18N.t('msg_username_len');statusEl.className='status-msg error';statusEl.style.display='block';return;}
+    var fd=new FormData();
+    fd.append('action','updateProfile');
+    fd.append('token',token);
+    fd.append('username',newUsername);
+    fd.append('bio',bio);
+    if(avatarFile)fd.append('avatar',avatarFile);
+    statusEl.textContent='⏳ '+I18N.t('saving')+'...';
+    statusEl.className='status-msg pending';
+    statusEl.style.display='block';
+    fetch(API_URL,{method:'POST',body:fd})
+    .then(r=>r.json())
+    .then(d=>{
+        if(d.success){
+            username=newUsername;
+            localStorage.setItem('username',username);
+            statusEl.textContent=I18N.t('save_profile_success')+'!';
+            statusEl.className='status-msg success';
+            loadProfile();
+            if(d.bio_status==='pending'){
+                statusEl.textContent=I18N.t('save_success_review');
+                setTimeout(function(){checkBioStatus();},30000);
+            }
+            setTimeout(function(){closeEditProfile();},1500);
+        }else{
+            statusEl.textContent=''+d.message;
+            statusEl.className='status-msg error';
+        }
+    })
+    .catch(function(e){
+        statusEl.textContent='保存失败: '+e.message;
+        statusEl.className='status-msg error';
+    });
+}
+
+function checkBioStatus(){
+    var fd=new FormData();
+    fd.append('action','checkBioStatus');
+    fd.append('token',token);
+    fetch(API_URL,{method:'POST',body:fd})
+    .then(r=>r.json())
+    .then(d=>{
+        if(d.success){
+            loadProfile();
+            loadMails();
+        }
+    })
+    .catch(function(){});
+}
+
+function openCoverUpload(){
+    document.getElementById('coverModal').style.display='flex';
+    document.getElementById('coverInput').value='';
+    document.getElementById('coverStatus').style.display='none';
+    document.getElementById('coverPreviewImg').style.display='none';
+    document.getElementById('coverPreviewText').style.display='block';
+    document.getElementById('menuDropdown').classList.remove('show');
+}
+
+function closeCoverUpload(){
+    document.getElementById('coverModal').style.display='none';
+}
+
+function previewCoverUpload(e){
+    var file=e.target.files[0];
+    if(!file)return;
+    if(file.size>10*1024*1024){
+        document.getElementById('coverStatus').textContent=I18N.t('img_too_large');
+        document.getElementById('coverStatus').className='status-msg error';
+        document.getElementById('coverStatus').style.display='block';
+        e.target.value='';
+        return;
+    }
+    var reader=new FileReader();
+    reader.onload=function(ev){
+        document.getElementById('coverPreviewImg').src=ev.target.result;
+        document.getElementById('coverPreviewImg').style.display='block';
+        document.getElementById('coverPreviewText').style.display='none';
+    };
+    reader.readAsDataURL(file);
+    document.getElementById('coverStatus').style.display='none';
+}
+
+function saveCover(){
+    var file=document.getElementById('coverInput').files[0];
+    var statusEl=document.getElementById('coverStatus');
+    if(!file){
+        statusEl.textContent='请选择一张图片';
+        statusEl.className='status-msg error';
+        statusEl.style.display='block';
+        return;
+    }
+    var fd=new FormData();
+    fd.append('action','updateCover');
+    fd.append('token',token);
+    fd.append('cover',file);
+    statusEl.textContent='⏳ 上传中...';
+    statusEl.className='status-msg pending';
+    statusEl.style.display='block';
+    fetch(API_URL,{method:'POST',body:fd})
+    .then(r=>r.json())
+    .then(d=>{
+        if(d.success){
+            statusEl.textContent='封面更新成功！';
+            statusEl.className='status-msg success';
+            loadProfile();
+            setTimeout(function(){closeCoverUpload();},1500);
+        }else{
+            statusEl.textContent=''+d.message;
+            statusEl.className='status-msg error';
+        }
+    })
+    .catch(function(e){
+        statusEl.textContent='上传失败: '+e.message;
+        statusEl.className='status-msg error';
+    });
+}
+
+function openMails(){
+    document.getElementById('mailModal').style.display='flex';
+    document.getElementById('menuDropdown').classList.remove('show');
+    loadMails();
+}
+
+function closeMails(){
+    document.getElementById('mailModal').style.display='none';
+}
+
+function loadMails(){
+    var container=document.getElementById('mailList');
+    container.innerHTML='<div class="empty-state">加载中...</div>';
+    var fd=new FormData();
+    fd.append('action','getMails');
+    fd.append('token',token);
+    fetch(API_URL,{method:'POST',body:fd})
+    .then(r=>r.json())
+    .then(d=>{
+        if(d.success&&d.mails){
+            if(d.mails.length===0){
+                container.innerHTML='<div class="empty-state">📭 暂无邮件</div>';
+                return;
+            }
+            var html='';
+            var unreadCount=0;
+            d.mails.forEach(function(mail){
+                if(mail.is_read==0)unreadCount++;
+                var time=formatTime(mail.created_at);
+                html+='<div style="padding:10px 12px;border-bottom:1px solid #f0f4fa;cursor:pointer;" onclick="readMail('+mail.id+')">';
+                html+='<div style="font-weight:600;color:#1a2a3a;">'+(mail.is_read==0?'🔴 ':'')+escapeHtml(mail.title)+'</div>';
+                html+='<div style="font-size:12px;color:#6b7f94;white-space:pre-wrap;margin-top:4px;">'+escapeHtml(mail.content)+'</div>';
+                html+='<div style="font-size:10px;color:#8a9baa;margin-top:4px;">'+time+'</div></div>';
+            });
+            container.innerHTML=html;
+            var badge=document.getElementById('mailBadge');
+            if(badge){
+                if(unreadCount>0){badge.style.display='inline';badge.textContent=unreadCount;}else{badge.style.display='none';}
+            }
+        }else{
+            var errMsg = d.message || '未知错误';
+            var detail = d.table_used ? ' | 表:'+d.table_used : '';
+            container.innerHTML='<div class="empty-state" style="color:#e74c3c;">加载失败: '+escapeHtml(errMsg)+detail+'</div>';
+            console.error('getMails失败:', d);
+        }
+    })
+    .catch(function(e){
+        container.innerHTML='<div class="empty-state" style="color:#e74c3c;">网络错误: '+escapeHtml(e.message||'未知')+'</div>';
+        console.error('getMails异常:', e);
+    });
+}
+
+function readMail(mailId){
+    var fd=new FormData();
+    fd.append('action','readMail');
+    fd.append('token',token);
+    fd.append('mail_id',mailId);
+    fetch(API_URL,{method:'POST',body:fd})
+    .then(function(){loadMails();})
+    .catch(function(){});
+}
+
+function loadProfile(){
+    var fd=new FormData();
+    fd.append('action','getUserInfo');
+    fd.append('token',token);
+    fetch(API_URL,{method:'POST',body:fd})
+    .then(r=>r.json())
+    .then(d=>{
+        if(d.success){
+            if(d.id){ localStorage.setItem('user_id', d.id); userId = d.id; }
+            document.getElementById('profileName').innerHTML = (d.username||'未命名')+' <span class="num">#'+(d.id||'0')+'</span>';
+            document.getElementById('profileEmail').textContent = d.email||'未绑定';
+            document.getElementById('profileRcoins').textContent = d.rcoins||0;
+            rcoinsDisplay.textContent = d.rcoins||0;
+            // 信用分显示
+            var cs = typeof d.credit_score !== 'undefined' ? parseInt(d.credit_score) : 100;
+            currentCreditScore = cs;
+            var csEl = document.getElementById('profileCredit');
+            if(csEl){
+                csEl.textContent = '信用分 ' + cs;
+                csEl.className = 'credit-score' + (cs < 70 ? ' low' : '');
+            }
+            // 信用分检查
+            if(cs < 1){
+                showBanScreen();
+                return;
+            }
+            if(cs < 40){
+                // 低于40无法打开首页，自动跳回个人主页
+                var homePage = document.getElementById('homePage');
+                if(homePage && homePage.style.display !== 'none'){
+                    showToast('你的信用分低于40，无法访问首页');
+                    switchTab('profile');
+                }
+            }
+            if(d.avatar){
+                document.getElementById('profileAvatar').src = d.avatar;
+            }
+            if(d.cover){
+                document.getElementById('profileCover').src = d.cover;
+                document.getElementById('profileCover').style.display='block';
+                document.getElementById('coverPlaceholder').style.display='none';
+            }
+            document.getElementById('bioDisplay').innerHTML = d.bio ? d.bio : '<span class="empty">这个人很懒，什么都没写...</span>';
+            var statusEl=document.getElementById('bioStatusDisplay');
+            if(d.bio_status==='pending'){statusEl.innerHTML='<span style="color:#2c6b9e;">审核中</span>';}
+            else if(d.bio_status==='approved'){statusEl.innerHTML='<span style="color:#1e7b4a;">已审核</span>';}
+            else if(d.bio_status==='failed'){statusEl.innerHTML='<span style="color:#b03a2e;">审核失败：'+(d.bio_error||'请重新填写')+'</span>';}
+            else{statusEl.innerHTML='';}
+            loadProfileStats();
+        } else if (d.message === 'Token expired' || d.message === 'Invalid token') {
+            logout();
+        }
+    })
+    .catch(function(){});
+}
+
+function showBanScreen(){
+    var overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#fff;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;text-align:center;';
+    overlay.innerHTML = '<div style="font-size:48px;margin-bottom:20px;">&#128683;</div><div style="font-size:20px;font-weight:700;color:#1a2a3a;margin-bottom:12px;">账号已被封禁</div><div style="font-size:14px;color:#64748b;line-height:1.8;max-width:320px;">你的账号已经被封禁，请你更换账号进行游玩。<br>如有疑问，请联系客服。</div>';
+    document.body.appendChild(overlay);
+}
+
+function loadProfileStats(){
+    var fd=new FormData();
+    fd.append('action','getUserStats');
+    fd.append('token',token);
+    fetch(API_URL,{method:'POST',body:fd})
+    .then(r=>r.json())
+    .then(d=>{
+        if(d.success){
+            document.getElementById('statGames').textContent=d.games||0;
+            document.getElementById('statLikes').textContent=d.likes||0;
+            document.getElementById('statCollects').textContent=d.collects||0;
+            document.getElementById('statFollowing').textContent=d.following||0;
+            document.getElementById('statFollowers').textContent=d.followers||0;
+        }
+    })
+    .catch(function(){});
+}
+
+function loadMyGames(){
+    myGameGrid.innerHTML = '<div class="empty-state"><div class="icon">🎮</div>加载中...</div>';
+    var fd = new FormData();
+    fd.append('action','getMyGames');
+    fd.append('token',token);
+    fetch(API_URL,{method:'POST',body:fd})
+    .then(r=>r.json())
+    .then(d=>{
+        if(d.success && d.games){
+            renderGames(d.games, myGameGrid, true);
+            document.getElementById('statGames').textContent = d.games.length;
+        }else{
+            myGameGrid.innerHTML = '<div class="empty-state"><div class="icon">📭</div>你还没有发布作品</div>';
+            document.getElementById('statGames').textContent = '0';
+        }
+    })
+    .catch(function(e){
+        myGameGrid.innerHTML = '<div class="empty-state"><div class="icon">❌</div>加载失败</div>';
+    });
+}
+
+function deleteGame(gameId){
+    if(!confirm('确定要删除这个作品吗？删除后无法恢复！')) return;
+    var fd = new FormData();
+    fd.append('action','deleteGame');
+    fd.append('token',token);
+    fd.append('game_id',gameId);
+    fetch(API_URL,{method:'POST',body:fd})
+    .then(r=>r.json())
+    .then(d=>{
+        if(d.success){
+            alert('删除成功');
+            loadMyGames();
+            if(currentTab === 'hot') loadHotGames();
+            else loadNewGames();
+        }else{
+            alert('删除失败：'+d.message);
+        }
+    })
+    .catch(function(e){
+        alert('删除失败：'+e.message);
+    });
+}
+
+var EDIT_GAME_ID = null;
+var EDIT_ICON_DATA = null;
+
+function editGame(gameId){
+    var fd = new FormData();
+    fd.append('action','getEditorFiles');
+    fd.append('token',token);
+    fd.append('game_id',gameId);
+    fetch(API_URL,{method:'POST',body:fd})
+    .then(r=>r.json())
+    .then(d=>{
+        if(d.success && d.files && d.files.length > 0){
+            window.location.href = '2htm.html?id=' + gameId;
+        }else{
+            openEditGameModal(gameId);
+        }
+    })
+    .catch(function(){
+        openEditGameModal(gameId);
+    });
+}
+
+function openEditGameModal(gameId){
+    EDIT_GAME_ID = gameId;
+    EDIT_ICON_DATA = null;
+    document.getElementById('editGameTitle').value = '';
+    document.getElementById('editGameDesc').value = '';
+    document.getElementById('editGameCode').value = '';
+    document.getElementById('editGameIconText').textContent = '上传作品图标（≤5MB）';
+    document.getElementById('editGameIconPreview').style.display = 'none';
+    document.getElementById('editGameIconPreview').style.backgroundImage = '';
+    document.getElementById('editGameStatus').style.display = 'none';
+    document.getElementById('editGameStatus').className = 'status-msg';
+    var fd = new FormData();
+    fd.append('action','getGameDetail');
+    fd.append('token',token);
+    fd.append('game_id',gameId);
+    fetch(API_URL,{method:'POST',body:fd})
+    .then(r=>r.json())
+    .then(d=>{
+        if(d.success && d.game){
+            document.getElementById('editGameTitle').value = d.game.title || '';
+            document.getElementById('editGameDesc').value = d.game.description || '';
+            if(d.game.file_path){
+                fetch(d.game.file_path)
+                .then(r=>r.text())
+                .then(code=>{
+                    document.getElementById('editGameCode').value = code;
+                })
+                .catch(function(){});
+            }
+            document.getElementById('editGameModal').style.display = 'flex';
+        }else{
+            alert('加载失败：'+(d.message||'未知错误'));
+        }
+    })
+    .catch(function(e){
+        alert('加载失败：'+e.message);
+    });
+}
+
+function closeEditGameModal(){
+    document.getElementById('editGameModal').style.display = 'none';
+}
+
+function previewEditGameIcon(e){
+    var file = e.target.files[0];
+    if(!file) return;
+    if(file.size > 5 * 1024 * 1024){
+        alert('图标不能超过5MB');
+        e.target.value = '';
+        return;
+    }
+    var reader = new FileReader();
+    reader.onload = function(ev){
+        EDIT_ICON_DATA = ev.target.result;
+        document.getElementById('editGameIconText').textContent = file.name;
+        var preview = document.getElementById('editGameIconPreview');
+        preview.style.backgroundImage = 'url(' + ev.target.result + ')';
+        preview.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+}
+
+function saveEditGame(){
+    var title = document.getElementById('editGameTitle').value.trim();
+    var desc = document.getElementById('editGameDesc').value.trim();
+    var code = document.getElementById('editGameCode').value;
+    if(!title){ alert('请输入作品名称'); return; }
+    if(!code){ alert('请输入HTML代码'); return; }
+    if(!EDIT_ICON_DATA){ alert('请选择作品图标'); return; }
+    var statusEl = document.getElementById('editGameStatus');
+    statusEl.textContent = '保存中...';
+    statusEl.className = 'status-msg info';
+    statusEl.style.display = 'block';
+    var fd = new FormData();
+    fd.append('action','updateEditorGame');
+    fd.append('token',token);
+    fd.append('game_id',EDIT_GAME_ID);
+    fd.append('title',title);
+    fd.append('description',desc);
+    fd.append('code',code);
+    fd.append('icon_data',EDIT_ICON_DATA);
+    fetch(API_URL,{method:'POST',body:fd})
+    .then(r=>r.json())
+    .then(d=>{
+        if(d.success){
+            statusEl.textContent = '保存成功，已上线';
+            statusEl.className = 'status-msg success';
+            setTimeout(function(){
+                closeEditGameModal();
+                loadMyGames();
+            },1000);
+        }else{
+            statusEl.textContent = '保存失败：'+d.message;
+            statusEl.className = 'status-msg error';
+        }
+    })
+    .catch(function(){
+        statusEl.textContent = '网络错误，请重试';
+        statusEl.className = 'status-msg error';
+    });
+}
+
+function loadBadges() {
+    var fd = new FormData();
+    fd.append('action', 'getUserBadges');
+    fd.append('token', token);
+    fetch(API_URL, { method: 'POST', body: fd })
+        .then(r => r.json())
+        .then(d => {
+            if (d.success && d.badges) {
+                showBadges(d.badges);
+            }
+        })
+        .catch(function() {});
+}
+
+function showBadges(badges) {
+    var container = document.getElementById('badgesContainer');
+    var list = document.getElementById('badgeList');
+    
+    if (!badges || badges.length === 0) {
+        container.style.display = 'none';
+        return;
+    }
+    container.style.display = 'block';
+    
+    var html = '';
+    badges.forEach(function(b) {
+        var colorStyle = b.color;
+        if (b.color && b.color.startsWith('linear-gradient')) {
+            colorStyle = 'background:' + b.color;
+        } else {
+            colorStyle = 'background:' + (b.color || '#4488ff');
+        }
+        html += '<div style="display:flex;align-items:center;gap:8px;background:#f8fafc;padding:6px 14px 6px 10px;border-radius:20px;border:1px solid #e8edf4;">';
+        html += '<div style="width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;' + colorStyle + ';flex-shrink:0;">' + (b.icon || '🏅') + '</div>';
+        html += '<span style="font-size:12px;font-weight:600;color:#1a2a3a;">' + b.name + '</span>';
+        html += '</div>';
+    });
+    list.innerHTML = html;
+}
+
+function openBadgeManager() {
+    document.getElementById('badgeModal').style.display = 'flex';
+    document.getElementById('menuDropdown').classList.remove('show');
+    loadBadgeManager();
+}
+
+function closeBadgeManager() {
+    document.getElementById('badgeModal').style.display = 'none';
+}
+
+function loadBadgeManager() {
+    var fd = new FormData();
+    fd.append('action', 'checkBadges');
+    fd.append('token', token);
+    fetch(API_URL, { method: 'POST', body: fd })
+        .then(r => r.json())
+        .then(d => {
+            if (d.success && d.new_badges && d.new_badges.length > 0) {
+                loadBadges();
+                showToast('获得新勋章');
+            }
+            loadBadgeList();
+        })
+        .catch(function() {
+            loadBadgeList();
+        });
+}
+
+function loadBadgeList() {
+    var list = document.getElementById('badgeManagerList');
+    var progress = document.getElementById('badgeProgressList');
+    
+    var fd = new FormData();
+    fd.append('action', 'getUserBadges');
+    fd.append('token', token);
+    fetch(API_URL, { method: 'POST', body: fd })
+        .then(r => r.json())
+        .then(d => {
+            if (d.success && d.badges) {
+                if (d.badges.length === 0) {
+                    list.innerHTML = '<div style="text-align:center;color:#8a9baa;padding:20px 0;">还没有获得勋章，继续努力吧！</div>';
+                } else {
+                    var html = '';
+                    d.badges.forEach(function(b) {
+                        var colorStyle = b.color;
+                        if (b.color && b.color.startsWith('linear-gradient')) {
+                            colorStyle = 'background:' + b.color;
+                        } else {
+                            colorStyle = 'background:' + (b.color || '#4488ff');
+                        }
+                        html += '<div style="display:flex;align-items:center;gap:12px;background:#f8fafc;padding:10px 14px;border-radius:10px;border:1px solid #e8edf4;">';
+                        html += '<div style="width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#fff;' + colorStyle + ';flex-shrink:0;">' + (b.icon || '🏅') + '</div>';
+                        html += '<div style="flex:1;"><div style="font-size:14px;font-weight:600;color:#1a2a3a;">' + b.name + '</div>';
+                        html += '<div style="font-size:11px;color:#8a9baa;">' + (b.description || '') + '</div></div>';
+                        html += '<div style="font-size:11px;color:#1e7b4a;">✅ 已获得</div>';
+                        html += '</div>';
+                    });
+                    list.innerHTML = html;
+                }
+            } else {
+                list.innerHTML = '<div style="text-align:center;color:#8a9baa;padding:20px 0;">加载失败</div>';
+            }
+        })
+        .catch(function() {
+            list.innerHTML = '<div style="text-align:center;color:#8a9baa;padding:20px 0;">加载失败</div>';
+        });
+    
+    var fd2 = new FormData();
+    fd2.append('action', 'getUserStats');
+    fd2.append('token', token);
+    fetch(API_URL, { method: 'POST', body: fd2 })
+        .then(r => r.json())
+        .then(d2 => {
+            if (d2.success) {
+                var games = d2.games || 0;
+                var likes = d2.likes || 0;
+                var collects = d2.collects || 0;
+                var totalInteract = likes + collects;
+                
+                var fd4 = new FormData();
+                fd4.append('action', 'getMyGames');
+                fd4.append('token', token);
+                fetch(API_URL, { method: 'POST', body: fd4 })
+                    .then(r => r.json())
+                    .then(d3 => {
+                        var totalViews = 0;
+                        if (d3.success && d3.games) {
+                            d3.games.forEach(function(g) {
+                                totalViews += g.views || 0;
+                            });
+                        }
+                        renderBadgeProgress(games, totalInteract, totalViews);
+                    })
+                    .catch(function() { renderBadgeProgress(games, totalInteract, 0); });
+            }
+        })
+        .catch(function() {});
+}
+
+function renderBadgeProgress(games, interact, views) {
+    var progress = document.getElementById('badgeProgressList');
+    var html = '';
+    
+    var blueVProgress = 0;
+    var blueVTotal = 3;
+    var blueVStatus = [];
+    if (games >= 20) { blueVProgress++; blueVStatus.push('✅ 发布20个作品'); } else { blueVStatus.push('📝 发布作品 ' + games + '/20'); }
+    if (interact >= 90) { blueVProgress++; blueVStatus.push('✅ 点赞+收藏≥90 (' + interact + ')'); } else { blueVStatus.push('❤️ 点赞+收藏 ' + interact + '/90'); }
+    if (views >= 10000) { blueVProgress++; blueVStatus.push('✅ 浏览≥10000 (' + views + ')'); } else { blueVStatus.push('👁️ 浏览 ' + views + '/10000'); }
+    
+    var blueVColor = blueVProgress >= blueVTotal ? '#1e7b4a' : '#2563eb';
+    html += '<div style="margin-bottom:8px;">';
+    html += '<div style="display:flex;justify-content:space-between;font-size:12px;font-weight:600;">';
+    html += '<span>👑 优秀创作者 (蓝V)</span>';
+    html += '<span style="color:' + blueVColor + ';">' + blueVProgress + '/' + blueVTotal + '</span>';
+    html += '</div>';
+    html += '<div style="height:4px;background:#e8edf4;border-radius:2px;overflow:hidden;margin-top:2px;">';
+    html += '<div style="height:100%;width:' + (blueVProgress/blueVTotal*100) + '%;background:' + blueVColor + ';border-radius:2px;transition:width 0.5s;"></div>';
+    html += '</div>';
+    html += '<div style="font-size:11px;color:#8a9baa;margin-top:2px;">' + blueVStatus.join(' · ') + '</div>';
+    html += '</div>';
+    
+    var regYear = new Date().getFullYear();
+    var isEligible = (regYear == 2026 || regYear == 2027);
+    var colorfulStatus = isEligible ? '✅ 符合条件（' + regYear + '年注册）' : '❌ 需在2026或2027年注册（当前' + regYear + '年）';
+    html += '<div>';
+    html += '<div style="display:flex;justify-content:space-between;font-size:12px;font-weight:600;">';
+    html += '<span>⭐ 开服元老玩家 (彩色V)</span>';
+    html += '<span style="color:' + (isEligible ? '#1e7b4a' : '#8a9baa') + ';">' + (isEligible ? '✅ 可获得' : '⏳ 未满足') + '</span>';
+    html += '</div>';
+    html += '<div style="font-size:11px;color:#8a9baa;margin-top:2px;">' + colorfulStatus + '</div>';
+    html += '</div>';
+    
+    progress.innerHTML = html;
+}
+
+function showToast(text) {
+    var el = document.createElement('div');
+    el.style.cssText = 'position:fixed;top:60px;left:50%;transform:translateX(-50%);z-index:999;background:rgba(13,17,23,0.92);color:#ffd700;padding:12px 24px;border-radius:12px;font-size:14px;font-weight:600;border:1px solid rgba(255,215,0,0.2);backdrop-filter:blur(10px);transition:opacity 0.5s;';
+    el.textContent = text;
+    document.body.appendChild(el);
+    setTimeout(function() {
+        el.style.opacity = '0';
+        setTimeout(function() { document.body.removeChild(el); }, 600);
+    }, 2500);
+}
+
+function loadFriends() {
+    var container = document.getElementById('friendList');
+    container.innerHTML = '<div class="empty-state"><div class="icon">👥</div>加载好友中...</div>';
+    var fd = new FormData();
+    fd.append('action', 'getFriends');
+    fd.append('token', token);
+    fetch(API_URL, { method: 'POST', body: fd })
+    .then(r => r.json())
+    .then(d => {
+        if (d.success && d.friends) {
+            if (d.friends.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div class="icon">👥</div>暂无好友，快去关注他人吧！</div>';
+                return;
+            }
+            var html = '';
+            d.friends.forEach(function(f) {
+                var avatar = f.avatar || 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2244%22 height=%2244%22 viewBox=%220 0 44 44%22%3E%3Crect width=%2244%22 height=%2244%22 fill=%22%23eef2f6%22/%3E%3Ctext x=%2222%22 y=%2228%22 text-anchor=%22middle%22 font-size=%2220%22 fill=%22%238a9baa%22%3E👤%3C/text%3E%3C/svg%3E';
+                html += '<div class="friend-list-item" onclick="openChat(' + f.id + ', \'' + escapeHtml(f.username) + '\', \'' + avatar + '\')">';
+                html += '<img class="favatar" src="' + avatar + '" alt="头像" onerror="this.src=\'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2244%22 height=%2244%22 viewBox=%220 0 44 44%22%3E%3Crect width=%2244%22 height=%2244%22 fill=%22%23eef2f6%22/%3E%3Ctext x=%2222%22 y=%2228%22 text-anchor=%22middle%22 font-size=%2220%22 fill=%22%238a9baa%22%3E👤%3C/text%3E%3C/svg%3E\'">';
+                html += '<div class="finfo"><div class="fname">' + escapeHtml(f.username) + '</div>';
+                html += '<div class="fstatus">好友 · ID #' + f.id + '</div></div>';
+                html += '</div>';
+            });
+            container.innerHTML = html;
+        } else {
+            container.innerHTML = '<div class="empty-state"><div class="icon">❌</div>加载失败</div>';
+        }
+    })
+    .catch(function() {
+        container.innerHTML = '<div class="empty-state"><div class="icon">❌</div>加载失败</div>';
+    });
+}
+
+function loadPendingFriendRequests() {
+    var fd = new FormData();
+    fd.append('action', 'getPendingFriendRequests');
+    fd.append('token', token);
+    fetch(API_URL, { method: 'POST', body: fd })
+    .then(r => r.json())
+    .then(d => {
+        var badge = document.getElementById('inviteBadge');
+        if (d.success && d.invites && d.invites.length > 0) {
+            badge.textContent = d.invites.length;
+            badge.style.display = 'inline';
+        } else {
+            badge.style.display = 'none';
+        }
+    })
+    .catch(function() {});
+}
+
+function openFriendRequests() {
+    document.getElementById('friendRequestModal').style.display = 'flex';
+    var container = document.getElementById('friendRequestList');
+    container.innerHTML = '<div class="empty-state">加载中...</div>';
+    var fd = new FormData();
+    fd.append('action', 'getPendingFriendRequests');
+    fd.append('token', token);
+    fetch(API_URL, { method: 'POST', body: fd })
+    .then(r => r.json())
+    .then(d => {
+        if (d.success && d.invites) {
+            if (d.invites.length === 0) {
+                container.innerHTML = '<div class="empty-state">📭 暂无好友请求</div>';
+                return;
+            }
+            var html = '';
+            d.invites.forEach(function(inv) {
+                var avatar = inv.from_avatar || 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2240%22 height=%2240%22 viewBox=%220 0 40 40%22%3E%3Crect width=%2240%22 height=%2240%22 fill=%22%23eef2f6%22/%3E%3Ctext x=%2220%22 y=%2226%22 text-anchor=%22middle%22 font-size=%2218%22 fill=%22%238a9baa%22%3E👤%3C/text%3E%3C/svg%3E';
+                html += '<div class="friend-request-item">';
+                html += '<div style="display:flex;align-items:center;gap:10px;">';
+                html += '<img src="' + avatar + '" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid #e8edf4;" onerror="this.src=\'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2236%22 height=%2236%22 viewBox=%220 0 36 36%22%3E%3Crect width=%2236%22 height=%2236%22 fill=%22%23eef2f6%22/%3E%3Ctext x=%2218%22 y=%2224%22 text-anchor=%22middle%22 font-size=%2216%22 fill=%22%238a9baa%22%3E👤%3C/text%3E%3C/svg%3E\'">';
+                html += '<span class="rname">' + escapeHtml(inv.from_username) + '</span>';
+                html += '</div>';
+                html += '<div class="rbtns">';
+                html += '<button class="accept" onclick="acceptFriendRequest(' + inv.id + ')">接受</button>';
+                html += '<button class="reject" onclick="rejectFriendRequest(' + inv.id + ')">拒绝</button>';
+                html += '</div>';
+                html += '</div>';
+            });
+            container.innerHTML = html;
+        } else {
+            container.innerHTML = '<div class="empty-state">加载失败</div>';
+        }
+    })
+    .catch(function() {
+        container.innerHTML = '<div class="empty-state">加载失败</div>';
+    });
+}
+
+function closeFriendRequests() {
+    document.getElementById('friendRequestModal').style.display = 'none';
+}
+
+function acceptFriendRequest(inviteId) {
+    var fd = new FormData();
+    fd.append('action', 'acceptFriendRequest');
+    fd.append('token', token);
+    fd.append('invite_id', inviteId);
+    fetch(API_URL, { method: 'POST', body: fd })
+    .then(r => r.json())
+    .then(d => {
+        if (d.success) {
+            showToast(d.message);
+            openFriendRequests();
+            loadFriends();
+            loadPendingFriendRequests();
+        } else {
+            alert(d.message || '操作失败');
+        }
+    })
+    .catch(function() { alert('网络错误'); });
+}
+
+function rejectFriendRequest(inviteId) {
+    var fd = new FormData();
+    fd.append('action', 'rejectFriendRequest');
+    fd.append('token', token);
+    fd.append('invite_id', inviteId);
+    fetch(API_URL, { method: 'POST', body: fd })
+    .then(r => r.json())
+    .then(d => {
+        if (d.success) {
+            showToast('已拒绝');
+            openFriendRequests();
+            loadPendingFriendRequests();
+        } else {
+            alert(d.message || '操作失败');
+        }
+    })
+    .catch(function() { alert('网络错误'); });
+}
+
+function openChat(friendId, friendName, friendAvatar) {
+    currentChatFriendId = friendId;
+    document.getElementById('chatFriendName').textContent = friendName || '好友';
+    document.getElementById('chatModal').style.display = 'flex';
+    document.getElementById('chatInput').value = '';
+    loadChatMessages();
+    if (chatInterval) { clearInterval(chatInterval); }
+    chatInterval = setInterval(function() {
+        loadChatMessages();
+    }, 3000);
+}
+
+function closeChat() {
+    document.getElementById('chatModal').style.display = 'none';
+    if (chatInterval) {
+        clearInterval(chatInterval);
+        chatInterval = null;
+    }
+    currentChatFriendId = null;
+}
+
+function loadChatMessages() {
+    if (!currentChatFriendId) return;
+    var container = document.getElementById('chatMessages');
+    var fd = new FormData();
+    fd.append('action', 'getFriendMessages');
+    fd.append('token', token);
+    fd.append('friend_id', currentChatFriendId);
+    fd.append('limit', 50);
+    fetch(API_URL, { method: 'POST', body: fd })
+    .then(r => r.json())
+    .then(d => {
+        if (d.success && d.messages) {
+            if (d.messages.length === 0) {
+                container.innerHTML = '<div class="empty-state" style="padding:20px 0;">暂无消息，开始聊天吧！</div>';
+                return;
+            }
+            var html = '';
+            d.messages.forEach(function(msg) {
+                var isSelf = msg.sender_id == userId;
+                var time = formatTime(msg.created_at);
+                var avatar = msg.avatar || '';
+                var name = msg.username || (isSelf ? '我' : '用户');
+                if(msg.is_recalled == 1 || msg.is_recalled === '1'){
+                    html += '<div class="msg-recalled">'+escapeHtml(name)+'撤回了一条消息</div>';
+                    return;
+                }
+                var letter = name ? name.charAt(0) : '?';
+                var avatarHtml = '<div class="msg-avatar">';
+                if(avatar){
+                    avatarHtml += '<img src="'+avatar+'" onerror="this.style.display=\'none\'">';
+                }
+                avatarHtml += '<span class="avatar-letter">'+letter+'</span></div>';
+                var safeContent = escapeHtml(msg.content).replace(/"/g,'&quot;');
+                var msgData = ' data-msg-id="'+msg.id+'" data-sender-id="'+msg.sender_id+'" data-content="'+safeContent+'" data-is-self="'+(isSelf?1:0)+'" data-created="'+msg.created_at+'"';
+                if(isSelf){
+                    html += '<div class="msg-row msg-self msg-item"'+msgData+'>';
+                    html += '<div class="msg-body">';
+                    html += '<div class="msg-meta"><span class="ctime">'+time+'</span><span class="msg-name">'+escapeHtml(name)+'</span></div>';
+                    html += '<div class="msg-bubble">'+escapeHtml(msg.content)+'</div>';
+                    html += '</div>';
+                    html += avatarHtml;
+                    html += '</div>';
+                }else{
+                    html += '<div class="msg-row msg-other msg-item"'+msgData+'>';
+                    html += avatarHtml;
+                    html += '<div class="msg-body">';
+                    html += '<div class="msg-meta"><span class="msg-name">'+escapeHtml(name)+'</span><span class="ctime">'+time+'</span></div>';
+                    html += '<div class="msg-bubble">'+escapeHtml(msg.content)+'</div>';
+                    html += '</div>';
+                    html += '</div>';
+                }
+            });
+            container.innerHTML = html;
+            container.scrollTop = container.scrollHeight;
+            bindMsgLongPress();
+        }
+    })
+    .catch(function() {});
+}
+
+var currentMsgData = null;
+var longPressTimer = null;
+
+function bindMsgLongPress(){
+    var items = document.querySelectorAll('#chatMessages .msg-item');
+    items.forEach(function(el){
+        el.addEventListener('touchstart', function(e){
+            var touch = e.touches[0];
+            longPressTimer = setTimeout(function(){
+                e.preventDefault();
+                showMsgMenu(touch.clientX, touch.clientY, el);
+            }, 500);
+        });
+        el.addEventListener('touchend', function(){ if(longPressTimer){clearTimeout(longPressTimer);longPressTimer=null;} });
+        el.addEventListener('touchmove', function(){ if(longPressTimer){clearTimeout(longPressTimer);longPressTimer=null;} });
+        el.addEventListener('mousedown', function(e){
+            longPressTimer = setTimeout(function(){
+                showMsgMenu(e.clientX, e.clientY, el);
+            }, 500);
+        });
+        el.addEventListener('mouseup', function(){ if(longPressTimer){clearTimeout(longPressTimer);longPressTimer=null;} });
+        el.addEventListener('mouseleave', function(){ if(longPressTimer){clearTimeout(longPressTimer);longPressTimer=null;} });
+    });
+    document.addEventListener('click', hideMsgMenu);
+}
+
+function showMsgMenu(x, y, el){
+    currentMsgData = {
+        id: el.getAttribute('data-msg-id'),
+        senderId: el.getAttribute('data-sender-id'),
+        content: el.getAttribute('data-content'),
+        isSelf: el.getAttribute('data-is-self') === '1',
+        created: el.getAttribute('data-created')
+    };
+    var menu = document.getElementById('msgContextMenu');
+    var recallBtn = document.getElementById('menuRecall');
+    var reportBtn = document.getElementById('menuReport');
+    // 发送者：显示撤回+复制；对方：显示举报+复制
+    if(currentMsgData.isSelf){
+        recallBtn.style.display = 'block';
+        reportBtn.style.display = 'none';
+        // 检查是否超过15分钟
+        var sendTime = new Date(currentMsgData.created.replace(' ', 'T') + 'Z').getTime();
+        if(Date.now() - sendTime > 15 * 60 * 1000){
+            recallBtn.style.display = 'none';
+        }
+    }else{
+        recallBtn.style.display = 'none';
+        reportBtn.style.display = 'block';
+    }
+    menu.style.display = 'block';
+    var menuW = menu.offsetWidth;
+    var menuH = menu.offsetHeight;
+    var left = x - menuW / 2;
+    var top = y - menuH - 10;
+    if(left < 10) left = 10;
+    if(left + menuW > window.innerWidth - 10) left = window.innerWidth - menuW - 10;
+    if(top < 10) top = y + 10;
+    menu.style.left = left + 'px';
+    menu.style.top = top + 'px';
+}
+
+function hideMsgMenu(){
+    document.getElementById('msgContextMenu').style.display = 'none';
+}
+
+function doRecallMessage(){
+    hideMsgMenu();
+    if(!currentMsgData) return;
+    if(!confirm('确定撤回这条消息吗？')) return;
+    var fd = new FormData();
+    fd.append('action', 'recallMessage');
+    fd.append('token', token);
+    fd.append('message_id', currentMsgData.id);
+    fetch(API_URL, {method:'POST', body:fd})
+    .then(r=>r.json())
+    .then(d=>{
+        if(d.success){
+            showToast('消息已撤回');
+            loadChatMessages();
+        }else{
+            showToast(d.msg || '撤回失败');
+        }
+    })
+    .catch(function(){ showToast('网络错误'); });
+}
+
+function doCopyMessage(){
+    hideMsgMenu();
+    if(!currentMsgData) return;
+    var text = currentMsgData.content;
+    if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text).then(function(){ showToast('已复制'); }).catch(function(){ fallbackCopy(text); });
+    }else{
+        fallbackCopy(text);
+    }
+}
+
+function fallbackCopy(text){
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try{ document.execCommand('copy'); showToast('已复制'); }catch(e){ showToast('复制失败'); }
+    document.body.removeChild(ta);
+}
+
+var reportTargetUserId = 0;
+var reportTargetMsgId = 0;
+
+function openReportModal(){
+    hideMsgMenu();
+    if(!currentMsgData) return;
+    reportTargetUserId = currentMsgData.senderId;
+    reportTargetMsgId = currentMsgData.id;
+    document.getElementById('reportTitle').value = '';
+    document.getElementById('reportContent').value = '';
+    document.getElementById('reportContact').value = '';
+    document.getElementById('reportStatus').textContent = '';
+    document.getElementById('reportModal').style.display = 'flex';
+}
+
+function closeReportModal(){
+    document.getElementById('reportModal').style.display = 'none';
+}
+
+function submitReport(){
+    var title = document.getElementById('reportTitle').value.trim();
+    var content = document.getElementById('reportContent').value.trim();
+    var contact = document.getElementById('reportContact').value.trim();
+    if(!title){ showToast('请填写举报标题'); return; }
+    if(!content){ showToast('请填写举报内容'); return; }
+    var statusEl = document.getElementById('reportStatus');
+    statusEl.textContent = '提交中...';
+    statusEl.style.color = '#64748b';
+    var fd = new FormData();
+    fd.append('action', 'submitReport');
+    fd.append('token', token);
+    fd.append('reported_user_id', reportTargetUserId);
+    fd.append('report_type', 'message');
+    fd.append('target_id', reportTargetMsgId);
+    fd.append('title', title);
+    fd.append('content', content);
+    fd.append('contact', contact);
+    fetch(API_URL, {method:'POST', body:fd})
+    .then(r=>r.json())
+    .then(d=>{
+        if(d.success){
+            statusEl.textContent = d.msg;
+            statusEl.style.color = '#1e7b4a';
+            setTimeout(function(){ closeReportModal(); }, 1500);
+        }else{
+            statusEl.textContent = d.msg || '提交失败';
+            statusEl.style.color = '#dc2626';
+        }
+    })
+    .catch(function(){
+        statusEl.textContent = '网络错误';
+        statusEl.style.color = '#dc2626';
+    });
+}
+
+function updateChatCount(){
+    var input=document.getElementById('chatInput');
+    var count=document.getElementById('chatCount');
+    if(input&&count){
+        var len=input.value.length;
+        count.textContent=len+'/500';
+        count.style.color=len>=450?'#da3633':'#8a9baa';
+    }
+}
+
+function sendChatMessage() {
+    if (!currentChatFriendId) return;
+    var input = document.getElementById('chatInput');
+    var content = input.value.trim();
+    if (!content) return;
+    if (content.length > 500) { showToast('消息不能超过500字'); return; }
+    var fd = new FormData();
+    fd.append('action', 'sendFriendMessage');
+    fd.append('token', token);
+    fd.append('friend_id', currentChatFriendId);
+    fd.append('content', content);
+    fetch(API_URL, { method: 'POST', body: fd })
+    .then(r => r.json())
+    .then(d => {
+        if (d.success) {
+            input.value = '';
+            updateChatCount();
+            loadChatMessages();
+            checkUnreadMessages();
+        } else {
+            showToast(d.message || '发送失败');
+        }
+    })
+    .catch(function() { showToast('网络错误'); });
+}
+
+function checkUnreadMessages() {
+    var fd = new FormData();
+    fd.append('action', 'getUnreadMessageCount');
+    fd.append('token', token);
+    fetch(API_URL, { method: 'POST', body: fd })
+    .then(r => r.json())
+    .then(d => {
+        if (d.success) {
+            var badge = document.getElementById('friendBadge');
+            if (d.unread > 0) {
+                badge.textContent = d.unread;
+                badge.style.display = 'inline';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+    })
+    .catch(function() {});
+}
+
+function logout(){
+    sessionStorage.removeItem('dashboard_refreshed');
+    localStorage.removeItem('token');
+    localStorage.removeItem('username');
+    localStorage.removeItem('email');
+    localStorage.removeItem('user_id');
+    if (chatInterval) { clearInterval(chatInterval); chatInterval = null; }
+    window.location.href='index.html';
+}
+
+function escapeHtml(text){if(!text)return '';var d=document.createElement('div');d.textContent=text;return d.innerHTML;}
+
+loadHotGames();
+loadProfile();
+
+setInterval(function(){
+    if(currentTab === 'hot' && document.getElementById('homePage').style.display !== 'none'){
+        loadHotGames();
+    }
+}, 20000);
+
+setInterval(function(){
+    if(document.getElementById('homePage').style.display !== 'none'){
+        var fd = new FormData();
+        fd.append('action','getNewGamesCount');
+        fd.append('token',token);
+        fetch(API_URL,{method:'POST',body:fd})
+        .then(r=>r.json())
+        .then(d=>{
+            if(d.success){
+                newGamesCount = d.count;
+                document.getElementById('newBadge').textContent = newGamesCount;
+            }
+        })
+        .catch(function(){});
+    }
+}, 60000);
+
+setInterval(function(){
+    var fd=new FormData();
+    fd.append('action','getRcoins');
+    fd.append('token',token);
+    fetch(API_URL,{method:'POST',body:fd})
+    .then(r=>r.json())
+    .then(d=>{
+        if(d.success){
+            rcoinsDisplay.textContent=d.rcoins||0;
+            document.getElementById('profileRcoins').textContent=d.rcoins||0;
+        }
+    })
+    .catch(function(){});
+},30000);
+
+setInterval(function(){
+    if (document.getElementById('friendsPage').style.display !== 'none') {
+        checkUnreadMessages();
+        loadPendingFriendRequests();
+    }
+}, 15000);
+
+console.log('🚀 龙黑化社区已加载！');
+console.log('🔥 热度榜每20秒刷新一次');
+console.log('✨ 新品标签显示35分钟内发布的作品');
+console.log('📖 点击作者头像可查看对方主页');
+console.log('🏅 勋章系统已启用！');
+console.log('✏️ 创作支持两种模式：直接上传 + 2.0编辑器');
+console.log('👥 好友系统已启用！互相关注自动发起好友请求');
+
+/* ========== 多语言初始化 ========== */
+(function(){
+    function syncLangBtns(){
+        var cur = I18N.getLang();
+        var btns = document.querySelectorAll('#profileLangSelector .lang-btn');
+        btns.forEach(function(b){
+            if(b.getAttribute('data-lang')===cur){b.classList.add('active');}
+            else{b.classList.remove('active');}
+        });
+    }
+    /* 打开编辑资料弹窗时同步语言按钮状态 */
+    var origOpenEdit = openEditProfile;
+    openEditProfile = function(){
+        origOpenEdit();
+        setTimeout(syncLangBtns, 50);
+    };
+    /* 语言变化时刷新动态内容 */
+    document.addEventListener('languagechange', function(){
+        syncLangBtns();
+        /* 刷新当前tab的加载文本（如果是空状态） */
+        var emptyStates = document.querySelectorAll('.empty-state');
+        /* 刷新头部标题 */
+        if(typeof currentTab !== 'undefined'){
+            if(currentTab === 'profile'){
+                headerTitle.innerHTML = I18N.t('app_name')+'<span class="sub">'+I18N.t('app_sub')+'</span>';
+            }
+        }
+    });
+    /* 页面加载时应用语言 */
+    if(typeof I18N !== 'undefined'){
+        I18N.applyLanguage();
+        syncLangBtns();
+    }
+})();
+
+
+</script>
+
+<!-- ===== 首次进入引导 Onboarding ===== -->
+<div id="onboardingOverlay">
+    <div class="onboarding-card">
+        <div class="onboarding-welcome">
+            <h2 data-i18n="onboarding_welcome">欢迎来到龙黑化创作工坊</h2>
+            <p>只需两步，开启创作之旅</p>
+        </div>
+
+        <!-- 第一步：存储权限 -->
+        <div class="onboarding-step active" id="onboardingStep1">
+            <div class="onboarding-step-icon">📁</div>
+            <div class="onboarding-step-title" data-i18n="onboarding_step1_title">存储权限</div>
+            <div class="onboarding-step-desc" data-i18n="onboarding_step1_desc">存储权限用于游戏中上传文件（作品图标、封面、导入文件等）</div>
+            <div class="onboarding-status checking" id="storageStatus" data-i18n="onboarding_step1_checking">正在检测存储权限...</div>
+            <button class="onboarding-btn onboarding-btn-primary" id="grantStorageBtn" onclick="grantStoragePermission()" data-i18n="onboarding_btn_grant">开启存储权限</button>
+            <button class="onboarding-btn onboarding-btn-secondary" onclick="skipOnboardingStep(1)" data-i18n="onboarding_btn_skip">跳过</button>
+        </div>
+
+        <!-- 第二步：设备位置 -->
+        <div class="onboarding-step" id="onboardingStep2">
+            <div class="onboarding-step-icon">📍</div>
+            <div class="onboarding-step-title" data-i18n="onboarding_step2_title">设备位置</div>
+            <div class="onboarding-step-desc" data-i18n="onboarding_step2_desc">获取设备位置用于适配时区时间，否则将自动使用美国地区时间</div>
+            <div class="onboarding-status checking" id="locationStatus" data-i18n="onboarding_step2_checking">正在获取设备位置...</div>
+            <button class="onboarding-btn onboarding-btn-primary" id="getLocationBtn" onclick="getDeviceLocation()" data-i18n="onboarding_btn_get_location">获取设备位置</button>
+            <button class="onboarding-btn onboarding-btn-secondary" onclick="skipOnboardingStep(2)" data-i18n="onboarding_btn_skip">跳过</button>
+        </div>
+
+        <!-- 完成按钮 -->
+        <div id="onboardingDoneSection" style="display:none;margin-top:16px">
+            <button class="onboarding-btn onboarding-btn-done" onclick="completeOnboarding()" data-i18n="onboarding_btn_done">✓ 已经设置，进入主界面</button>
+        </div>
+
+        <div class="onboarding-indicator">
+            <div class="onboarding-dot active" id="dot1"></div>
+            <div class="onboarding-dot" id="dot2"></div>
+        </div>
+        <div class="onboarding-step-text" id="onboardingStepText">第 1 步 / 共 2 步</div>
+    </div>
+</div>
+</body>
+</html>

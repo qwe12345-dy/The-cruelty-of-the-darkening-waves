@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>兑换码管理 · 后台</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;min-height:100vh;overflow:hidden}
+body{background:#0a0a1a;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:#fff}
+.card{width:100%;height:100vh;background:#12121e;display:flex;flex-direction:column;overflow:hidden}
+
+.header{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:#1a1a2e;border-bottom:1px solid rgba(255,255,255,0.05);flex-shrink:0}
+.header .logo{font-size:18px;font-weight:700;color:#ffd700}
+.header .logo span{color:#4488ff}
+.header .right{display:flex;align-items:center;gap:12px}
+.header .right .admin{font-size:12px;color:#6b7f94}
+.header .right .btn-back{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.05);border-radius:8px;color:#8a9baa;padding:6px 14px;cursor:pointer;font-size:13px;transition:.3s}
+.header .right .btn-back:hover{background:rgba(255,255,255,0.1)}
+
+.content{flex:1;overflow-y:auto;padding:16px;background:#0f0f1a}
+.content::-webkit-scrollbar{width:3px}
+.content::-webkit-scrollbar-thumb{background:#2a2a4a;border-radius:10px}
+
+.form-card{background:#1a1a2e;border-radius:12px;padding:20px;margin-bottom:16px;border:1px solid rgba(255,255,255,0.05)}
+.form-card h3{color:#ffd700;font-size:16px;margin-bottom:12px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.form-row .full{grid-column:1/3}
+.form-card label{font-size:12px;color:#6b7f94;display:block;margin-bottom:4px}
+.form-card input,.form-card select{width:100%;padding:8px 12px;border:1px solid rgba(255,255,255,0.05);border-radius:8px;background:rgba(255,255,255,0.05);color:#fff;font-size:14px;outline:none;transition:.3s}
+.form-card input:focus,.form-card select:focus{border-color:#ffd700}
+.form-card input::placeholder{color:#4a5a6a}
+.form-card .btn-submit{background:linear-gradient(135deg,#ff6b35,#f7931e);color:#fff;border:none;padding:10px 24px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;transition:.3s}
+.form-card .btn-submit:hover{transform:scale(1.02)}
+.form-card .btn-submit:disabled{opacity:0.5;cursor:not-allowed}
+
+.table-wrap{background:#1a1a2e;border-radius:12px;padding:16px;border:1px solid rgba(255,255,255,0.05);overflow-x:auto}
+.table-wrap .table-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.table-wrap .table-header h3{color:#ffd700;font-size:16px}
+.table-wrap .table-header .count{color:#6b7f94;font-size:13px}
+.table-wrap table{width:100%;border-collapse:collapse;font-size:13px}
+.table-wrap th{text-align:left;padding:10px 8px;color:#6b7f94;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.05)}
+.table-wrap td{padding:10px 8px;border-bottom:1px solid rgba(255,255,255,0.03);color:#c8d0dc}
+.table-wrap .status-active{color:#2ecc71}
+.table-wrap .status-inactive{color:#e74c3c}
+.table-wrap .btn-delete{background:transparent;border:none;color:#e74c3c;cursor:pointer;font-size:14px;padding:2px 8px;border-radius:4px;transition:.3s}
+.table-wrap .btn-delete:hover{background:rgba(231,76,60,0.1)}
+.table-wrap .btn-toggle{background:transparent;border:none;color:#3498db;cursor:pointer;font-size:12px;padding:2px 8px;border-radius:4px;transition:.3s}
+.table-wrap .btn-toggle:hover{background:rgba(52,152,219,0.1)}
+
+.empty-state{text-align:center;color:#4a5a6a;padding:40px 0;font-size:14px}
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.9);color:#fff;padding:10px 24px;border-radius:10px;font-size:14px;z-index:200;opacity:0;transition:opacity .3s;border:1px solid rgba(255,255,255,0.05)}
+.toast.show{opacity:1}
+.toast.success{border-color:rgba(46,204,113,0.3)}
+.toast.error{border-color:rgba(231,76,60,0.3)}
+
+@media(max-width:480px){
+    .form-row{grid-template-columns:1fr}
+    .form-row .full{grid-column:1}
+    .table-wrap table{font-size:12px}
+    .table-wrap th,.table-wrap td{padding:6px 4px}
+}
+</style>
+</head>
+<body>
+
+<div class="card">
+
+    <div class="header">
+        <div class="logo">🎫 兑换<span>码</span>管理</div>
+        <div class="right">
+            <span class="admin">👤 管理员</span>
+            <button class="btn-back" onclick="window.location.href='dashboard.html'">← 返回</button>
+        </div>
+    </div>
+
+    <div class="content">
+
+        <div class="form-card">
+            <h3>📝 创建兑换码</h3>
+            <div class="form-row">
+                <div>
+                    <label>兑换码名字</label>
+                    <input type="text" id="codeName" placeholder="如：新手礼包" maxlength="100">
+                </div>
+                <div>
+                    <label>获得R币数量</label>
+                    <input type="number" id="rewardRcoins" placeholder="100" min="1">
+                </div>
+            </div>
+            <div class="form-row">
+                <div>
+                    <label>每人兑换次数</label>
+                    <input type="number" id="maxUsePerUser" placeholder="1" min="1" value="1">
+                </div>
+                <div>
+                    <label>总使用次数限制（0=无限）</label>
+                    <input type="number" id="maxTotalUses" placeholder="0" min="0" value="0">
+                </div>
+            </div>
+            <div class="form-row">
+                <div>
+                    <label>过期时间（留空=永不过期）</label>
+                    <input type="datetime-local" id="expireTime">
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;padding-top:20px;">
+                    <label style="margin-bottom:0;display:flex;align-items:center;gap:6px;cursor:pointer;">
+                        <input type="checkbox" id="singleAccountOnly" value="1">
+                        仅限单账号兑换
+                    </label>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="full" style="display:flex;gap:10px;">
+                    <button class="btn-submit" onclick="createCode()">🎫 生成兑换码</button>
+                    <button class="btn-submit" style="background:rgba(255,255,255,0.05);color:#8a9baa;" onclick="generateRandomCode()">🔄 随机生成</button>
+                </div>
+            </div>
+            <div style="margin-top:10px;padding:10px;background:rgba(255,215,0,0.05);border-radius:8px;border:1px solid rgba(255,215,0,0.1);display:none;" id="resultArea">
+                <div style="color:#6b7f94;font-size:12px;">✅ 兑换码已生成：</div>
+                <div style="color:#ffd700;font-size:20px;font-weight:700;letter-spacing:4px;font-family:monospace;word-break:break-all;" id="resultCode"></div>
+                <button onclick="copyCode()" style="margin-top:6px;background:rgba(255,255,255,0.05);border:none;border-radius:6px;color:#8a9baa;padding:4px 12px;cursor:pointer;font-size:12px;">📋 复制</button>
+            </div>
+        </div>
+
+        <div class="table-wrap">
+            <div class="table-header">
+                <h3>📋 兑换码列表</h3>
+                <span class="count" id="totalCount">共 0 个</span>
+            </div>
+            <div id="codeList">
+                <div class="empty-state">加载中...</div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+var API_URL = window.location.origin + '/api.php';
+
+function getToken() {
+    var t = localStorage.getItem('token') || '';
+    return t;
+}
+
+var token = getToken();
+
+if (!token) {
+    window.location.href = 'index.html';
+}
+
+function showToast(msg, type) {
+    var el = document.getElementById('toast');
+    el.textContent = msg;
+    el.className = 'toast show ' + (type || '');
+    clearTimeout(el._timer);
+    el._timer = setTimeout(function() {
+        el.classList.remove('show');
+    }, 3000);
+}
+
+function generateRandomCode() {
+    var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    var code = '';
+    for (var i = 0; i < 8; i++) {
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    document.getElementById('resultCode').textContent = code;
+    document.getElementById('resultArea').style.display = 'block';
+}
+
+function copyCode() {
+    var code = document.getElementById('resultCode').textContent;
+    if (!code) return;
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(code).then(function() {
+            showToast('✅ 已复制到剪贴板', 'success');
+        });
+    } else {
+        var input = document.createElement('input');
+        input.value = code;
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand('copy');
+        document.body.removeChild(input);
+        showToast('✅ 已复制到剪贴板', 'success');
+    }
+}
+
+function createCode() {
+    var name = document.getElementById('codeName').value.trim();
+    var reward = parseInt(document.getElementById('rewardRcoins').value) || 0;
+    var maxUse = parseInt(document.getElementById('maxUsePerUser').value) || 1;
+    var maxTotal = parseInt(document.getElementById('maxTotalUses').value) || 0;
+    var expire = document.getElementById('expireTime').value;
+    var singleOnly = document.getElementById('singleAccountOnly').checked ? 1 : 0;
+    var codeKey = document.getElementById('resultCode').textContent.trim();
+    
+    if (!name) {
+        showToast('❌ 请输入兑换码名字', 'error');
+        return;
+    }
+    if (reward <= 0) {
+        showToast('❌ 请输入有效的R币数量', 'error');
+        return;
+    }
+    if (!codeKey || codeKey.length < 4) {
+        showToast('❌ 请先生成兑换码', 'error');
+        return;
+    }
+    
+    var fd = new FormData();
+    fd.append('action', 'adminCreateCode');
+    fd.append('token', token);
+    fd.append('code_name', name);
+    fd.append('code_key', codeKey);
+    fd.append('reward_rcoins', reward);
+    fd.append('max_use_per_user', maxUse);
+    fd.append('max_total_uses', maxTotal);
+    fd.append('expire_time', expire);
+    fd.append('single_account_only', singleOnly);
+    
+    fetch(API_URL, { method: 'POST', body: fd })
+        .then(r => r.json())
+        .then(d => {
+            if (d.success) {
+                showToast('✅ ' + d.message, 'success');
+                document.getElementById('resultArea').style.display = 'none';
+                document.getElementById('codeName').value = '';
+                document.getElementById('rewardRcoins').value = '';
+                document.getElementById('resultCode').textContent = '';
+                loadCodeList();
+            } else {
+                showToast('❌ ' + d.message, 'error');
+            }
+        })
+        .catch(function() {
+            showToast('❌ 网络错误', 'error');
+        });
+}
+
+function loadCodeList() {
+    var container = document.getElementById('codeList');
+    container.innerHTML = '<div class="empty-state">加载中...</div>';
+    
+    var fd = new FormData();
+    fd.append('action', 'adminGetCodes');
+    fd.append('token', token);
+    
+    fetch(API_URL, { method: 'POST', body: fd })
+        .then(r => r.json())
+        .then(d => {
+            if (d.success && d.codes) {
+                renderCodeList(d.codes);
+            } else {
+                container.innerHTML = '<div class="empty-state">📭 暂无兑换码</div>';
+            }
+        })
+        .catch(function() {
+            container.innerHTML = '<div class="empty-state">❌ 加载失败</div>';
+        });
+}
+
+function renderCodeList(codes) {
+    var container = document.getElementById('codeList');
+    if (!codes || codes.length === 0) {
+        container.innerHTML = '<div class="empty-state">📭 暂无兑换码</div>';
+        document.getElementById('totalCount').textContent = '共 0 个';
+        return;
+    }
+    
+    var html = '<table><thead><tr>';
+    html += '<th>ID</th>';
+    html += '<th>名字</th>';
+    html += '<th>兑换码</th>';
+    html += '<th>奖励</th>';
+    html += '<th>每人</th>';
+    html += '<th>已用/总</th>';
+    html += '<th>单账号</th>';
+    html += '<th>状态</th>';
+    html += '<th>操作</th>';
+    html += '</tr></thead><tbody>';
+    
+    codes.forEach(function(c) {
+        var statusClass = c.is_active == 1 ? 'status-active' : 'status-inactive';
+        var statusText = c.is_active == 1 ? '✅ 启用' : '❌ 停用';
+        var singleText = c.single_account_only == 1 ? '🔒 是' : '🔓 否';
+        var expireText = c.expire_time ? c.expire_time.replace('T', ' ') : '永不过期';
+        
+        html += '<tr>';
+        html += '<td>' + c.id + '</td>';
+        html += '<td>' + escapeHtml(c.code_name) + '</td>';
+        html += '<td style="font-family:monospace;letter-spacing:1px;color:#ffd700;">' + escapeHtml(c.code_key) + '</td>';
+        html += '<td style="color:#ffd700;">+' + c.reward_rcoins + '</td>';
+        html += '<td>' + c.max_use_per_user + '</td>';
+        html += '<td>' + c.total_uses + '/' + (c.max_total_uses > 0 ? c.max_total_uses : '∞') + '</td>';
+        html += '<td>' + singleText + '</td>';
+        html += '<td class="' + statusClass + '">' + statusText + '</td>';
+        html += '<td>';
+        html += '<button class="btn-toggle" onclick="toggleCode(' + c.id + ',' + (c.is_active == 1 ? 0 : 1) + ')">' + (c.is_active == 1 ? '停用' : '启用') + '</button>';
+        html += '<button class="btn-delete" onclick="deleteCode(' + c.id + ')">🗑</button>';
+        html += '</td>';
+        html += '</tr>';
+    });
+    
+    html += '</tbody></table>';
+    container.innerHTML = html;
+    document.getElementById('totalCount').textContent = '共 ' + codes.length + ' 个';
+}
+
+function escapeHtml(text) {
+    if (!text) return '';
+    var div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function toggleCode(id, status) {
+    var fd = new FormData();
+    fd.append('action', 'adminToggleCode');
+    fd.append('token', token);
+    fd.append('code_id', id);
+    fd.append('status', status);
+    
+    fetch(API_URL, { method: 'POST', body: fd })
+        .then(r => r.json())
+        .then(d => {
+            if (d.success) {
+                showToast('✅ ' + d.message, 'success');
+                loadCodeList();
+            } else {
+                showToast('❌ ' + d.message, 'error');
+            }
+        })
+        .catch(function() {
+            showToast('❌ 网络错误', 'error');
+        });
+}
+
+function deleteCode(id) {
+    if (!confirm('确定要删除这个兑换码吗？')) return;
+    
+    var fd = new FormData();
+    fd.append('action', 'adminDeleteCode');
+    fd.append('token', token);
+    fd.append('code_id', id);
+    
+    fetch(API_URL, { method: 'POST', body: fd })
+        .then(r => r.json())
+        .then(d => {
+            if (d.success) {
+                showToast('✅ ' + d.message, 'success');
+                loadCodeList();
+            } else {
+                showToast('❌ ' + d.message, 'error');
+            }
+        })
+        .catch(function() {
+            showToast('❌ 网络错误', 'error');
+        });
+}
+
+loadCodeList();
+
+console.log('🎫 兑换码管理后台已加载');
+</script>
+</body>
+</html>

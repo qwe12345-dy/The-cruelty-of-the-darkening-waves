@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>💰 R币明细</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;min-height:100vh;overflow:hidden}
+body{background:#f0f4fa;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:#1a2a3a}
+.card{width:100%;height:100vh;background:#ffffff;display:flex;flex-direction:column;overflow:hidden;position:relative}
+.header{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-bottom:1px solid #e8edf4;flex-shrink:0;background:#fff;z-index:5}
+.header-left{display:flex;align-items:center;gap:10px}
+.header-left .back-btn{background:transparent;border:none;font-size:24px;cursor:pointer;color:#4a5a6a;padding:0}
+.header-left .back-btn:hover{color:#1a2a3a}
+.header-title{font-size:17px;font-weight:700;color:#1a2a3a}
+.header-right{display:flex;align-items:center;gap:8px}
+.header-right .rcoins{display:flex;align-items:center;gap:4px;background:#f5f7fa;padding:4px 12px;border-radius:16px;font-size:13px;font-weight:600;color:#e67e22;cursor:pointer}
+.header-right .rcoins .coin{font-size:16px}
+.header-right .btn-redeem{background:linear-gradient(135deg,#ff6b35,#f7931e);color:#fff;border:none;padding:4px 14px;border-radius:16px;font-size:12px;font-weight:700;cursor:pointer;transition:.3s}
+.header-right .btn-redeem:hover{transform:scale(1.05);box-shadow:0 4px 15px rgba(255,107,53,0.3)}
+.content{flex:1;overflow-y:auto;padding:12px 16px 20px 16px;background:#f8fafc}
+.content::-webkit-scrollbar{width:3px}
+.content::-webkit-scrollbar-thumb{background:#d0d8e0;border-radius:10px}
+.summary{display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.summary .box{flex:1;min-width:80px;background:#fff;border-radius:10px;padding:12px;text-align:center;border:1px solid #e8edf4}
+.summary .box .num{font-size:20px;font-weight:700;color:#1a2a3a}
+.summary .box .num.income{color:#1e7b4a}
+.summary .box .num.expense{color:#b03a2e}
+.summary .box .label{font-size:11px;color:#8a9baa;margin-top:2px}
+.record-item{display:flex;align-items:center;gap:12px;background:#fff;border-radius:10px;padding:12px 14px;margin-bottom:8px;border:1px solid #e8edf4;transition:.2s}
+.record-item:hover{background:#f8fafc}
+.record-item .icon{width:44px;height:44px;border-radius:10px;object-fit:cover;background:#eef2f6;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:20px;color:#8a9baa}
+.record-item .info{flex:1;min-width:0}
+.record-item .info .title{font-size:14px;font-weight:600;color:#1a2a3a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.record-item .info .desc{font-size:12px;color:#8a9baa;margin-top:2px}
+.record-item .info .desc .game-name{color:#e67e22;font-weight:500}
+.record-item .amount{font-size:16px;font-weight:700;flex-shrink:0}
+.record-item .amount.positive{color:#1e7b4a}
+.record-item .amount.negative{color:#b03a2e}
+.record-item .time{font-size:10px;color:#8a9baa;flex-shrink:0;margin-left:8px}
+.empty-state{text-align:center;color:#8a9baa;padding:60px 0;font-size:14px}
+.empty-state .icon{font-size:48px;margin-bottom:12px}
+.loading{text-align:center;color:#8a9baa;padding:40px 0;font-size:14px}
+#redeemModal{
+    position:fixed;
+    top:0;left:0;width:100%;height:100%;
+    background:rgba(0,0,0,0.7);
+    backdrop-filter:blur(6px);
+    z-index:100;
+    display:none;
+    justify-content:center;
+    align-items:center;
+}
+#redeemModal .modal{
+    background:linear-gradient(145deg,#1a1a2e,#16213e);
+    border-radius:20px;
+    padding:30px;
+    max-width:400px;
+    width:90%;
+    border:1px solid rgba(255,215,0,0.15);
+    box-shadow:0 20px 60px rgba(0,0,0,0.6);
+}
+#redeemModal .modal h3{
+    color:#ffd700;
+    font-size:20px;
+    text-align:center;
+    margin-bottom:6px;
+}
+#redeemModal .modal .sub{
+    color:#8a9baa;
+    text-align:center;
+    font-size:13px;
+    margin-bottom:20px;
+}
+#redeemModal .modal input{
+    width:100%;
+    padding:12px 16px;
+    border:1px solid rgba(255,255,255,0.1);
+    border-radius:10px;
+    background:rgba(255,255,255,0.05);
+    color:#fff;
+    font-size:16px;
+    text-align:center;
+    outline:none;
+    transition:.3s;
+    margin-bottom:12px;
+    text-transform:uppercase;
+    letter-spacing:2px;
+}
+#redeemModal .modal input:focus{border-color:#ffd700}
+#redeemModal .modal input::placeholder{color:#5a6a7a;letter-spacing:1px;text-transform:none}
+#redeemModal .modal .status{
+    padding:10px 14px;
+    border-radius:10px;
+    font-size:14px;
+    text-align:center;
+    display:none;
+    margin-bottom:12px;
+}
+#redeemModal .modal .status.success{
+    background:rgba(46,204,113,0.15);
+    color:#2ecc71;
+    border:1px solid rgba(46,204,113,0.2);
+    display:block;
+}
+#redeemModal .modal .status.error{
+    background:rgba(231,76,60,0.15);
+    color:#e74c3c;
+    border:1px solid rgba(231,76,60,0.2);
+    display:block;
+}
+#redeemModal .modal .status.pending{
+    background:rgba(52,152,219,0.15);
+    color:#3498db;
+    border:1px solid rgba(52,152,219,0.2);
+    display:block;
+}
+#redeemModal .modal .btn-group{
+    display:flex;
+    gap:10px;
+    justify-content:center;
+}
+#redeemModal .modal .btn-group button{
+    flex:1;
+    padding:12px;
+    border:none;
+    border-radius:10px;
+    font-size:15px;
+    font-weight:700;
+    cursor:pointer;
+    transition:.3s;
+}
+#redeemModal .modal .btn-group .btn-redeem{
+    background:linear-gradient(135deg,#ff6b35,#f7931e);
+    color:#fff;
+}
+#redeemModal .modal .btn-group .btn-redeem:hover{transform:scale(1.03)}
+#redeemModal .modal .btn-group .btn-cancel{
+    background:rgba(255,255,255,0.05);
+    color:#8a9baa;
+    border:1px solid rgba(255,255,255,0.1);
+}
+#redeemModal .modal .btn-group .btn-cancel:hover{background:rgba(255,255,255,0.1)}
+.header-right .btn-recharge{
+    background:linear-gradient(135deg,#667eea,#764ba2);
+    color:#fff;border:none;padding:4px 14px;border-radius:16px;font-size:12px;font-weight:700;cursor:pointer;transition:.3s;
+}
+.header-right .btn-recharge:hover{transform:scale(1.05);box-shadow:0 4px 15px rgba(102,126,234,0.35)}
+#rechargeModal{
+    position:fixed;
+    top:0;left:0;width:100%;height:100%;
+    background:rgba(0,0,0,0.7);
+    backdrop-filter:blur(6px);
+    z-index:100;
+    display:none;
+    justify-content:center;
+    align-items:center;
+}
+#rechargeModal .modal{
+    background:linear-gradient(145deg,#1a1a2e,#16213e);
+    border-radius:20px;
+    padding:30px;
+    max-width:400px;
+    width:90%;
+    border:1px solid rgba(255,215,0,0.15);
+    box-shadow:0 20px 60px rgba(0,0,0,0.6);
+}
+#rechargeModal .modal h3{
+    color:#ffd700;
+    font-size:20px;
+    text-align:center;
+    margin-bottom:6px;
+}
+#rechargeModal .modal .sub{
+    color:#8a9baa;
+    text-align:center;
+    font-size:13px;
+    margin-bottom:20px;
+}
+#rechargeModal .recharge-item{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    background:rgba(255,255,255,0.05);
+    border:1px solid rgba(255,255,255,0.1);
+    border-radius:12px;
+    padding:16px;
+    margin-bottom:12px;
+    cursor:pointer;
+    transition:.3s;
+}
+#rechargeModal .recharge-item:hover{
+    border-color:#ffd700;
+    background:rgba(255,255,255,0.08);
+    transform:scale(1.01);
+}
+#rechargeModal .recharge-item .recharge-name{font-size:18px;font-weight:700;color:#fff}
+#rechargeModal .recharge-item .recharge-price{font-size:14px;color:#ffd700;font-weight:600;margin-top:2px}
+#rechargeModal .recharge-item .btn-buy{
+    background:linear-gradient(135deg,#ff6b35,#f7931e);
+    color:#fff;border:none;
+    padding:10px 18px;border-radius:10px;
+    font-size:14px;font-weight:700;
+    cursor:pointer;transition:.3s;flex-shrink:0;
+}
+#rechargeModal .recharge-item .btn-buy:hover{transform:scale(1.05)}
+#rechargeModal .modal .btn-group{
+    display:flex;
+    gap:10px;
+    justify-content:center;
+    margin-top:6px;
+}
+#rechargeModal .modal .btn-group button{
+    flex:1;
+    padding:12px;
+    border:none;
+    border-radius:10px;
+    font-size:15px;
+    font-weight:700;
+    cursor:pointer;
+    transition:.3s;
+}
+#rechargeModal .modal .btn-group .btn-cancel{
+    background:rgba(255,255,255,0.05);
+    color:#8a9baa;
+    border:1px solid rgba(255,255,255,0.1);
+}
+#rechargeModal .modal .btn-group .btn-cancel:hover{background:rgba(255,255,255,0.1)}
+</style>
+<script src="i18n.js"></script>
+</head>
+<body>
+<div class="card">
+    <div class="header">
+        <div class="header-left">
+            <button class="back-btn" onclick="history.back()">‹</button>
+            <span class="header-title" data-i18n="w_page_title">💰 R币明细</span>
+        </div>
+        <div class="header-right">
+            <button class="btn-recharge" onclick="openRechargeModal()" data-i18n="w_btn_recharge">💳 充值</button>
+            <button class="btn-redeem" onclick="openRedeemModal()" data-i18n="w_btn_redeem">🎫 兑换码</button>
+            <span class="rcoins" onclick="location.reload()"><span class="coin">🪙</span> <span id="rcoinsDisplay">0</span></span>
+        </div>
+    </div>
+    <div class="content" id="contentArea">
+        <div class="summary" id="summaryArea">
+            <div class="box"><div class="num income" id="totalIncome">0</div><div class="label" data-i18n="w_total_income">💰 总收入</div></div>
+            <div class="box"><div class="num expense" id="totalExpense">0</div><div class="label" data-i18n="w_total_expense">💸 总支出</div></div>
+            <div class="box"><div class="num" id="totalCount">0</div><div class="label" data-i18n="w_total_count">📊 总笔数</div></div>
+        </div>
+        <div id="recordList">
+            <div class="loading" data-i18n="w_loading">加载中...</div>
+        </div>
+    </div>
+</div>
+<div id="redeemModal">
+    <div class="modal">
+        <h3 data-i18n="w_redeem_title">🎫 兑换码</h3>
+        <div class="sub" data-i18n="w_redeem_sub">输入兑换码领取R币奖励</div>
+        <input type="text" id="redeemInput" placeholder="输入兑换码" data-i18n-placeholder="w_redeem_placeholder" maxlength="50" onkeyup="if(event.key==='Enter') doRedeem()">
+        <div id="redeemStatus" class="status"></div>
+        <div class="btn-group">
+            <button class="btn-redeem" onclick="doRedeem()" data-i18n="w_btn_do_redeem">🎫 兑换</button>
+            <button class="btn-cancel" onclick="closeRedeemModal()" data-i18n="w_btn_cancel">取消</button>
+        </div>
+    </div>
+</div>
+<div id="rechargeModal">
+    <div class="modal">
+        <h3 data-i18n="w_recharge_title">💰 充值中心</h3>
+        <div class="sub" data-i18n="w_recharge_sub">购买完成后R币自动到账，请刷新余额查看</div>
+
+        <div class="recharge-item" onclick="openBuy50()">
+            <div>
+                <div class="recharge-name" data-i18n="rcoin_50">50 R币</div>
+                <div class="recharge-price" data-i18n="price_50">¥ 1.00｜入门套餐</div>
+            </div>
+            <button class="btn-buy" data-i18n="w_btn_buy">去购买</button>
+        </div>
+
+        <div class="recharge-item" onclick="openBuy1000()">
+            <div>
+                <div class="recharge-name" data-i18n="rcoin_1000">1000 R币</div>
+                <div class="recharge-price" data-i18n="price_1000">¥ 9.80｜超值套餐</div>
+            </div>
+            <button class="btn-buy" data-i18n="w_btn_buy">去购买</button>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn-cancel" onclick="closeRechargeModal()" data-i18n="w_btn_close">关闭</button>
+        </div>
+    </div>
+</div>
+<script>
+var API_URL = window.location.origin + '/api.php';
+function getToken() {
+    var t = '';
+    try {
+        if (window.parent && window.parent !== window) {
+            t = window.parent.localStorage.getItem('token') || '';
+        }
+        if (!t) {
+            t = localStorage.getItem('token') || '';
+        }
+    } catch(e) {
+        t = localStorage.getItem('token') || '';
+    }
+    return t;
+}
+var token = getToken();
+if (!token) {
+    window.location.href = 'index.html';
+}
+function loadBalance() {
+    var fd = new FormData();
+    fd.append('action', 'getRcoins');
+    fd.append('token', token);
+    fetch(API_URL, { method: 'POST', body: fd })
+        .then(r => r.json())
+        .then(d => {
+            if (d.success) {
+                document.getElementById('rcoinsDisplay').textContent = d.rcoins || 0;
+            }
+        })
+        .catch(function() {});
+}
+function loadRecords() {
+    var container = document.getElementById('recordList');
+    container.innerHTML = '<div class="loading" data-i18n="w_loading">加载中...</div>';
+    
+    var fd = new FormData();
+    fd.append('action', 'getRcoinRecords');
+    fd.append('token', token);
+    
+    fetch(API_URL, { method: 'POST', body: fd })
+        .then(r => r.json())
+        .then(d => {
+            if (d.success && d.records) {
+                renderRecords(d.records);
+                renderSummary(d.records);
+            } else {
+                container.innerHTML = '<div class="empty-state"><div class="icon">📭</div>'+I18N.t('w_no_records')+'</div>';
+            }
+        })
+        .catch(function() {
+            container.innerHTML = '<div class="empty-state"><div class="icon">❌</div>'+I18N.t('w_load_failed')+'</div>';
+        });
+}
+function renderRecords(records) {
+    var container = document.getElementById('recordList');
+    if (!records || records.length === 0) {
+        container.innerHTML = '<div class="empty-state"><div class="icon">📭</div>'+I18N.t('w_no_records')+'</div>';
+        return;
+    }
+    
+    var html = '';
+    records.forEach(function(r) {
+        var isIncome = r.amount > 0;
+        var sign = isIncome ? '+' : '';
+        var amountClass = isIncome ? 'positive' : 'negative';
+        var iconHtml = '';
+        
+        if (r.game_icon) {
+            iconHtml = '<img class="icon" src="' + r.game_icon + '" alt="游戏图标" onerror="this.style.display=\'none\';this.parentElement.querySelector(\'.icon-fallback\').style.display=\'flex\';">';
+            iconHtml += '<div class="icon icon-fallback" style="display:none;">🎮</div>';
+        } else if (r.game_id > 0) {
+            iconHtml = '<div class="icon">🎮</div>';
+        } else {
+            iconHtml = '<div class="icon">🪙</div>';
+        }
+        
+        var title = r.title || I18N.t('w_rcoin_change');
+        var desc = '';
+        if (r.game_id > 0 && r.game_name) {
+            desc = I18N.t('w_in_game') + '<span class="game-name">' + escapeHtml(r.game_name) + '</span>';
+            if (isIncome) {
+                desc += I18N.t('w_received_tip');
+            } else {
+                desc += I18N.t('w_spent_tip');
+            }
+        } else if (isIncome) {
+            desc = I18N.t('w_income_desc');
+        } else {
+            desc = I18N.t('w_expense_desc');
+        }
+        
+        var time = r.created_at ? r.created_at.replace('T', ' ') : '';
+        
+        html += '<div class="record-item">';
+        html += iconHtml;
+        html += '<div class="info">';
+        html += '<div class="title">' + escapeHtml(title) + '</div>';
+        html += '<div class="desc">' + desc + '</div>';
+        html += '</div>';
+        html += '<div class="amount ' + amountClass + '">' + sign + r.amount + ' 🪙</div>';
+        html += '<div class="time">' + time + '</div>';
+        html += '</div>';
+    });
+    
+    container.innerHTML = html;
+}
+function renderSummary(records) {
+    var totalIncome = 0, totalExpense = 0;
+    records.forEach(function(r) {
+        if (r.amount > 0) totalIncome += r.amount;
+        else totalExpense += Math.abs(r.amount);
+    });
+    document.getElementById('totalIncome').textContent = totalIncome;
+    document.getElementById('totalExpense').textContent = totalExpense;
+    document.getElementById('totalCount').textContent = records.length;
+}
+function openRedeemModal() {
+    document.getElementById('redeemModal').style.display = 'flex';
+    document.getElementById('redeemInput').value = '';
+    document.getElementById('redeemStatus').style.display = 'none';
+    document.getElementById('redeemStatus').className = 'status';
+    document.getElementById('redeemInput').focus();
+}
+function closeRedeemModal() {
+    document.getElementById('redeemModal').style.display = 'none';
+}
+function doRedeem() {
+    var code = document.getElementById('redeemInput').value.trim().toUpperCase();
+    var statusEl = document.getElementById('redeemStatus');
+    
+    if (!code) {
+        statusEl.textContent = I18N.t('w_err_enter_code');
+        statusEl.className = 'status error';
+        statusEl.style.display = 'block';
+        return;
+    }
+    
+    statusEl.textContent = I18N.t('w_verifying');
+    statusEl.className = 'status pending';
+    statusEl.style.display = 'block';
+    
+    var fd = new FormData();
+    fd.append('action', 'redeemCode');
+    fd.append('token', token);
+    fd.append('code', code);
+    
+    fetch(API_URL, { method: 'POST', body: fd })
+        .then(r => r.json())
+        .then(d => {
+            if (d.success) {
+                statusEl.textContent = I18N.t('w_success_prefix') + d.message;
+                statusEl.className = 'status success';
+                loadBalance();
+                loadRecords();
+                setTimeout(function() {
+                    closeRedeemModal();
+                }, 2000);
+            } else {
+                statusEl.textContent = I18N.t('w_error_prefix') + d.message;
+                statusEl.className = 'status error';
+            }
+        })
+        .catch(function() {
+            statusEl.textContent = I18N.t('w_network_error');
+            statusEl.className = 'status error';
+        });
+}
+function escapeHtml(text) {
+    if (!text) return '';
+    var div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+//=====新增跳转函数=====
+function openBuy50(){
+    window.open("https://shop.xhyfk.com/detail/nEAJYB","_blank");
+}
+function openBuy1000(){
+    window.open("https://shop.xhyfk.com/detail/5D2ohP","_blank");
+}
+
+function openRechargeModal() {
+    document.getElementById('rechargeModal').style.display = 'flex';
+}
+function closeRechargeModal() {
+    document.getElementById('rechargeModal').style.display = 'none';
+}
+
+loadBalance();
+loadRecords();
+setInterval(function() {
+    loadBalance();
+    loadRecords();
+}, 30000);
+function getUrlParam(name) {
+    var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)');
+    var r = window.location.search.substr(1).match(reg);
+    if (r != null) return decodeURIComponent(r[2]);
+    return null;
+}
+function autoCheckRecharge() {
+    var orderNo = getUrlParam('out_trade_no');
+    if (!orderNo) {
+        orderNo = localStorage.getItem('pending_recharge_order');
+    }
+    if (!orderNo) return;
+    var fd = new FormData();
+    fd.append('action', 'checkRecharge');
+    fd.append('token', token);
+    fd.append('out_trade_no', orderNo);
+    fetch(API_URL, { method: 'POST', body: fd })
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+            if (d.success && d.is_paid) {
+                localStorage.removeItem('pending_recharge_order');
+                loadBalance();
+                loadRecords();
+                alert(I18N.t('w_recharge_success') + d.rcoins + I18N.t('w_rcoin_arrived'));
+                if (window.location.search) {
+                    history.replaceState(null, '', window.location.pathname);
+                }
+            } else if (d.success && !d.is_paid) {
+                setTimeout(autoCheckRecharge, 3000);
+            } else {
+                localStorage.removeItem('pending_recharge_order');
+            }
+        })
+        .catch(function() {
+            setTimeout(autoCheckRecharge, 3000);
+        });
+}
+autoCheckRecharge();
+</script>
+</body>
+</html>
